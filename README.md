@@ -10,19 +10,22 @@ All the code within this project is covered by GPLv3, the GNU Public Licence, Ve
 licence is included with the source code; more information can be found at <https://www.gnu.org/licenses/>.
 
 Eddy can be downloaded as either a pre-compiled executable, <from https://github.com/Cerberus-Nuclear/Eddy>,
-or as source code from <https://github.com/Peter-Evans-Cerberus/Eddy-source>.
-
-If using the executable version of Eddy, the logo that appears on the HTML output from Eddy will be whatever is saved 
-as "Logo.png" in the \static directory. This logo can therefore be changed to the logo of your company by placing that 
-logo in the \static directory and renaming it "Logo.png".
-
-Eddy can be run from the command line with the output file and any applicable scaling factor as optional arguments;
-if no such arguments are supplied a GUI will appear to request them.
+or as source code from <https://github.com/Cerberus-Nuclear/Eddy-Source>.
 
 The source code for Eddy can be run with python; if doing so python 3.6 or later is required, and the Jinja2 python 
 package is needed; this can be installed using the pip package installer.
 All other modules used by Eddy are either part of the python standard library or included with Eddy; other modules used 
 to compile the source code into an executable can be found in the requirements.txt file.
+
+If using the source code to compile an executable, make sure to include the files in the .\static folder; if using 
+pyinstaller then these should be included in the 'datas' section of a spec file. An example of such a spec file is
+included in with the source code; the 'pathex' and 'datas' variables will have to be changed to match the file location
+where you have Eddy installed.
+
+Eddy can be run from the command line with the output file and any applicable scaling factor as optional arguments;
+if no such arguments are supplied a GUI will appear to request them.
+
+
 
 General CLI usage: python3 Eddy.py [-o outputfile] [-sf scaling_factor] ---> outputfile.html 
 
