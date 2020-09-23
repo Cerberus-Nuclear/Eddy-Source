@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en" id="top">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ case_name }}: MCNP Results</title>
+    {{ inline_css }}
+</head>
+
+<body>
+
+
+<div class="navbar">
+    <ul>
+      <li><a href="#top">Home</a></li>
+      {% if tally_list %}
+      <li><a href="#results_summary">Summary</a></li>
+      <li><a href="#results_breakdown">Results Breakdown</a></li>
+      {% endif %}
+      {% if k_eff %}
+      <li><a href="#k_effective">K-Effective</a></li>
+      {% endif %}
+      {% if cycles %}
+      <li><a href="#cycles">Cycles</a></li>
+      {% endif %}
+      {% if warnings %}
+      <li><a href="#warnings">Warnings</a></li>
+      {% endif %}
+      {% if comments %}
+      <li><a href="#comments">Comments</a></li>
+      {% endif %}
+      {% if duplicate_surfaces %}
+      <li><a href="#duplicates">Duplicate Surfaces</a></li>
+      {% endif %}
+      <li><a href="#cells">Cells</a></li>
+      {% for particle in particle_list %}
+      <li><a href="#{{particle.particle_type}}">{{particle.particle_type.capitalize()}}s</a></li>
+      {% endfor %}
+      {% for particle in particle_list %}
+      <li><a href="#{{particle.particle_type}}_populations">{{particle.particle_type.capitalize()}} Populations</a></li>
+      {% endfor %}
+      <li><a href="#input_deck">MCNP Input</a><li>
+    </ul>
+</div>
+
+<!--
+<div id="logo">
+  <img class="logo" src={{logo}} width=50% height=auto>
+</div>
+-->
+
+<div id="heading">
+    <h1>{{ case_name }}</h1>
+</div>
+
+
+<div id="details">
+  <table class="details">
+    <tr>
+      <td style="background-color: #cce0ff;">Input Generated from MCNP Case</td>
+      <td>{{filename}}</td>
+    </tr>
+    <tr>
+      <td style="background-color: #cce0ff;">MCNP Case Executed</td>
+      <td style="white-space: pre">{{ rundate }}   {{ runtime }}</td>
+    </tr>
+    <tr>
+      <td style="background-color: #cce0ff;">HTML Output Created</td>
+      <td style="white-space: pre;">{{ date }}   {{ time }}</td>
+    </tr>
+    <tr>
+      <td style="background-color: #cce0ff;">Scaling Factor: </td>
+      <td>{{scaling_factor}} </td>
+    </tr>
+    {% if ctme %}
+    <tr>
+      <td style="background-color: #cce0ff;">CTME</td>
+      <td>{{ctme}}</td>
+    </tr>
+    {% endif %}
+    {% if nps %}
+    <tr>
+      <td style="background-color: #cce0ff;">NPS</td>
+      <td>{{nps}}</td>
+    </tr>
+    {% endif %}
+    </table>
+</div>
+
+
+{% if parameters %}
+<div id="parameters">
+    <h1>Parameters</h1>
+    <table>
+        <tr>
+            <th>Parameter</th>
+            <th>Value</th>
+        </tr>
+        {% for parameter in parameters %}
+            <tr>
+                <td>{{ parameter.capitalize() }}</td>
+                <td>{{ parameters[parameter] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endif %}
+
+
+{% if tally_list %}
+<div id="results_summary">
+    <h1>Results - Summary</h1>
+
+    {% if 'F2' in tally_types %}
+    {% for particle in f2_tallies if f2_tallies[particle] %}
+    <h2>F2 Tally {{particle.capitalize()[:-1]}} Values</h2>
+    <table>
+        <tr>
+            <th>Tally Number</th>
+            <th>Surface</th>
+            <th>Value (uSv/h)</th>
+            <th>Error</th>
+        </tr>
+        {% for tally in f2_tallies[particle] %}
+        <tr>
+            <td>{{tally.tally_number}}</td>
+            <td>{{tally.results['surface']}}</td>
+            <td>{{"%.3e"|format(tally.results['result'])}}</td>
+            <td style="
+                {% if tally.results['variance'] > 0.1 %}background-color: tomato
+                {% elif tally.results['variance'] == 0.0 %}background-color: orangered
+                {% endif %}
+                ">
+                {{tally.results['variance']}}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+    {% endif %}
+
+    {% if 'F4' in tally_types %}
+    {% for particle in f4_tallies if f4_tallies[particle] %}
+    <h2>F4 Tally {{particle.capitalize()[:-1]}} Values</h2>
+    <table>
+        <tr>
+            <th>Tally Number</th>
+            <th>Cell Number</th>
+            <th>Value (uSv/h)</th>
+            <th>Error</th>
+        </tr>
+        {% for tally in f4_tallies[particle] %}
+        {% for region in tally.results %}
+        <tr>
+            <td>{{tally.tally_number}}</td>
+            <td>{{region['region'][5:]}}</td>
+            <td>{{"%.3e"|format(region['result'])}}</td>
+            <td style="
+                {% if region['variance'] > 0.1 %}background-color: tomato
+                {% elif region['variance'] == 0.0 %}background-color: orangered
+                {% endif %}
+                ">
+                {{region['variance']}}
+            </td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+    </table>
+    {% endfor %}
+    {% endif %}
+
+    {% if 'F5' in tally_types %}
+    {% for particle in f5_tallies if f5_tallies[particle] %}
+    <h2>F5 Tally {{particle.capitalize()[:-1]}} Values</h2>
+    <table>
+        <tr>
+            <th>Tally Number</th>
+            <th>X</th>
+            <th>Y</th>
+            <th>Z</th>
+            <th>Value (uSv/h)</th>
+            <th>Error</th>
+        </tr>
+        {% for tally in f5_tallies[particle] %}
+        <tr>
+            <td>{{tally.tally_number}}</td>
+            <td>{{tally.results['x']}}</td>
+            <td>{{tally.results['y']}}</td>
+            <td>{{tally.results['z']}}</td>
+            <td>{{"%.3e"|format(tally.results['result'])}}</td>
+            <td style="
+                {% if tally.results['variance'] > 0.1 %}background-color: tomato
+                {% elif tally.results['variance'] == 0.0 %}background-color: orangered
+                {% endif %}
+                ">
+                {{tally.results['variance']}}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+    {% endif %}
+</div>
+
+
+<div id="tally_check_summary">
+    <h2>Tally Summary Against 10 Error Checks</h2>
+    <table>
+        <tr>
+            <th>Tally Number</th>
+            <th>Target</th>
+            <th>Score out of 10</th>
+        </tr>
+        {% for tally in tally_list %}
+        {% if 'statistical_checks' in tally.__dict__ %}
+        <tr style="{{ 'background-color: #dfe85a' if tally.passes < 10 }}">
+            <td>{{tally.tally_number}}</td>
+            <td>10</td>
+            <td>{{tally.passes}}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </table>
+</div>
+
+
+{# The tally check summary table is the same for every tally type, so is presented in a macro #}
+{% macro tally_check(tally) -%}
+    {% if 'statistical_checks' in tally.__dict__ %}
+    <div class="tally_checks">
+        <h2>Tally {{tally.tally_number}} Passed {{tally.passes}} out of 10 Checks</h2>
+        <table>
+            <!-- First line of header -->
+            <tr>
+                <th rowspan = 2>Bin Behaviour</th>
+                <th rowspan = 2>Mean Behaviour</th>
+                <th colspan = 3>Relative Error</th>
+                <th colspan = 3>Variance of the Variance</th>
+                <th colspan = 2>Figure of Merit</th>
+                <th rowspan = 2>PDF Slope</th>
+            </tr>
+            <!-- Second line of header -->
+                <th>Value</th>
+                <th>Decrease</th>
+                <th>Decrease Rate</th>
+                <th>Value</th>
+                <th>Decrease</th>
+                <th>Decrease Rate</th>
+                <th>Value</th>
+                <th>Behaviour</th>
+            <!-- Table Data -->
+            <!-- Row 1-->
+            <tr>
+                <td>Desired</td>
+                <td>Random</td>
+                <td><0.10</td>
+                <td>Yes</td>
+                <td>1/Sqrt(Nps)</td>
+                <td><0.10</td>
+                <td>Yes</td>
+                <td>1/Nps</td>
+                <td>Constant</td>
+                <td>Random</td>
+                <td>>3.00</td>
+            </tr>
+            <!-- Row 2 -->
+            <tr>
+                <td>Observed</td>
+                {% for check in tally.statistical_checks %}
+                <td>{{tally.statistical_checks[check]['value'].capitalize()}}</td>
+                {% endfor %}
+            </tr>
+            <!-- Row 3 -->
+            <tr>
+                <td>Passed</td>
+                {% for check in tally.statistical_checks %}
+                <td style="{{ 'background-color: #dfe85a' if tally.statistical_checks[check]['pass'] == 'no' }}">
+                    {{tally.statistical_checks[check]['pass'].capitalize()}}
+                </td>
+                {% endfor %}
+            </tr>
+        </table>
+    </div>
+    {% else %}
+    <div>
+        <h2 Style="font-weight: normal">There are no statistical checks available for Tally {{tally.tally_number}}</h2>
+    </div>
+    {% endif %} {# This was "if tally has statistical checks #}
+{%- endmacro %}
+
+
+<div id="results_breakdown">
+    <h1>Results Breakdown</h1>
+
+    {# F2 TALLY RESULTS #}
+    {% if 'F2' in tally_types %}
+    <div id="F2 Tally Breakdown">
+        <h1>F2 Tally Results</h1>
+        {% for particle in f2_tallies %}
+        {% for tally in f2_tallies[particle] %}
+        <div class="tally_breakdown">
+            <div class="tally_results">
+                <h2>Results for {{tally.particles.capitalize()[:-1]}} {{tally.tally_type[:-1].title()}}, Tally Number: {{tally.tally_number}}</h2>
+                <table>
+                    <tr>
+                        <th>Tally Number</th>
+                        <th>Surface</th>
+                        <th>Value (uSv/h)</th>
+                        <th>Error</th>
+                    </tr>
+                    <tr>
+                        <td>{{tally.tally_number}}</td>
+                        <td>{{tally.results['surface']}}</td>
+                        <td>{{"%.3e"|format(tally.results['result'])}}</td>
+                        <td style="
+                            {% if tally.results['variance'] > 0.1 %}background-color: tomato
+                            {% elif tally.results['variance'] == 0.0 %}background-color: orangered
+                            {% endif %}
+                            ">
+                            {{tally.results['variance']}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            {{ tally_check(tally=tally) }}
+        </div>
+        {% endfor %} {# This was "for tally in particle" #}
+        {% endfor %} {# This was "for particle in F2_tallies" #}
+    </div>
+    {% endif %} {# This was "if F2 in tally_types" #}
+
+    {# F4 TALLY RESULTS #}
+    {% if 'F4' in tally_types %}
+    <div id="F4 tally breakdown">
+        <h1>F4 Tally Results</h1>
+        {% for particle in f4_tallies %}
+        {% for tally in f4_tallies[particle] %}
+        <div class="tally">
+            <div class="tally_results">
+                <h2>Results for {{tally.particles.capitalize()[:-1]}} {{tally.tally_type[:-1].title()}}, Tally Number: {{tally.tally_number}}</h2>
+                <table>
+                    <tr>
+                        <th>Tally Number</th>
+                        <th>Cell Number</th>
+                        <th>Value (uSv/h)</th>
+                        <th>Error</th>
+                    </tr>
+                    {% for region in tally.results %}
+                    <tr>
+                        <td>{{tally.tally_number}}</td>
+                        <td>{{region['region'][5:]}}</td>
+                        <td>{{"%.3e"|format(region['result'])}}</td>
+                        <td style="
+                            {% if region['variance'] > 0.1 %}background-color: tomato
+                            {% elif region['variance'] == 0.0 %}background-color: orangered
+                            {% endif %}
+                            ">
+                            {{region['variance']}}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            {{ tally_check(tally=tally) }}
+        </div>
+        {% endfor %} {# This was "for tally in particle" #}
+        {% endfor %} {# This was "for particle in F4_tallies" #}
+    </div>
+    {% endif %} {# This was "if F4 in tally_types" #}
+
+    {# F5 TALLY RESULTS #}
+    {% if 'F5' in tally_types %}
+    <div id="F5 tally breakdown">
+        <h1>F5 Tally Results</h1>
+        {% for particle in f5_tallies %}
+        {% for tally in f5_tallies[particle] %}
+        <div class="tally_breakdown">
+            <div class="tally_results">
+                <h2>Results for {{tally.particles.capitalize()[:-1]}} {{tally.tally_type[:-1].title()}}, Tally Number: {{tally.tally_number}}</h2>
+                <table>
+                    <tr>
+                        <th>Tally Number</th>
+                        <th>X</th>
+                        <th>Y</th>
+                        <th>Z</th>
+                        <th>Value (uSv/h)</th>
+                        <th>Error</th>
+                    </tr>
+                    <tr>
+                        <td>{{tally.tally_number}}</td>
+                        <td>{{tally.results['x']}}</td>
+                        <td>{{tally.results['y']}}</td>
+                        <td>{{tally.results['z']}}</td>
+                        <td>{{"%.3e"|format(tally.results['result'])}}</td>
+                        <td style="
+                            {% if tally.results['variance'] > 0.1 %}background-color: tomato
+                            {% elif tally.results['variance'] == 0.0 %}background-color: orangered
+                            {% endif %}
+                            ">
+                            {{tally.results['variance']}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            {{ tally_check(tally=tally) }}
+        </div>
+        {% endfor %} {# This was "for tally in particle" #}
+        {% endfor %} {# This was "for particle in F5_tallies" #}
+    </div>
+    {% endif %} {# This was "if F5 in tally_types" #}
+
+
+</div>
+{% endif %} {# This is the "if tallies" #}
+
+
+{% if k_eff %}
+<div id="k_effective">
+    <h1>K-Effective</h1>
+    <table class="table">
+        <tr>
+            <th>Problem</th>
+            <th>K-Effective</th>
+            <th>Standard Deviation</th>
+        </tr>
+        <tr>
+            <td>First Half</td>
+            <td>{{ k_eff['first half k_eff'] }}</td>
+            <td>{{ k_eff['first half stdev'] }}</td>
+        </tr>
+        <tr>
+            <td>Second Half</td>
+            <td>{{ k_eff['second half k_eff'] }}</td>
+            <td>{{ k_eff['second half stdev'] }}</td>
+        </tr>
+        <tr>
+            <td>Final Result</td>
+            <td>{{ k_eff['final k_eff'] }}</td>
+            <td>{{ k_eff['final stdev'] }}</td>
+        </tr>
+    </table>
+</div>
+{% endif %}
+
+
+{% if cycles %}
+<div id="cycles">
+    <h1>Cycles</h1>
+    <table class="table">
+        <tr>
+            <td>Inactive Cycles</td>
+            <td>{{ cycles["inactive"] }}</td>
+        </tr>
+        <tr>
+            <td>Active Cycles</td>
+            <td>{{ cycles["active"] }}</td>
+        </tr>
+        <tr>
+            <td>Total Cycles</td>
+            <td>{{ cycles["inactive"] + cycles["active"] }}</td>
+        </tr>
+    </table>
+
+</div>
+{% endif %}
+
+
+{% if warnings %}
+<div id="warnings">
+    <h1>Warnings</h1>
+    <div id="warning_messages">
+        <p style="font-weight: bold">The following warning messages were generated:</p>
+        {% for warning in warnings %}
+        {% if "messages so far" not in warning %}
+        <p>{{warning.capitalize()}}</p>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+
+{% if comments %}
+<div id="comments">
+    <h1>Comments</h1>
+    <div id="comment_messages">
+        <p style="font-weight: bold">The following comments were generated:</p>
+        {% for comment in comments %}
+        <p>{{comment.capitalize()}}</p>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+
+{% if duplicate_surfaces %}
+<div id="duplicates">
+    <h1>Duplicate Surfaces</h1>
+    <div id="duplicate_messages">
+        <p style="font-weight: bold">The following duplicate surfaces were detected:</p>
+        {% for item in duplicate_surfaces %}
+        <p>{{item.strip().capitalize()}}</p>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+
+<div id="cells">
+    <h1>Cells</h1>
+    <table>
+        <!--header-->
+        <tr>
+            <th>Cell Number</th>
+            <th>Material</th>
+            <th>Mass (g)</th>
+            <th>Volume (cm^3)</th>
+        </tr>
+        <!--data-->
+        {% for cell in cell_list %}
+        <tr>
+            <td>{{cell.cell_number}}</td>
+            <td>{{cell.material_number}}</td>
+            <td>{{"%.3e"|format(cell.mass)}}</td>
+            <td>{{"%.3e"|format(cell.volume)}}</td>
+        </tr>
+        {% endfor %}
+        <tr></tr>
+    </table>
+</div>
+
+
+{% for particle in particle_list %}
+<div id="{{particle.particle_type}}">
+    <h1>{{particle.particle_type.capitalize()}} Summary</h1>
+    <div id="{{particle.particle_type}}_creation_table">
+        <h2>{{particle.particle_type.capitalize()}} Creation</h2>
+        <table>
+            <tr>
+                <th>Source</th>
+                <th>Tracks</th>
+                <th>Weight</th>
+                <th>Energy</th>
+            </tr>
+            {% for attribute in particle.attributes %}
+            {% if 'Creation' in attribute %}
+            <tr>
+                <td>{{attribute[:-9]}}</td>
+                <td>{{particle.__dict__[attribute]['tracks']}}</td>
+                <td>{{particle.__dict__[attribute]['weight']}}</td>
+                <td>{{particle.__dict__[attribute]['energy']}}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+
+
+    <div id="{{particle.particle_type}}_loss_table">
+        <h2>{{particle.particle_type.capitalize()}} Loss</h2>
+        <table>
+            <tr>
+                <th>Source</th>
+                <th>Tracks</th>
+                <th>Weight</th>
+                <th>Energy</th>
+            </tr>
+            {% for attribute in particle.attributes %}
+            {% if 'Loss' in attribute %}
+            <tr>
+                <td>{{attribute[:-5]}}</td>
+                <td>{{particle.__dict__[attribute]['tracks']}}</td>
+                <td>{{particle.__dict__[attribute]['weight']}}</td>
+                <td>{{particle.__dict__[attribute]['energy']}}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endfor %}
+
+
+{% for particle in particle_list %} {# can be any of neutrons, photons, electrons #}
+{% set particle_name = particle.particle_type %}
+<div id="{{particle_name}}_populations">
+    <h1>{{particle_name.capitalize()}} Populations</h1>
+    <table>
+        <tr>
+            <th>Cell</th>
+            <th>Tracks Entering</th>
+            <th>Populations</th>
+            <th>Collisions</th>
+        </tr>
+        {% for cell in cell_list %}
+        {% if particle_name + '_population' in cell.__dict__ %}
+        <tr>
+            <td>{{cell.cell_number}}</td>
+            <td>{{cell.__dict__[particle_name + '_tracks_entering']}}</td>
+            <td>{{cell.__dict__[particle_name + '_population']}}</td>
+            <td>{{cell.__dict__[particle_name + '_collisions']}}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </table>
+</div>
+{% endfor %}
+
+
+<div id="input_deck">
+  <H1>MCNP Input</H1>
+  <div id="input">
+    {% for line in input_deck %}
+      <p>{{ line }}</p>
+    {% endfor %}
+  </div>
+</div>
+
+<div id="cerberus_credit">
+    <p>Eddy, the MCNP and SCALE output HTML Generator, was created by
+      <a href="https://cerberusnuclear.com/" target="_blank">Cerberus Nuclear</a>.
+    </p>
+    <p>Unless the results in this document were calculated directly by Cerberus Nuclear,
+        Cerberus accepts no responsibility for the accuracy of any results presented here.
+    </p>
+</div>
+
+</body>
+</html>

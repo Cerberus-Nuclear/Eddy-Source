@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" id="top">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ case_name }}: SCALE Results</title>
+    {{ inline_css }}
+</head>
+
+<body>
+
+
+<div class="navbar">
+  <ul>
+    <li><a href="#top">Home</a></li>
+    {% if tally_list %}
+    <li><a href="#results_summary">Summary</a></li>
+    <li><a href="#results_breakdown">Results Breakdown</a></li>
+    {% endif %}
+    {% if mixture_list %}
+    <li><a href="#mixtures">Mixtures</a></li>
+    {% endif %}
+    <li><a href="#input_deck">SCALE Input</a><li>
+  </ul>
+</div>
+
+<!--
+<div id="logo">
+  <img class="logo" src={{ logo }} width=50% height=auto>
+</div>
+-->
+
+<div id="heading">
+    <h1>{{ case_name }}</h1>
+</div>
+
+
+<div id="details">
+  <table class="details">
+    <tr>
+      <td style="background-color: #cce0ff;">Input Generated from SCALE Case: </td>
+      <td style="text-align: left">{{filename}}</td>
+    </tr>
+    <tr>
+      <td style="background-color: #cce0ff;">SCALE Case Executed: </td>
+      <td style="text-align: left; white-space: pre">{{ rundate }}   {{ runtime }}</td>
+    </tr>
+    <tr>
+      <td style="background-color: #cce0ff;">HTML Output Created: </td>
+      <td style="text-align: left; white-space: pre;">{{ date }}   {{ time }}</td>
+    </tr>
+    <tr>
+      <td style="background-color: #cce0ff;">Scaling Factor: </td>
+      <td style="text-align: left">{{scaling_factor}} </td>
+    </tr>
+  </table>
+</div>
+
+
+{% if tally_list %}
+<div id="results_summary">
+  <h1>Results - Summary</h1>
+  <div>
+      <table class="results_summary_table">
+        <tr>
+          <th>Tally Number</th>
+          <th>Response (uSv/h)</th>
+          <th>Error</th>
+          <th>Statistical Checks Passed (out of 6)</th>
+        </tr>
+      {% for tally in tally_list %}
+        <tr>
+          <td>{{tally.tally_number}}</td>
+          <td>{{ "%.3e"|format(tally.response) }}</td>
+          <td style="
+            {% if tally.rel_uncertainty > 0.1 %}background-color: tomato;
+            {% elif tally.rel_uncertainty == 0.0 %}background-color: orangered;
+            {% endif %}">
+            {{tally.rel_uncertainty}}
+          </td>
+          <td>{{tally.passes}}</td>
+        </tr>
+      {% endfor %}
+      </table>
+  </div>
+</div>
+
+<div id="results_breakdown">
+  <h1>Results Breakdown</h1>
+  <div>
+    {% for tally in tally_list %}
+    <div>
+      <div class="tally_results">
+        <h2>Results for Tally {{tally.tally_number}}: {{tally.particle}} {{tally.type}}</h2>
+        {% if tally.title %}
+        <h2>Title: {{tally.title}}</h2>
+        {% endif %}
+        <table class="results_breakdown_table">
+          <tr>
+            <th>Tally Number</th>
+            <th>Response (uSv/h)</th>
+            <th>Error</th>
+          </tr>
+          <tr>
+            <td>{{tally.tally_number}}</td>
+            <td>{{ "%.3e"|format(tally.response) }}</td>
+            <td>{{tally.rel_uncertainty}}</td>
+          </tr>
+        </table>
+      </div>
+      <div class="tally_checks">
+        <h2>Tally {{tally.tally_number}} Passed {{tally.passes}} out of 6 Statistical Checks</h2>
+        <table>
+          <tr>
+            <th>No.</th>
+            <th>Quantity</th>
+            <th>Check</th>
+            <th>Goal</th>
+            <th>Passing</th>
+            <th>Pass / Fail</th>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>Mean</td>
+            <td>Relative slope of linear fit</td>
+            <td>0.00</td>
+            <td>|slope| < 0.10</td>
+            <td style="{{ 'background-color: #dfe85a' if tally.checks[1] == 'Fail' }}">
+              {{tally.checks[1]}}
+            </td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Standard Deviation</td>
+            <td>Exponent of power fit</td>
+            <td>-0.50</td>
+            <td>R**2 > 0.99</td>
+            <td style="{{ 'background-color: #dfe85a' if tally.checks[2] == 'Fail' }}">
+              {{tally.checks[2]}}
+            </td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Relative Uncertainty</td>
+            <td>Final Value</td>
+            <td>0.05</td>
+            <td>Value < 0.05</td>
+            <td style="{{ 'background-color: #dfe85a' if tally.checks[3] == 'Fail' }}">
+              {{tally.checks[3]}}
+            </td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Relative VoV</td>
+            <td>Exponent of power fit</td>
+            <td>-1.00</td>
+            <td>R**2 > 0.95</td>
+            <td style="{{ 'background-color: #dfe85a' if tally.checks[4] == 'Fail' }}">
+              {{tally.checks[4]}}
+            </td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>Relative VoV</td>
+            <td>Final Value</td>
+            <td>0.10</td>
+            <td>value < 0.10</td>
+            <td style="{{ 'background-color: #dfe85a' if tally.checks[5] == 'Fail' }}">
+              {{tally.checks[5]}}
+            </td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Figure of Merit (FOM)</td>
+            <td>Relative slope of linear fit</td>
+            <td>0.00</td>
+            <td>|slope| < 0.10</td>
+            <td style="{{ 'background-color: #dfe85a' if tally.checks[6] == 'Fail' }}">
+              {{tally.checks[6]}}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+
+{% if mixture_list %}
+<div id="mixtures">
+  <H1>Mixtures</H1>
+  {% for mixture in mixture_list %}
+  <div id="mixture details">
+    <h2>Mixture number {{mixture.number}}</h2>
+    <table class="details">
+      <tr>
+        <td style="text-align: right">Density:</td>
+        <td style="text-align: left;">{{mixture.density}} g/cm<sup>3</sup></td>
+      </tr>
+      <tr>
+        <td style="text-align: right">Temperature:</td>
+        <td style="text-align: left;">{{mixture.temperature}}</td>
+      </tr>
+    </table>
+
+  </div>
+
+  <div id="mixture_table">
+    <table>
+      <tr>
+        <th>Nuclide</th>
+        <th>Name</th>
+        <th>Atom Density (10<sup>24</sup> atoms/cm<sup>3</sup>)</th>
+        <th>Weight Fraction</th>
+        <th>Atomic Number</th>
+        <th>Atomic Weight (AMU)</th>
+        <th>Temperature (K)</th>
+      </tr>
+      {% for nuclide in mixture.isotopes %}
+      <tr>
+        <td>{{ mixture.isotopes[nuclide]['nuclide'] }}</td>
+        <td>{{ mixture.isotopes[nuclide]['title'] }}</td>
+        <td>{{ mixture.isotopes[nuclide]['atom-density'] }}</td>
+        <td>{{ mixture.isotopes[nuclide]['weight fraction'] }}</td>
+        <td>{{ mixture.isotopes[nuclide]['z-number'] }}</td>
+        <td>{{ mixture.isotopes[nuclide]['atomic weight'] }}</td>
+        <td>{{ mixture.isotopes[nuclide]['temperature'] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+
+<div id="input_deck">
+  <H1>SCALE Input</H1>
+  <div id="input">
+    {% for line in input_deck %}
+      <p>{{ line }}</p>
+    {% endfor %}
+  </div>
+</div>
+
+<div id="cerberus_credit">
+    <p>Eddy, the MCNP and SCALE output HTML Generator, was created by
+      <a href="https://cerberusnuclear.com/" target="_blank">Cerberus Nuclear</a>.
+    </p>
+    <p>Unless the results in this document were calculated directly by Cerberus Nuclear,
+        Cerberus accepts no responsibility for the accuracy of any results presented here.
+    </p>
+</div>
+
+</body>
+</html>
