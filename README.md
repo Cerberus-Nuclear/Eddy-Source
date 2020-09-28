@@ -9,7 +9,7 @@ and writes it to a user-friendly HTML file.
 All the code within this project is covered by GPLv3, the GNU Public Licence, Version 3, June 2007. A full copy of this 
 licence is included with the source code; more information can be found at <https://www.gnu.org/licenses/>.
 
-Eddy can be downloaded as either a pre-compiled executable, <from https://github.com/Cerberus-Nuclear/Eddy>,
+Eddy can be downloaded as either a pre-compiled executable, from <https://github.com/Cerberus-Nuclear/Eddy>,
 or as source code from <https://github.com/Cerberus-Nuclear/Eddy-Source>.
 
 The source code for Eddy can be run with python; if doing so python 3.6 or later is required, and the Jinja2 python 
