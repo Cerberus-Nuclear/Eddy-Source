@@ -4,11 +4,11 @@ block_cipher = None
 
 
 a = Analysis(['eddy.py'],
-             pathex=['C:\\Projects\\Eddy'],
+             pathex=['C:\\Projects\\Eddy-Source'],
              binaries=[],
-             datas=[('C:\\Projects\\Eddy\\static\\style.css', '.\static'),
-                    ('C:\\Projects\\Eddy\\static\\MCNP_template.html', '.\static'),
-                    ('C:\\Projects\\Eddy\\static\\SCALE_template.html', '.\static'),
+             datas=[('C:\\Projects\\Eddy-Source\\static\\style.css', '.\static'),
+                    ('C:\\Projects\\Eddy-Source\\static\\MCNP_template.html', '.\static'),
+                    ('C:\\Projects\\Eddy-Source\\static\\SCALE_template.html', '.\static'),
                     ],
              hiddenimports=[],
              hookspath=[],
