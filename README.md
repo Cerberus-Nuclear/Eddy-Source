@@ -25,9 +25,15 @@ where you have Eddy installed.
 Eddy can be run from the command line with the output file and any applicable scaling factor as optional arguments;
 if no such arguments are supplied a GUI will appear to request them.
 
-
-
 General CLI usage: python3 Eddy.py [-o outputfile] [-sf scaling_factor] ---> outputfile.html 
+
+This software is provided by Cerberus Nuclear Limited "as is" and any express or implied warranties, including, 
+but not limited to, the implied warranties of merchantability and fitness for a particular purpose are disclaimed. 
+In no event shall cerberus nuclear limited be liable for any direct, indirect, incidental, special, exemplary, 
+or consequential damages (including, but not limited to, procurement of substitute goods or services; loss of use, 
+data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, 
+strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, 
+even if advised of the possibility of such damage.
 
 
 
