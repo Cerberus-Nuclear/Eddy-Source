@@ -253,6 +253,7 @@ def main(filename, scaling_factor=1, crit_case=False):
     Args:
         filename (str): the mcnp output file
         scaling_factor (float): A number which all results will be multiplied by
+        crit_case (bool): True if criticality case, False (default) for shielding case
 
     Returns:
         None
