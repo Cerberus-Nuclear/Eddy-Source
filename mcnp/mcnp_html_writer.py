@@ -27,6 +27,17 @@ def get_css():
     return inline_css
 
 
+def sanitize_input(mcnp_input):
+    san_mcnp_input = []
+    for line in mcnp_input:
+        if "<" in line:
+            line = line.replace("<","&lt")
+        if ">" in line:
+            line = line.replace(">", "&gt")
+        san_mcnp_input.append(line)
+    return san_mcnp_input
+
+
 def get_html(filename, inline_css):
     """Get the HTML from the jinja template
 
@@ -39,6 +50,7 @@ def get_html(filename, inline_css):
     """
     case_name, extension = os.path.splitext(filename)
     case_name = case_name.replace('\\', '/').split('/')[-1]
+    mcnp_input = sanitize_input(gv.mcnp_input)
     with open("static/MCNP_template.html", "r") as file:
         template = Template(file.read())
     html = template.render(
@@ -63,7 +75,7 @@ def get_html(filename, inline_css):
         duplicate_surfaces=gv.duplicate_surfaces,
         cell_list=gv.cell_list,
         particle_list=gv.particle_list,
-        input_deck=gv.mcnp_input,
+        input_deck=mcnp_input,
         cycles=gv.cycles,
         )
     return html
