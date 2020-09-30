@@ -24,6 +24,23 @@ def get_css():
     return inline_css
 
 
+def sanitize_input(scale_input):
+    """Replaces any < and > characters in the scale output with html codes &lt and &gt to stop
+    them from being interpreted as html tags.
+
+    Args: mcnp_input [list]: The mcnp input file
+    Returns: san_mcnp_input [list]: The sanitized version of the mcnp input
+    """
+    san_scale_input = []
+    for line in scale_input:
+        if "<" in line:
+            line = line.replace("<","&lt")
+        if ">" in line:
+            line = line.replace(">", "&gt")
+        san_scale_input.append(line)
+    return san_scale_input
+
+
 def get_html(filename, inline_css):
     """Get the html output from the jinja template
 
@@ -34,6 +51,7 @@ def get_html(filename, inline_css):
     Returns:
         html (str): the html output as a single string
     """
+    scale_input = sanitize_input(gv.scale_input)
     with open("static/SCALE_template.html") as file:
         # create jinja Template object
         template = Template(file.read())
@@ -52,7 +70,7 @@ def get_html(filename, inline_css):
         scaling_factor=gv.scaling_factor,
         tally_list=gv.tally_list,
         mixture_list=gv.mixture_list,
-        input_deck=gv.scale_input,
+        input_deck=scale_input,
         )
     return html
 
