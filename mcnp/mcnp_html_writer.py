@@ -28,6 +28,12 @@ def get_css():
 
 
 def sanitize_input(mcnp_input):
+    """Replaces any < and > characters in the mcnp output with html codes &lt and &gt to stop
+    them from being interpreted as html tags.
+
+    Args: mcnp_input [list]: The mcnp input file
+    Returns: san_mcnp_input [list]: The sanitized version of the mcnp input
+    """
     san_mcnp_input = []
     for line in mcnp_input:
         if "<" in line:
