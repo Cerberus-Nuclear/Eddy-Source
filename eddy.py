@@ -82,6 +82,7 @@ def get_args():
         output (str): the file path (including the name) of the output file
         output_data (list): The contents of the output file
         scaling_factor (float): the scaling factor to multiply results by
+        crit_case (bool): True if kcode case, otherwise False
     """
     parser = argparse.ArgumentParser(description='MCNP or SCALE output to HTML Converter')
     parser.add_argument("-o", "--file", help="MCNP or SCALE output file")
