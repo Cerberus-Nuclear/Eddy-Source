@@ -93,6 +93,7 @@ def get_args():
         output = args.file
         output_data = read_file(output)
         scaling_factor = args.scaling_factor
+        crit_case = check_if_crit(output_data)
     else:                       # tkinter window for file selection
         Tk().withdraw()
         output = askopenfilename(
