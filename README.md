@@ -1,5 +1,3 @@
-# Eddy
-
 ![logo](https://cerberusnuclear.com/wp-content/uploads/2020/10/EddyLinkedin.jpg)
 
 Eddy is a HTML output generator for MCNP and SCALE, it imports an MCNP or SCALE output file, extracts the important data, and writes it to a user-friendly HTML file.
@@ -26,7 +24,7 @@ the python standard library or included with Eddy; other modules used to
 compile the source code into an executable can be found in the requirements.txt file.
 
 <details>
-  <summary>Example HTML outputs</summary><details>
+  <summary>Example HTML outputs</summary>
   <img src="https://cerberusnuclear.com/wp-content/uploads/2020/10/eddy-screen-shot-2.jpg" name="image-name">
   <img src="https://cerberusnuclear.com/wp-content/uploads/2020/10/Results_Summary-1.jpg" name="image-name">
   <img src="https://cerberusnuclear.com/wp-content/uploads/2020/10/Results_Stats-1.jpg" name="image-name">
