@@ -73,64 +73,75 @@ def read_file(filename):
     return data
 
 
-def get_args():
+def get_args(filename=None, scaling_factor=None):
     """
-    Get the args from argparse is they are sent by the command line,
-    otherwise open GUI windows to select input file and scaling factor
+    Get the args from argparse if they are sent by the command line,
+    otherwise open GUI windows to select input file and scaling factor.
+    Read in the output data from the mcnp output file.
+
+    Args:
+        filename (optional) (str or None): the file path (including the name) of the output file, may be None
+        scaling_factor (optioonal) (float or None): the scaling factor to multiply results by, may be None
 
     Returns:
-        output (str): the file path (including the name) of the output file
+        filename (str): the file path (including the name) of the output file
         output_data (list): The contents of the output file
         scaling_factor (float): the scaling factor to multiply results by
         crit_case (bool): True if kcode case, otherwise False
     """
     parser = argparse.ArgumentParser(description='MCNP or SCALE output to HTML Converter')
     parser.add_argument("-o", "--file", help="MCNP or SCALE output file")
-    parser.add_argument("-sf", "--scaling_factor", type=float, default=1, help="Scaling Factor")
+    parser.add_argument("-sf", "--scaling_factor", type=float, help="Scaling Factor")
     args = parser.parse_args()
 
-    if args.file:          # Check if filename was passed as an argument
-        output = args.file
-        output_data = read_file(output)
-        scaling_factor = args.scaling_factor
-        crit_case = check_if_crit(output_data)
-    else:                       # tkinter window for file selection
-        Tk().withdraw()
-        output = askopenfilename(
-            title="Select Output File",
-            filetypes=(("output files", "*.out"), ("all files", "*.*"))
-            )
-        # check that a file was actually selected:
-        assert len(output) != 0, "No file was selected."
-        output_data = read_file(output)
+    # Get filename (and path) of mcnp output
+    if filename is None:            # if filename was not passed as an argument to main()...
+        if args.file:               # check if filename was passed as a command line argument
+            filename = args.file
+        else:                       # open tkinter window for file selection
+            Tk().withdraw()
+            filename = askopenfilename(
+                title="Select Output File",
+                filetypes=(("output files", "*.out"), ("all files", "*.*"))
+                )
+            # check that a file was actually selected:
+            assert len(filename) != 0, "No file was selected."
+    output_data = read_file(filename)
 
-        # Check if shielding or crit case
-        crit_case = check_if_crit(output_data)
-        # Ask for scaling factor for shielding cases
-        if not crit_case:
-            scaling_factor = simpledialog.askfloat(
+    # Check if shielding or crit case
+    crit_case = check_if_crit(output_data)
+
+    # Ask for scaling factor for shielding cases
+    if not crit_case:
+        if scaling_factor is None:                          # check if scaling factor was passed as an argument to main()
+            if args.scaling_factor:                         # check if scaling factor was passed as a command line argument 
+                scaling_factor = args.scaling_factor
+            else:                                           # open tkinter window to ask for scaling factor
+                scaling_factor = simpledialog.askfloat(
                 title="Scaling Factor",
                 prompt="Please enter a scaling factor to multiply your results by", initialvalue=1,
                 )
-        # set scaling factor to 1 for crit cases (this variable will not be used)
-        else:
-            scaling_factor = 1
+    # set scaling factor to 1 for crit cases (this variable will not be used)
+    else:
+        scaling_factor = 1
 
-    assert len(output) != 0, "You did not select an output file."
-    print(f"Output file: {output}")
-    return output, output_data, scaling_factor, crit_case
+    assert len(filename) != 0, "You did not select an output file."
+    print(f"Output file: {filename}")
+    return filename, output_data, scaling_factor, crit_case
 
 
-def main(filename, output_data, scaling_factor, crit_case):
-    """Call read_file() and determines whether it is an MCNP or SCALE case;
+def main(filename=None, scaling_factor=None):
+    """Entry point to Eddy. Can take filename and scaling factor as arguments.
+    Call get_args to find the filename & scaling factor if not provided, and also get the
+    output data and determine whether it is a crit case.
+    Call read_file() and determines whether it is an MCNP or SCALE case;
     call the relevant converter.
 
     Args:
-        filename (str): the file path (including the name) of the output file
-        output_data (list): The contents of the output file
-        scaling_factor (float): A number by which the results will be multiplied
-        crit_case (bool): whether this is a crit case (True) or shielding case (False)
+        filename (optional) (str): the file path (including the name) of the output file
+        scaling_factor (optional) (float): A number by which the results will be multiplied
     """
+    filename, output_data, scaling_factor, crit_case = get_args(filename, scaling_factor)
     if 'SCALE' in output_data[2]:
         scale_converter.main(filename, scaling_factor)
     elif 'MCNP' in output_data[0]:
@@ -140,5 +151,4 @@ def main(filename, output_data, scaling_factor, crit_case):
 
 
 if __name__ == "__main__":
-    filename, file_data, scaling_factor, crit_case = get_args()
-    main(filename, file_data, scaling_factor, crit_case)
+    main()
