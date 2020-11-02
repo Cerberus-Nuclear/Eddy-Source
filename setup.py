@@ -5,7 +5,7 @@ with open("README.md", "r") as readme:
 
 setuptools.setup(
     name="eddy_mc", 
-    version="0.1.1",
+    version="0.1.2",
     author="Cerberus Nuclear",
     author_email="nuclear@cerberusnuclear.com",
     description="Eddy, the MCNP and SCALE HTML output converter",
@@ -13,6 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/Cerberus-Nuclear/Eddy-Source",
     packages=setuptools.find_packages(),
+    package_data={'static': ['*']},
     install_requires=['Jinja2'],
     classifiers=[
         "Programming Language :: Python :: 3",
