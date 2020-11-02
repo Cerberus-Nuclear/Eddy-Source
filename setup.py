@@ -4,7 +4,7 @@ with open("README.md", "r") as readme:
     long_description = readme.read()
 
 setuptools.setup(
-    name="eddy-mc-peter-evans", # Replace with your own username
+    name="eddy_mc", 
     version="0.1.0",
     author="Cerberus Nuclear",
     author_email="nuclear@cerberusnuclear.com",

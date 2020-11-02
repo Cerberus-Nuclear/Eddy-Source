@@ -1,0 +1,6 @@
+README.md
+setup.py
+eddy_mc.egg-info/PKG-INFO
+eddy_mc.egg-info/SOURCES.txt
+eddy_mc.egg-info/dependency_links.txt
+eddy_mc.egg-info/top_level.txt
