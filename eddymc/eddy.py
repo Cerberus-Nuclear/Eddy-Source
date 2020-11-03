@@ -29,6 +29,7 @@ Alternatively, main() can be called directly by another module and provided with
 """
 
 # Imports from standard library
+import sys
 import argparse
 from tkinter import Tk, simpledialog
 from tkinter.filedialog import askopenfilename
@@ -131,6 +132,7 @@ def get_args(filename=None, scaling_factor=None):
             scaling_factor = float(scaling_factor)
         except ValueError:
             print("The scaling factor should be a floating-point (decimal) number")
+            sys.exit()
 
     assert len(filename) != 0, "You did not select an output file."
     print(f"Output file: {filename}")
