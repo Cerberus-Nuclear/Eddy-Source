@@ -69,7 +69,7 @@ class Tally:
                 'pdf_slope'         : {'value': value[10], 'pass': pass_fail[10]},
                 }
         else:
-            print(f"Tally {self.tally_number} does not have statistical checks")
+            # print(f"Tally {self.tally_number} does not have statistical checks")
             statistical_checks = {
                 'mean_behaviour'    : {'value': r"none", 'pass': "no"},
                 'rel_err_value'     : {'value': r"none", 'pass': "no"},
