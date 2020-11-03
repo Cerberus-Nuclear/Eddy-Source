@@ -125,6 +125,12 @@ def get_args(filename=None, scaling_factor=None):
     # set scaling factor to 1 for crit cases (this variable will not be used)
     else:
         scaling_factor = 1
+    # type checking for scaling factor
+    if type(scaling_factor) is not float:
+        try:
+            scaling_factor = float(scaling_factor)
+        except ValueError:
+            print("The scaling factor should be a floating-point (decimal) number")
 
     assert len(filename) != 0, "You did not select an output file."
     print(f"Output file: {filename}")
