@@ -117,6 +117,7 @@ def get_args(filename=None, scaling_factor=None):
             if args.scaling_factor:                         # check if scaling factor was passed as a command line argument 
                 scaling_factor = args.scaling_factor
             else:                                           # open tkinter window to ask for scaling factor
+                Tk().withdraw()
                 scaling_factor = simpledialog.askfloat(
                 title="Scaling Factor",
                 prompt="Please enter a scaling factor to multiply your results by", initialvalue=1,
