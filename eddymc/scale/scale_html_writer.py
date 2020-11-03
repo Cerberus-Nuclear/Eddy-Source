@@ -7,6 +7,7 @@
 # Standard library imports
 import os
 import datetime
+import pkgutil
 # Third party imports
 from jinja2 import Template
 #local imports
@@ -19,8 +20,7 @@ def get_css():
     Returns:
         inline_css (str): The whole static css file as a single string
     """
-    with open("static/style.css") as file:
-        inline_css = file.read()
+    inline_css = pkgutil.get_data(__name__, "../static/style.css").decode("utf-8")
     return inline_css
 
 
@@ -52,9 +52,8 @@ def get_html(filename, inline_css):
         html (str): the html output as a single string
     """
     scale_input = sanitize_input(gv.scale_input)
-    with open("static/SCALE_template.html") as file:
-        # create jinja Template object
-        template = Template(file.read())
+    html_template = pkgutil.get_data(__name__, "../static/SCALE_template.html").decode("utf-8")
+    template = Template(html_template)
     case_name, extension = os.path.splitext(filename)
     case_name = case_name.replace('\\', '/').split('/')[-1]
     # render template as a unicode string

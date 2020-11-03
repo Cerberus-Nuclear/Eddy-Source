@@ -23,8 +23,6 @@ def get_css():
     Returns:
         inline_css (str): the whole static css file
     """
-    #with open(r"static/style.css") as file:
-    #    inline_css = file.read()
     inline_css = pkgutil.get_data(__name__, "../static/style.css").decode("utf-8")
     return inline_css
 
