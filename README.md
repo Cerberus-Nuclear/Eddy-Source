@@ -6,13 +6,30 @@ This repository contains the the source code version of Eddy, however Eddy is al
 
 Eddy can be run from the command line with the output file and any applicable scaling factor as optional arguments; if no such arguments are supplied a GUI will appear to request them.
 
-General CLI usage: 
+General CLI usage:
+
 ```bash
 python3 eddy.py [-o outputfile] [-sf scaling_factor]
 ```
 
+Eddy is also available on the PyPI Python Package index as eddy-mc, in order to allow easier integration into other programs. It can be installed using pip:
+
+```bash
+python3 -m pip install eddy-mc
+```
+
+and accessed using:
+
+```python
+from eddymc import eddy
+eddy.main()
+```
+
+where `eddy.main()` can take the same two optional arguments; the filepath for the MCNP output and a scaling factor. If these are not supplied, the GUI will appear to request them when `eddy.main()` is called.
+
 Requirements
-- Python 3.6 or later 
+
+- Python 3.6 or later
 - Jinja2 Python package is required
 
 <details>
