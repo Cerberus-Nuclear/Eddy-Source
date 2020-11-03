@@ -74,10 +74,56 @@ def read_file(filename):
     return data
 
 
+def get_filename(args=None):
+    """ Get the name and path of the MCNP output file
+    
+    Args: 
+        (optional) args: the argparse arguments, if they exist
+    
+    Returns:
+        filename (str): The filename including filepath
+    """
+    if args.file:               # check if filename was passed as a command line argument
+        filename = args.file
+    else:                       # open tkinter window for file selection
+        Tk().withdraw()
+        filename = askopenfilename(
+            title="Select Output File",
+            filetypes=(("output files", "*.out"), ("all files", "*.*"))
+            )
+    return filename
+
+
+def get_scaling_factor(args=None):
+    """ Get the scaling factor to multiply results by for a shielding case
+    Args: 
+        (optional) args: the argparse arguments, if they exist
+    Returns:
+        scaling_factor (float): The scaling factor
+    """
+    if args.scaling_factor:                         # check if scaling factor was passed as a command line argument 
+        scaling_factor = args.scaling_factor
+    else:                                           # open tkinter window to ask for scaling factor
+        Tk().withdraw()
+        scaling_factor = simpledialog.askfloat(
+        title="Scaling Factor",
+        prompt="Please enter a scaling factor to multiply your results by", initialvalue=1,
+        )
+    # type checking for scaling factor
+    if type(scaling_factor) is not float:
+        try:
+            scaling_factor = float(scaling_factor)
+        except ValueError:
+            print("The scaling factor should be a floating-point (decimal) number")
+            sys.exit()
+    return scaling_factor
+
+
 def get_args(filename=None, scaling_factor=None):
     """
     Get the args from argparse if they are sent by the command line,
-    otherwise open GUI windows to select input file and scaling factor.
+    Call functions to get filename and scaling factor.
+    Determine if this is a crit case (for MCNP).
     Read in the output data from the mcnp output file.
 
     Args:
@@ -97,44 +143,22 @@ def get_args(filename=None, scaling_factor=None):
 
     # Get filename (and path) of mcnp output
     if filename is None:            # if filename was not passed as an argument to main()...
-        if args.file:               # check if filename was passed as a command line argument
-            filename = args.file
-        else:                       # open tkinter window for file selection
-            Tk().withdraw()
-            filename = askopenfilename(
-                title="Select Output File",
-                filetypes=(("output files", "*.out"), ("all files", "*.*"))
-                )
-            # check that a file was actually selected:
-            assert len(filename) != 0, "No file was selected."
+        filename = get_filename(args)
+    # check that a file was actually selected:
+    assert len(filename) != 0, "No file was selected."
     output_data = read_file(filename)
 
     # Check if shielding or crit case
     crit_case = check_if_crit(output_data)
 
     # Ask for scaling factor for shielding cases
-    if not crit_case:
-        if scaling_factor is None:                          # check if scaling factor was passed as an argument to main()
-            if args.scaling_factor:                         # check if scaling factor was passed as a command line argument 
-                scaling_factor = args.scaling_factor
-            else:                                           # open tkinter window to ask for scaling factor
-                Tk().withdraw()
-                scaling_factor = simpledialog.askfloat(
-                title="Scaling Factor",
-                prompt="Please enter a scaling factor to multiply your results by", initialvalue=1,
-                )
-    # set scaling factor to 1 for crit cases (this variable will not be used)
-    else:
+    if crit_case:
+        # set scaling factor to 1 for crit cases (this variable will not be used)
         scaling_factor = 1
-    # type checking for scaling factor
-    if type(scaling_factor) is not float:
-        try:
-            scaling_factor = float(scaling_factor)
-        except ValueError:
-            print("The scaling factor should be a floating-point (decimal) number")
-            sys.exit()
-
-    assert len(filename) != 0, "You did not select an output file."
+    else:
+        if scaling_factor is None:
+            scaling_factor = get_scaling_factor(args)
+       
     print(f"Output file: {filename}")
     return filename, output_data, scaling_factor, crit_case
 
