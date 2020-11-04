@@ -91,7 +91,6 @@ def get_filename(filename=None):
 
     # check file exists
     assert os.path.isfile(filename), "That MCNP file does not exist in that location."
-    assert len(filename) != 0, "No file was selected."
     return filename
 
 
