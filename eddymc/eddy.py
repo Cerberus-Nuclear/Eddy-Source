@@ -115,7 +115,7 @@ def get_scaling_factor(args=None):
             scaling_factor = float(scaling_factor)
         except ValueError:
             print("The scaling factor should be a floating-point (decimal) number")
-            sys.exit()
+            raise
     return scaling_factor
 
 
