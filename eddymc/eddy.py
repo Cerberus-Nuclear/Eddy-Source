@@ -106,8 +106,8 @@ def get_scaling_factor(args=None):
     else:                                           # open tkinter window to ask for scaling factor
         Tk().withdraw()
         scaling_factor = simpledialog.askfloat(
-        title="Scaling Factor",
-        prompt="Please enter a scaling factor to multiply your results by", initialvalue=1,
+            title="Scaling Factor",
+            prompt="Please enter a scaling factor to multiply your results by", initialvalue=1,
         )
     # type checking for scaling factor
     if type(scaling_factor) is not float:
@@ -128,7 +128,7 @@ def get_args(filename=None, scaling_factor=None):
 
     Args:
         filename (optional) (str or None): the file path (including the name) of the output file, may be None
-        scaling_factor (optioonal) (float or None): the scaling factor to multiply results by, may be None
+        scaling_factor (optional) (float or None): the scaling factor to multiply results by, may be None
 
     Returns:
         filename (str): the file path (including the name) of the output file
