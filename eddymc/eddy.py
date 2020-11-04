@@ -29,7 +29,7 @@ Alternatively, main() can be called directly by another module and provided with
 """
 
 # Imports from standard library
-import sys
+import os.path
 import argparse
 from tkinter import Tk, simpledialog
 from tkinter.filedialog import askopenfilename
@@ -74,36 +74,35 @@ def read_file(filename):
     return data
 
 
-def get_filename(args=None):
+def get_filename(filename=None):
     """ Get the name and path of the MCNP output file
-    
-    Args: 
-        (optional) args: the argparse arguments, if they exist
-    
+    Args:
+        filename(str): The filename including filepath
     Returns:
         filename (str): The filename including filepath
     """
-    if args.file:               # check if filename was passed as a command line argument
-        filename = args.file
-    else:                       # open tkinter window for file selection
+    # open tkinter window for file selection
+    if not filename:
         Tk().withdraw()
         filename = askopenfilename(
             title="Select Output File",
             filetypes=(("output files", "*.out"), ("all files", "*.*"))
             )
+
+    # check file exists
+    assert os.path.isfile(filename), "That MCNP file does not exist in that location."
+    assert len(filename) != 0, "No file was selected."
     return filename
 
 
-def get_scaling_factor(args=None):
+def get_scaling_factor(scaling_factor=None):
     """ Get the scaling factor to multiply results by for a shielding case
-    Args: 
-        (optional) args: the argparse arguments, if they exist
+    Args: None
     Returns:
         scaling_factor (float): The scaling factor
     """
-    if args.scaling_factor:                         # check if scaling factor was passed as a command line argument 
-        scaling_factor = args.scaling_factor
-    else:                                           # open tkinter window to ask for scaling factor
+    if not scaling_factor:
+        # open tkinter window to ask for scaling factor
         Tk().withdraw()
         scaling_factor = simpledialog.askfloat(
             title="Scaling Factor",
@@ -136,28 +135,34 @@ def get_args(filename=None, scaling_factor=None):
         scaling_factor (float): the scaling factor to multiply results by
         crit_case (bool): True if kcode case, otherwise False
     """
+
     parser = argparse.ArgumentParser(description='MCNP or SCALE output to HTML Converter')
     parser.add_argument("-o", "--file", help="MCNP or SCALE output file")
     parser.add_argument("-sf", "--scaling_factor", type=float, help="Scaling Factor")
+    # Note: args will be an argparse Namespace object, with the values for args.file and args.scaling_factor
+    # set to None if no cli arguments have been passed.
     args = parser.parse_args()
 
-    # Get filename (and path) of mcnp output
-    if filename is None:            # if filename was not passed as an argument to main()...
-        filename = get_filename(args)
-    # check that a file was actually selected:
-    assert len(filename) != 0, "No file was selected."
+    # get filename, and check file exists
+    if args.file:
+        filename = args.file
+    filename = get_filename(filename)
+
+    # get contents of file
     output_data = read_file(filename)
 
     # Check if shielding or crit case
     crit_case = check_if_crit(output_data)
 
-    # Ask for scaling factor for shielding cases
+    # get scaling factor
     if crit_case:
         # set scaling factor to 1 for crit cases (this variable will not be used)
         scaling_factor = 1
     else:
-        if scaling_factor is None:
-            scaling_factor = get_scaling_factor(args)
+        # Ask for scaling factor for shielding cases, and check it is a valid float.
+        if args.scaling_factor:
+            scaling_factor = args.scaling_factor
+        scaling_factor = get_scaling_factor(scaling_factor)
        
     print(f"Output file: {filename}")
     return filename, output_data, scaling_factor, crit_case
