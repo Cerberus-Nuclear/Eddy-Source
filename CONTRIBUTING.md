@@ -1,7 +1,5 @@
 ## Eddy Contributor Guidelines
 
-test change
-
 First off, thanks for taking the time to contribute to Eddy!
 
 The following is a set of guidelines for contributing to Eddy, which is hosted in the Cerberus-Nuclear Organization on GitHub. 
