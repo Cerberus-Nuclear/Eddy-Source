@@ -182,9 +182,10 @@ def test_main_calls_scale_converter(mocker, scale_file):
     data = scale_file
     sf = 3.141592
     crit = False
-    mocker.patch('eddymc.eddy.get_args',
-                 return_value=[name, data, sf, crit],
-                 )
+    mocker.patch(
+        'eddymc.eddy.argparse.ArgumentParser.parse_args',
+        return_value=Namespace(file=None, scaling_factor=None),
+    )
     mocked_scale_converter = mocker.patch('eddymc.scale.scale_converter.main')
     mocked_mcnp_converter = mocker.patch('eddymc.mcnp.mcnp_converter.main')
     # act
@@ -200,9 +201,10 @@ def test_main_calls_mcnp_converter(mocker, f2_file):
     data = f2_file
     sf = 3.141592
     crit = False
-    mocker.patch('eddymc.eddy.get_args',
-                 return_value=[name, data, sf, crit],
-                 )
+    mocker.patch(
+        'eddymc.eddy.argparse.ArgumentParser.parse_args',
+        return_value=Namespace(file=None, scaling_factor=None),
+    )
     mocked_scale_converter = mocker.patch('eddymc.scale.scale_converter.main')
     mocked_mcnp_converter = mocker.patch('eddymc.mcnp.mcnp_converter.main')
     # act
@@ -218,9 +220,10 @@ def test_main_with_non_mc_input(mocker, text_file):
     data = text_file
     sf = 3.141592
     crit = False
-    mocker.patch('eddymc.eddy.get_args',
-                 return_value=[name, data, sf, crit],
-                 )
+    mocker.patch(
+        'eddymc.eddy.argparse.ArgumentParser.parse_args',
+        return_value=Namespace(file=None, scaling_factor=None),
+    )
     # act, assert
     with pytest.raises(RuntimeError):
         eddy.main(name, sf)
