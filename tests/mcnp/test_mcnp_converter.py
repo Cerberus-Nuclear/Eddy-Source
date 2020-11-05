@@ -77,3 +77,78 @@ def test_get_input(f2_file):
     assert actual_input[-6] == 'RAND SEED=7048155456235'
     assert actual_input[-1] == ''
     assert len(actual_input) == 191
+
+
+def test_get_parameters_positive():
+    pass
+    # arrange
+    # act
+    # assert
+
+
+def test_get_parameters_negative():
+    pass
+    # arrange
+    # act
+    # assert
+
+
+def test_get_warnings():
+    pass
+    # arrange
+    # act
+    # assert
+
+
+def test_get_comments():
+    pass
+    # arrange
+    # act
+    # assert
+
+
+def test_get_duplicate_surfaces():
+    pass
+    # arrange
+    # act
+    # assert
+
+
+def test_get_keff():
+    pass
+    # arrange
+    # act
+    # assert
+
+
+def test_get_active_cycles():
+    pass
+    # arrange
+    # act
+    # assert
+
+
+def test_main_calls_mcnp_html_writer(mocker):
+    # arrange
+    file = './mcnp_examples/F2.out'
+    sf = 1.0
+    mocked_html_writer = mocker.patch('eddymc.mcnp.mcnp_converter.mcnp_html_writer.main')
+    # act
+    mcnp_converter.main(file, sf)
+    # assert
+    mocked_html_writer.assert_called_with(file)
+
+
+def test_main_writes_to_gv(mocker):
+    # arrange
+    file = './mcnp_examples/F2.out'
+    sf = 1.0
+    output = mocker.patch('eddymc.mcnp.mcnp_converter.gv')
+    # act
+    mcnp_converter.main(file, sf)
+    # assert
+    assert output.scaling_factor == 1.0
+    assert output.crit_case is False
+
+
+# TODO: add tests for parse_output (see line 34)

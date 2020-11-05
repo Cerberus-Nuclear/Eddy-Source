@@ -66,7 +66,6 @@ def parse_output(output_data):
         tallies.get_tallies(output_data)
         for tally in gv.tally_list:
             tally.normalise_data()
-    # tallies.Tally.sort_for_html()
 
 
 def get_date_time(output_data):
