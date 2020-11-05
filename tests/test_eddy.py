@@ -29,9 +29,16 @@ def text_file(tmpdir):
     return file
 
 
-def test_crit_checker_positive():
+@pytest.fixture
+def crit_file(tmpdir):
+    with open('mcnp_examples/Criticality.out', 'r') as f:
+        file = f.readlines()
+    return file
+
+
+def test_crit_checker_positive(crit_file):
     # arrange
-    text = ["cat", "kcode", "badger"]
+    text = crit_file
     # act
     result = eddy.check_if_crit(text)
     # assert
