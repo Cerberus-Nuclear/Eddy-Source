@@ -1,6 +1,7 @@
-[![PyPI version](https://badge.fury.io/py/eddy-mc.svg)](https://badge.fury.io/py/eddy-mc)
-
 ![logo](https://cerberusnuclear.com/wp-content/uploads/2020/10/EddyLinkedin.jpg)
+
+
+[![PyPI version](https://badge.fury.io/py/eddy-mc.svg)](https://badge.fury.io/py/eddy-mc)
 
 Eddy is a HTML output generator for MCNP and SCALE, it imports an MCNP or SCALE output file, extracts the important data, and writes it to a user-friendly HTML file.
 
