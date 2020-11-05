@@ -64,3 +64,16 @@ def test_get_runtime_nps(f2_nps_file):
     actual_nps = mcnp_converter.get_runtime(file)[1]
     # assert
     assert actual_nps == expected_nps
+
+
+def test_get_input(f2_file):
+    pass
+    # arrange
+    file = f2_file
+    # act
+    actual_input = mcnp_converter.get_input(file)
+    # assert
+    assert actual_input[0] == 'Test MCNP example'
+    assert actual_input[-6] == 'RAND SEED=7048155456235'
+    assert actual_input[-1] == ''
+    assert len(actual_input) == 191

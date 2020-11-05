@@ -123,7 +123,7 @@ def get_input(output_data):
     Returns:
         mcnp_input (list): The MCNP input deck
     """
-    pattern_input = re.compile(r'^\s{6,}\d+-\s{7}(.+)')
+    pattern_input = re.compile(r'^\s{6,}\d+-\s{7}(.*)')
     mcnp_input = []
     for line in output_data:
         match = pattern_input.match(line)
