@@ -1,5 +1,8 @@
 ![logo](https://cerberusnuclear.com/wp-content/uploads/2020/10/EddyLinkedin.jpg)
 
+
+[![PyPI version](https://badge.fury.io/py/eddy-mc.svg)](https://badge.fury.io/py/eddy-mc)
+
 Eddy is a HTML output generator for MCNP and SCALE, it imports an MCNP or SCALE output file, extracts the important data, and writes it to a user-friendly HTML file.
 
 This repository contains the the source code version of Eddy, however Eddy is also available as [a pre-compiled executable](https://github.com/Cerberus-Nuclear/Eddy).
@@ -15,7 +18,7 @@ python3 eddy.py [-o outputfile] [-sf scaling_factor]
 Eddy is also available on the PyPI Python Package index as eddy-mc, in order to allow easier integration into other programs. It can be installed using pip:
 
 ```bash
-python3 -m pip install eddy-mc
+pip install eddy-mc
 ```
 
 and accessed using:
@@ -30,7 +33,8 @@ where `eddy.main()` can take the same two optional arguments; the filepath for t
 Requirements
 
 - Python 3.6 or later
-- Jinja2 Python package is required
+- Jinja2 Python package is required (will be included automatically if Eddy is installed via pip)
+- pytest and pytest-mock Python packages are requried to run the unit tests
 
 <details>
   <summary>Example HTML outputs</summary>
