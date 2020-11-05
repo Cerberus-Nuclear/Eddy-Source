@@ -43,7 +43,7 @@ def parse_output(output_data):
         None
     """
     gv.date_time = get_date_time(output_data)
-    get_runtime(output_data)
+    gv.ctme, gv.nps = get_runtime(output_data)
     gv.mcnp_input = get_input(output_data)
     gv.parameters = get_parameters(gv.mcnp_input)
     cell_data = cells.find_cells(output_data)
@@ -99,15 +99,19 @@ def get_runtime(output_data):
         output_data (list): The MCNP output file
 
     Returns:
-        None, but writes to either or both of gv.ctme or gv.nps project-level variables
+        ctme (str): The number of minutes the code ran for
+        nps (str): the number of particles run
     """
+    ctme = None
+    nps = None
     pattern_nps = re.compile(r'^\s{6,}\d+-\s{7}(nps|NPS)\s+.+')
     pattern_ctme = re.compile(r'^\s{6,}\d+-\s{7}(ctme|CTME)\s+.+')
     for line in output_data:
         if pattern_ctme.match(line):
-            gv.ctme = line.split()[2]
+            ctme = line.split()[2]
         if pattern_nps.match(line):
-            gv.nps = line.split()[2]
+            nps = line.split()[2]
+    return ctme, nps
 
 
 def get_input(output_data):
