@@ -1,0 +1,100 @@
+                                                   mixing table
+
+                                          number of scattering angles =  3
+                                      cross section message threshold = 1.0E-01
+
+
+ mixture =     1          density(g/cc) =  7.8600              temperature(K) =    293.00
+    nuclide    nucmix   atom-dens.   wgt. frac.     za      awt          temp               nuclide title
+      24050       1    7.11730E-04  7.51005E-03   24050    49.9460       293.00     cr50 2425 endf/b-7 rel1 rev7 mod5 Mon Jun 16 16:17:53 2014
+
+      24052       1    1.37250E-02  1.50607E-01   24052    51.9405       293.00     cr52 2431 endf/b-7 rel1 rev7 mod4 Mon Jun 16 16:17:53 2014
+
+      24053       1    1.55630E-03  1.74065E-02   24053    52.9407       293.00     cr53 2434 endf/b-7 rel1 rev7 mod4 Mon Jun 16 16:17:55 2014
+
+      24054       1    3.87397E-04  4.41454E-03   24054    53.9389       293.00     cr54 2437 endf/b-7 rel1 rev7 mod5 Mon Jun 16 16:17:55 2014
+
+      26054       1    3.66661E-03  4.17829E-02   26054    53.9396       293.00     fe54 2625 endf/b-7 rel1 rev7 mod5 Mon Jun 16 16:17:58 2014
+
+      26056       1    5.75579E-02  6.80165E-01   26056    55.9349       293.00     fe56 2631 endf/b-7 rel1 rev7 mod4 Mon Jun 16 16:17:58 2014
+
+      26057       1    1.32926E-03  1.59889E-02   26057    56.9354       293.00     fe57 2634 endf/b-7 rel1 rev7 mod4 Mon Jun 16 16:17:58 2014
+
+      26058       1    1.76900E-04  2.16513E-03   26058    57.9333       293.00     fe58 2637 endf/b-7 rel1 rev7 mod0 Mon Jun 16 16:17:58 2014
+
+      28058       1    4.38990E-03  5.37310E-02   28058    57.9353       293.00     ni58 2825 endf/b-7 rel1 rev7 mod5 Mon Jun 16 16:18:39 2014
+
+      28060       1    1.69098E-03  2.14099E-02   28060    59.9308       293.00     ni60 2831 endf/b-7 rel1 rev7 mod4 Mon Jun 16 16:18:39 2014
+
+      28061       1    7.35058E-05  9.46209E-04   28061    60.9311       293.00     ni61 2834 endf/b-7 rel1 rev7 mod5 Mon Jun 16 16:18:39 2014
+
+      28062       1    2.34369E-04  3.06631E-03   28062    61.9283       293.00     ni62 2837 endf/b-7 rel1 rev7 mod5 Mon Jun 16 16:18:39 2014
+
+      28064       1    5.96868E-05  8.06113E-04   28064    63.9280       293.00     ni64 2843 endf/b-7 rel1 rev7 mod4 Mon Jun 16 16:18:39 2014
+
+
+ mixture =     2          density(g/cc) = 0.12050E-02          temperature(K) =    293.00
+    nuclide    nucmix   atom-dens.   wgt. frac.     za      awt          temp               nuclide title
+       6000       2    7.49187E-09  1.23999E-04    6000    12.0107       293.00     c 600 endf/b-7 rel1 rev7 mod0 Mon Jun 16 16:17:50 2014
+
+       7014       2    3.89870E-05  7.52320E-01    7014    14.0031       293.00     n14 725 endf/b-7 rel1 rev7 mod0 Mon Jun 16 16:18:39 2014
+
+       7015       2    1.42431E-07  2.94415E-03    7015    15.0001       293.00     n15 728 endf/b-7 rel1 rev7 mod0 Mon Jun 16 16:18:39 2014
+
+       8016       2    1.04871E-05  2.31152E-01    8016    15.9949       293.00     o16 825 endf/b-7 rel1 rev7 mod4 Mon Jun 16 16:18:40 2014
+
+       8017       2    3.99481E-09  9.35799E-05    8017    16.9991       293.00     o17 828 endf/b-7 rel1 rev7 mod0 Mon Jun 16 16:18:40 2014
+
+       8018       2    2.15509E-08  5.39169E-04    8018    18.1551       293.00     Injected O-18 zero cross sections
+      18036       2    7.84073E-10  3.88622E-05   18036    35.9675       293.00     ar36 1825 endf/b-7 rel1 rev7 mod0 Mon Jun 16 16:17:47 2014
+
+      18038       2    1.47261E-10  7.70382E-06   18038    37.9627       293.00     ar38 1831 endf/b-7 rel1 rev7 mod0 Mon Jun 16 16:17:47 2014
+
+      18040       2    2.32077E-07  1.27804E-02   18040    39.9624       293.00     ar40 1837 endf/b-7 rel1 rev7 mod2 Mon Jun 16 16:17:47 2014
+
+
+ mixture =     3          density(g/cc) =  1.9895              temperature(K) =    293.00
+    nuclide    nucmix   atom-dens.   wgt. frac.     za      awt          temp               nuclide title
+      13027       3    1.48301E-02  3.33969E-01   13027    26.9815       293.00     al27 1325 endf/b-7 rel1 rev7 mod1 Mon Jun 16 16:17:47 2014
+
+      14028       3    4.09196E-04  9.55494E-03   14028    27.9769       293.00     si28 1425 endf/b-7 rel1 rev7 mod1 Mon Jun 16 16:18:44 2014
+
+      14029       3    2.07875E-05  5.02740E-04   14029    28.9765       293.00     si29 1428 endf/b-7 rel1 rev7 mod3 Mon Jun 16 16:18:44 2014
+
+      14030       3    1.37193E-05  3.43218E-04   14030    29.9738       293.00     si30 1431 endf/b-7 rel1 rev7 mod2 Mon Jun 16 16:18:44 2014
+
+      24050       3    9.45040E-05  3.93956E-03   24050    49.9460       293.00     cr50 2425 endf/b-7 rel1 rev7 mod5 Mon Jun 16 16:17:53 2014
+
+      24052       3    1.82242E-03  7.90042E-02   24052    51.9405       293.00     cr52 2431 endf/b-7 rel1 rev7 mod4 Mon Jun 16 16:17:53 2014
+
+      24053       3    2.06647E-04  9.13094E-03   24053    52.9407       293.00     cr53 2434 endf/b-7 rel1 rev7 mod4 Mon Jun 16 16:17:55 2014
+
+      24054       3    5.14389E-05  2.31574E-03   24054    53.9389       293.00     cr54 2437 endf/b-7 rel1 rev7 mod5 Mon Jun 16 16:17:55 2014
+
+      26054       3    4.86672E-04  2.19099E-02   26054    53.9396       293.00     fe54 2625 endf/b-7 rel1 rev7 mod5 Mon Jun 16 16:17:58 2014
+
+      26056       3    7.63971E-03  3.56662E-01   26056    55.9349       293.00     fe56 2631 endf/b-7 rel1 rev7 mod4 Mon Jun 16 16:17:58 2014
+
+      26057       3    1.76434E-04  8.38420E-03   26057    56.9354       293.00     fe57 2634 endf/b-7 rel1 rev7 mod4 Mon Jun 16 16:17:58 2014
+
+      26058       3    2.34802E-05  1.13534E-03   26058    57.9333       293.00     fe58 2637 endf/b-7 rel1 rev7 mod0 Mon Jun 16 16:17:58 2014
+
+      28058       3    5.82673E-04  2.81751E-02   28058    57.9353       293.00     ni58 2825 endf/b-7 rel1 rev7 mod5 Mon Jun 16 16:18:39 2014
+
+      28060       3    2.24445E-04  1.12268E-02   28060    59.9308       293.00     ni60 2831 endf/b-7 rel1 rev7 mod4 Mon Jun 16 16:18:39 2014
+
+      28061       3    9.75645E-06  4.96166E-04   28061    60.9311       293.00     ni61 2834 endf/b-7 rel1 rev7 mod5 Mon Jun 16 16:18:39 2014
+
+      28062       3    3.11078E-05  1.60789E-03   28062    61.9283       293.00     ni62 2837 endf/b-7 rel1 rev7 mod5 Mon Jun 16 16:18:39 2014
+
+      28064       3    7.92225E-06  4.22703E-04   28064    63.9280       293.00     ni64 2843 endf/b-7 rel1 rev7 mod4 Mon Jun 16 16:18:39 2014
+
+      92235       3    7.51882E-05  1.47501E-02   92235   235.0439       293.00     u235 9228 endf/b-7 rel1 rev7 mod7 Mon Jun 16 16:18:34 2014
+
+      92238       3    5.86203E-04  1.16470E-01   92238   238.0508       293.00     u238 9237 endf/b-7 rel1 rev7 mod5 Mon Jun 16 16:18:34 2014
+
+
+
+
+ 
+  ***** warning ***** sggp message number k6-064 follows:

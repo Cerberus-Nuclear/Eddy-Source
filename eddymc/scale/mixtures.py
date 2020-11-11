@@ -38,7 +38,7 @@ class Mixture:
         """
         isotopes = {}
         for line in self.data[2:]:
-            if line == '':
+            if line == '\n':
                 continue
             else:
                 nuclide = line.split()[0]
@@ -62,15 +62,18 @@ class Mixture:
         """
         isotopes = {}
         for line in self.data[2:]:
-            nuclide = line.split()[0]
-            isotopes[nuclide] = {}
-            isotopes[nuclide]['nuclide'] = int(nuclide)
-            isotopes[nuclide]['atom-density'] = float(line.split()[1])
-            isotopes[nuclide]['weight fraction'] = float(line.split()[2])
-            isotopes[nuclide]['z-number'] = int(line.split()[3])
-            isotopes[nuclide]['atomic weight'] = float(line.split()[4])
-            isotopes[nuclide]['title'] = line.split()[5].capitalize()
-            isotopes[nuclide]['temperature'] = float(line.split()[6])
+            if line == '\n':
+                continue
+            else:
+                nuclide = line.split()[0]
+                isotopes[nuclide] = {}
+                isotopes[nuclide]['nuclide'] = int(nuclide)
+                isotopes[nuclide]['atom-density'] = float(line.split()[1])
+                isotopes[nuclide]['weight fraction'] = float(line.split()[2])
+                isotopes[nuclide]['z-number'] = int(line.split()[3])
+                isotopes[nuclide]['atomic weight'] = float(line.split()[4])
+                isotopes[nuclide]['title'] = line.split()[5].capitalize()
+                isotopes[nuclide]['temperature'] = float(line.split()[6])
         return isotopes
 
 
@@ -88,7 +91,7 @@ def get_mixture_data(output_data):
     for n, line in enumerate(output_data):
         if pattern_mix.match(line):
             for m, other_line in enumerate(output_data[n+1:], start=n+1):
-                if "Cross section" in other_line or "***********" in other_line:
+                if "Cross section" in other_line or "*****" in other_line:
                     return output_data[n:m]
 
 
@@ -104,7 +107,7 @@ def create_mixtures(mix_data):
     for n, line in enumerate(mix_data):
         if "mixture = " in line:
             for m, other_line in enumerate(mix_data[n+1:], start=n+1):
-                if other_line == "\n":
+                if "mixture" in other_line or "Cross section" in other_line or "*****" in other_line:
                     mix = mix_data[n:m]
                     Mixture(mix)
                     break
