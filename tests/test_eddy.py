@@ -17,7 +17,7 @@ def f2_file(tmpdir):
 
 @pytest.fixture
 def scale_file(tmpdir):
-    with open('scale_examples/cylinder.out', 'r') as f:
+    with open('scale_examples/cylinder_ce.out', 'r') as f:
         file = f.readlines()
     return file
 
@@ -185,7 +185,7 @@ def test_get_args_with_bad_passed_sf(mocker):
 
 def test_main_calls_scale_converter(mocker, scale_file):
     # arrange
-    name = 'scale_examples/cylinder.out'
+    name = 'scale_examples/cylinder_ce.out'
     data = scale_file
     sf = 3.141592
     crit = False

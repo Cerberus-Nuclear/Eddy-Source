@@ -12,6 +12,7 @@ from . import scale_global_variables as gv
 class Mixture:
     """Each mixture in the SCALE case is represented by a Mixture object"""
     def __init__(self, data):
+        self.data = data
         self.number = data[0].split()[2]
         self.density = data[0].split()[5]
         try:
@@ -19,17 +20,59 @@ class Mixture:
         except IndexError:
             self.temperature = "Not given in output file"
         self.isotopes = {}
-        for line in data[2:]:
-            nuclide = line.split()[0]
-            self.isotopes[nuclide] = {}
-            self.isotopes[nuclide]['nuclide'] = int(nuclide)
-            self.isotopes[nuclide]['atom-density'] = float(line.split()[1])
-            self.isotopes[nuclide]['weight fraction'] = float(line.split()[2])
-            self.isotopes[nuclide]['z-number'] = int(line.split()[3])
-            self.isotopes[nuclide]['atomic weight'] = float(line.split()[4])
-            self.isotopes[nuclide]['title'] = line.split()[5].capitalize()
-            self.isotopes[nuclide]['temperature'] = float(line.split()[6])
+        # There seem to be two formats of mixture table; if multigroup energies are used the table has a
+        # 'nucmix' column, if continuous energies are used it does not.
+        if 'nucmix' in data[1].split():
+            self.isotopes = self.get_isotope_data_multigroup_format()
+        else:
+            self.isotopes = self.get_isotope_data_continuous_format()
         gv.mixture_list.append(self)
+
+    def get_isotope_data_multigroup_format(self):
+        """Create a dictionary with the relevant parts of the mixture table
+        Args:
+            self: The Mixture object
+        Returns:
+            isotopes (dict): a dictionary where each entry is a name:nuclide pair, where
+                            nuclide is a dict containing the relevant data about that nuclide
+        """
+        isotopes = {}
+        for line in self.data[2:]:
+            if line == '':
+                continue
+            else:
+                nuclide = line.split()[0]
+                isotopes[nuclide] = {}
+                isotopes[nuclide]['nuclide'] = int(nuclide)
+                isotopes[nuclide]['atom-density'] = float(line.split()[2])
+                isotopes[nuclide]['weight fraction'] = float(line.split()[2])
+                isotopes[nuclide]['z-number'] = int(line.split()[4])
+                isotopes[nuclide]['atomic weight'] = float(line.split()[5])
+                isotopes[nuclide]['title'] = line.split()[7].capitalize()
+                isotopes[nuclide]['temperature'] = float(line.split()[6])
+        return isotopes
+
+    def get_isotope_data_continuous_format(self):
+        """Create a dictionary with the relevant parts of the mixture table
+        Args:
+            self: The Mixture object
+        Returns:
+            isotopes (dict): a dictionary where each entry is a name:nuclide pair, where
+                            nuclide is a dict containing the relevant data about that nuclide
+        """
+        isotopes = {}
+        for line in self.data[2:]:
+            nuclide = line.split()[0]
+            isotopes[nuclide] = {}
+            isotopes[nuclide]['nuclide'] = int(nuclide)
+            isotopes[nuclide]['atom-density'] = float(line.split()[1])
+            isotopes[nuclide]['weight fraction'] = float(line.split()[2])
+            isotopes[nuclide]['z-number'] = int(line.split()[3])
+            isotopes[nuclide]['atomic weight'] = float(line.split()[4])
+            isotopes[nuclide]['title'] = line.split()[5].capitalize()
+            isotopes[nuclide]['temperature'] = float(line.split()[6])
+        return isotopes
+
 
 
 def get_mixture_data(output_data):
