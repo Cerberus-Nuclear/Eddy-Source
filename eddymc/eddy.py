@@ -135,16 +135,6 @@ def get_args(filename=None, scaling_factor=None):
         crit_case (bool): True if kcode case, otherwise False
     """
 
-    parser = argparse.ArgumentParser(description='MCNP or SCALE output to HTML Converter')
-    parser.add_argument("-o", "--file", help="MCNP or SCALE output file")
-    parser.add_argument("-sf", "--scaling_factor", type=float, help="Scaling Factor")
-    # Note: args will be an argparse Namespace object, with the values for args.file and args.scaling_factor
-    # set to None if no cli arguments have been passed.
-    args = parser.parse_args()
-
-    # get filename, and check file exists
-    if args.file:
-        filename = args.file
     filename = get_filename(filename)
 
     # get contents of file
@@ -159,8 +149,6 @@ def get_args(filename=None, scaling_factor=None):
         scaling_factor = 1
     else:
         # Ask for scaling factor for shielding cases, and check it is a valid float.
-        if args.scaling_factor:
-            scaling_factor = args.scaling_factor
         scaling_factor = get_scaling_factor(scaling_factor)
        
     print(f"Output file: {filename}")
@@ -188,4 +176,11 @@ def main(filename=None, scaling_factor=None):
 
 
 if __name__ == "__main__":
-    main()
+    # Eddy should only take command line args if run as __main__
+    parser = argparse.ArgumentParser(description='MCNP or SCALE output to HTML Converter')
+    parser.add_argument("-o", "--file", help="MCNP or SCALE output file")
+    parser.add_argument("-sf", "--scaling_factor", type=float, help="Scaling Factor")
+    # Note: args will be an argparse Namespace object, with the values for args.file and args.scaling_factor
+    # set to None if no cli arguments have been passed.
+    args = parser.parse_args()
+    main(filename=args.file, scaling_factor=args.scaling_factor)

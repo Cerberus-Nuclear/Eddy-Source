@@ -34,7 +34,7 @@ Requirements
 
 - Python 3.6 or later
 - Jinja2 Python package is required (will be included automatically if Eddy is installed via pip)
-- pytest and pytest-mock Python packages are requried to run the unit tests
+- pytest and pytest-mock Python packages are required to run the unit tests
 
 <details>
   <summary>Example HTML outputs</summary>
