@@ -125,33 +125,6 @@ def test_get_scaling_factor_with_invalid_arg_passed():
         eddy.get_scaling_factor(sf)
 
 
-def test_get_args_with_cli_args(mocker, f2_file):
-    # arrange
-    data = f2_file
-    mocker.patch(
-        'eddymc.eddy.argparse.ArgumentParser.parse_args',
-        return_value=Namespace(file='mcnp_examples/F2.out', scaling_factor=3.141592)
-    )
-    # act
-    name, output_data, sf, crit = eddy.get_args()
-    # assert
-    assert name == 'mcnp_examples/F2.out'
-    assert output_data == data
-    assert sf == 3.141592
-    assert crit is False
-
-
-def test_get_args_with_invalid_cli_scaling_factor(mocker):
-    # arrange
-    mocker.patch(
-        'eddymc.eddy.argparse.ArgumentParser.parse_args',
-        return_value=Namespace(file='mcnp_examples/F2.out', scaling_factor='parrot')
-    )
-    # act, assert
-    with pytest.raises(ValueError):
-        eddy.get_args()
-
-
 def test_get_args_with_passed_arguments(mocker, f2_file):
     # arrange
     name = 'mcnp_examples/F2.out'
@@ -248,12 +221,3 @@ def test_main_with_nonexistent_input_passed(mocker):
         eddy.main(name)
 
 
-def test_main_with_nonexistent_cli_input(mocker):
-    # arrange
-    mocker.patch(
-        'eddymc.eddy.argparse.ArgumentParser.parse_args',
-        return_value=Namespace(file='mcnp_examples/nonexistent_file.txt', scaling_factor=None),
-    )
-    # act, assert
-    with pytest.raises(AssertionError):
-        eddy.main()
