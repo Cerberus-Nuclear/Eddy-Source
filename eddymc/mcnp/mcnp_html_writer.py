@@ -10,11 +10,19 @@ This module holds the code that writes HTML to the html file.
 # Imports from standard library
 import datetime
 import os
-import pkgutil
+try:
+    import importlib.resources as pkg_resources
+except ImportError:
+    import importlib_resources as pkg_resources
 # Third party imports:
 from jinja2 import Template
 # local imports
 from . import global_variables as gv
+try:
+    from .. import static
+except ValueError:
+    import static
+
 
 
 def get_css():
@@ -23,7 +31,7 @@ def get_css():
     Returns:
         inline_css (str): the whole static css file
     """
-    inline_css = pkgutil.get_data(__name__, "../static/style.css").decode("utf-8")
+    inline_css = pkg_resources.read_text(static, 'style.css')
     return inline_css
 
 
@@ -59,8 +67,7 @@ def get_html(filename, inline_css):
     mcnp_input = sanitize_input(gv.mcnp_input)
     #with open("static/MCNP_template.html", "r") as file:
     #    html_template = file.read()
-    html_template = pkgutil.get_data(__name__, "../static/MCNP_template.html").decode("utf-8")
-
+    html_template = pkg_resources.read_text(static, 'mcnp_template.html')
     template = Template(html_template)
     html = template.render(
         filename=filename, # with path
@@ -106,3 +113,5 @@ def main(filename):
     output_file += '.html'
     with open(output_file, 'w') as f:
         f.write(output)
+
+
