@@ -3,27 +3,32 @@
 or add a configuration in pycharm
 """
 
+import os
 import pytest
 from eddymc.mcnp import mcnp_converter
+from tests import mcnp_examples
+try:
+    import importlib.resources as pkg_resources
+except ImportError:
+    import importlib_resources as pkg_resources
 
 
 @pytest.fixture
 def f2_file(tmpdir):
-    with open('./mcnp_examples/F2.out', 'r') as f:
-        file = f.readlines()
-    return file
+    f2 = pkg_resources.read_text(mcnp_examples, 'F2.out')
+    return f2.split('\n')
 
 
 @pytest.fixture
 def f2_nps_file(tmpdir):
-    with open('./mcnp_examples/F2_nps.out', 'r') as f:
-        file = f.readlines()
-    return file
+    f2_nps = pkg_resources.read_text(mcnp_examples, 'F2_nps.out')
+    return f2_nps.split('\n')
 
 
 def test_read_file():
     # arrange
-    file = "./mcnp_examples/F2.out"
+    file = os.path.dirname(mcnp_examples.__file__)
+    file += "\\F2.out"
     # act
     data = mcnp_converter.read_file(file)
     # assert
@@ -130,7 +135,8 @@ def test_get_active_cycles():
 
 def test_main_calls_mcnp_html_writer(mocker):
     # arrange
-    file = './mcnp_examples/F2.out'
+    file = os.path.dirname(mcnp_examples.__file__)
+    file += "\\F2.out"
     sf = 1.0
     mocked_html_writer = mocker.patch('eddymc.mcnp.mcnp_converter.mcnp_html_writer.main')
     # act
@@ -141,9 +147,14 @@ def test_main_calls_mcnp_html_writer(mocker):
 
 def test_main_writes_to_gv(mocker):
     # arrange
-    file = './mcnp_examples/F2.out'
+    file = os.path.dirname(mcnp_examples.__file__)
+    file += "\\F2.out"
     sf = 1.0
     output = mocker.patch('eddymc.mcnp.mcnp_converter.gv')
+    # mock the rest of the main() function so it doesn't make actual calls
+    mock_read_file = mocker.patch('eddymc.mcnp.mcnp_converter.read_file')
+    mock_parse_output = mocker.patch('eddymc.mcnp.mcnp_converter.parse_output')
+    mock_html_writer = mocker.patch('eddymc.mcnp.mcnp_converter.mcnp_html_writer.main')
     # act
     mcnp_converter.main(file, sf)
     # assert
