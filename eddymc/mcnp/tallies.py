@@ -26,19 +26,25 @@ class Tally:
         self.tally_type = data[1].split()[3:]
         self.tally_type = ' '.join(self.tally_type)
         self.particles = data[2].split()[1]
-        self.dose_functions = data[3].split()[7], data[3].split()[9]
+        self.dose_functions = self.get_dose_functions()
         self.results = self.get_results(data)
-        self.statistical_checks = self.get_statistical_checks(data)
+        self.statistical_checks = self.get_statistical_checks()
         self.passes = self.get_passes()
         gv.tally_list.append(self)
         if self.f_type not in gv.f_types:
             gv.f_types.append(self.f_type)
 
+    def get_dose_functions(self):
+        if "this tally is modified by dose function" in self.data[3]:
+            return self.data[3].split()[7], self.data[3].split()[9]
+        else:
+            return "This tally is not modified by any dose function"
+
     def get_results(self, data):
         """This is a placeholder method; each subclass of Tally should have its own 'get_results' method"""
-        raise NotImplementedError(f"The {self.__class__} subclass should have its own normalise_data method")
+        raise NotImplementedError(f"The {self.__class__} subclass should have its own get_results() method")
 
-    def get_statistical_checks(self, data):
+    def get_statistical_checks(self):
         """Get the statistical check results from the mcnp output file
 
         Args:
@@ -50,10 +56,10 @@ class Tally:
         """
         start_PATTERN = re.compile(r"\s+results of 10 statistical checks.+")
         value = None
-        for n, line in enumerate(data):
+        for n, line in enumerate(self.data):
             if start_PATTERN.match(line):
-                value = data[n+6].split()
-                pass_fail = data[n+7].split()
+                value = self.data[n+6].split()
+                pass_fail = self.data[n+7].split()
                 break
         if value:       # if statistical checks have been found
             statistical_checks = {
@@ -240,6 +246,20 @@ class F5Tally(Tally):
         self.results["result"] *= gv.scaling_factor
 
 
+class F6Tally(Tally):
+
+    def __init__(self, data):
+        super().__init__(data)
+        gv.F6_tallies[self.particles].append(self)
+
+    def get_results(self, data):
+        #TODO: IMPLEMENT
+        return None
+
+    def normalise_data(self):
+        #TODO: IMPLEMENT
+        pass
+
 ############################################################
 #  End of Tally class                                      #
 ############################################################
@@ -276,4 +296,6 @@ def get_tallies(data):
                         F4Tally(tally_data)
                     if tally_type == "5":
                         F5Tally(tally_data)
+                    if tally_type == "6" or tally_type == "6+":
+                        F6Tally(tally_data)
             break

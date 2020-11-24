@@ -13,6 +13,7 @@ f_types = []
 F2_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
 F4_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
 F5_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
+F6_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
 tally_types = {}
 warnings = []
 comments = []
