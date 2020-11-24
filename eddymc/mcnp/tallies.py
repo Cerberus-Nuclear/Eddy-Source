@@ -35,6 +35,13 @@ class Tally:
             gv.f_types.append(self.f_type)
 
     def get_dose_functions(self):
+        """Gets the dose function, if any, that the results of this tally are multiplied by
+
+        Returns:
+            Either a tuple of the DE and DF functions, if they exist, otherwise a string
+            stating that this tally is not multiplied by a dose function.
+
+        """
         if "this tally is modified by dose function" in self.data[3]:
             return self.data[3].split()[7], self.data[3].split()[9]
         else:
@@ -47,12 +54,8 @@ class Tally:
     def get_statistical_checks(self):
         """Get the statistical check results from the mcnp output file
 
-        Args:
-            data (list): the section of the mcnp output for this tally
-
         Returns:
-            None, but creates self.statistical_checks, a dictionary with
-                the results of the statistical checks for this tally.
+            statistical_checks, a dictionary with the results of the statistical checks for this tally.
         """
         start_PATTERN = re.compile(r"\s+results of 10 statistical checks.+")
         value = None
@@ -247,18 +250,20 @@ class F5Tally(Tally):
 
 
 class F6Tally(Tally):
-
     def __init__(self, data):
         super().__init__(data)
         gv.F6_tallies[self.particles].append(self)
 
     def get_results(self, data):
-        #TODO: IMPLEMENT
+        # TODO: DOCSTRING
+        # TODO: IMPLEMENT
         return None
 
     def normalise_data(self):
-        #TODO: IMPLEMENT
+        # TODO: DOCSTRING
+        # TODO: IMPLEMENT
         pass
+
 
 ############################################################
 #  End of Tally class                                      #
