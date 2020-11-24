@@ -54,7 +54,7 @@ def parse_output(output_data):
     for cell in gv.cell_list:
         cell.assign_populations(neutron_populations, photon_populations, electron_populations)
     gv.warnings = get_warnings(output_data)
-    get_comments(output_data)
+    gv.comments = get_comments(output_data)
     get_duplicate_surfaces(output_data)
     particles.get_neutrons(output_data)
     particles.get_photons(output_data)
@@ -163,7 +163,7 @@ def get_warnings(output_data):
         output_data (list): The MCNP output data
 
     Returns:
-        None, but populates gv.warnings, a list of the warning messages
+        warnings, a list of the warning messages
     """
     warnings = []
     PATTERN_warnings = re.compile(r'warning')
@@ -183,13 +183,15 @@ def get_comments(output_data):
         output_data (list): The mcnp output
 
     Returns:
-        None, but populates gv.comments, a list of the comments
+        comments, a list of the comments
     """
     PATTERN_comments = re.compile(r'comment\.\s+[A-Za-z0-9].+')    # Ignores blank comment lines
+    comments = []
     for line in output_data:
         if PATTERN_comments.search(line):
             comment = line[10:].strip().capitalize()
-            gv.comments.append(comment)
+            comments.append(comment)
+    return comments
 
 
 def get_duplicate_surfaces(output_data):

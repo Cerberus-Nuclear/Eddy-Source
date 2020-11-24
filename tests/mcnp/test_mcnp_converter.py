@@ -129,13 +129,6 @@ def test_get_parameters_positive():
     assert parameters['width'] == 10.0
 
 
-def test_get_parameters_negative():
-    pass
-    # arrange
-    # act
-    # assert
-
-
 def test_get_warnings(f2_file):
     # arrange
     file = f2_file
@@ -149,11 +142,16 @@ def test_get_warnings(f2_file):
     assert warnings[3] == "2 photons from neutron collisions were created below a local photon energy cutoff and were not followed."
 
 
-def test_get_comments():
-    pass
+def test_get_comments(f2_file):
     # arrange
+    file = f2_file
     # act
+    comments = mcnp_converter.get_comments(file)
     # assert
+    assert len(comments) == 7
+    assert comments[0] == "Physics models disabled."
+    assert comments[6] == "Setting up hash-based fast table search for xsec tables"
+
 
 
 def test_get_duplicate_surfaces():
