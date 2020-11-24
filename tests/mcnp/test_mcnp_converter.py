@@ -85,10 +85,48 @@ def test_get_input(f2_file):
 
 
 def test_get_parameters_positive():
-    pass
     # arrange
+    input_section = [
+"Test MCNP example",
+"c",
+"c ==============================================================================",
+"c",
+"c",
+"c                 _______     _______ _      ____  _   _ ______",
+"c                / ____\ \   / / ____| |    / __ \| \ | |  ____|",
+"c               | |     \ \_/ / |    | |   | |  | |  \| | |__",
+"c               | |      \   /| |    | |   | |  | | . ` |  __|",
+"c               | |____   | | | |____| |___| |__| | |\  | |____",
+"c                \_____|  |_|  \_____|______\____/|_| \_|______|",
+"c",
+"c",
+"c",
+"c                                Version 0.19.2",
+"c",
+"c ######################### Cerberus Nuclear 2020 ############################",
+"c",
+"c",
+"c",
+"c",
+"c     USING THE FOLLOWING VARIABLES:",
+"c               width     =   10.00000",
+"c",
+"c",
+"c =============================== START TITLE ==================================",
+"c ==============================================================================",
+"c   MCNP example Case - concentric spheres",
+"c",
+"c",
+"c <width=10>",
+"c",
+"c ==============================================================================",
+"c ============================= START CELL SECTION =============================",
+"c ==============================================================================",
+]
     # act
+    parameters = mcnp_converter.get_parameters(input_section)
     # assert
+    assert parameters['width'] == 10.0
 
 
 def test_get_parameters_negative():
@@ -98,11 +136,17 @@ def test_get_parameters_negative():
     # assert
 
 
-def test_get_warnings():
-    pass
+def test_get_warnings(f2_file):
     # arrange
+    file = f2_file
     # act
+    warnings = mcnp_converter.get_warnings(file)
     # assert
+    assert len(warnings) == 4
+    assert warnings[0] == "1 materials had unnormalized fractions. print table 40."
+    assert warnings[1] == "8017.80c lacks gamma-ray production cross sections."
+    assert warnings[2] == "Material        1 has been set to a conductor."
+    assert warnings[3] == "2 photons from neutron collisions were created below a local photon energy cutoff and were not followed."
 
 
 def test_get_comments():

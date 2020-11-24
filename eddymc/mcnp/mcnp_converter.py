@@ -53,7 +53,7 @@ def parse_output(output_data):
     cells.create_cell_objects(cell_data)
     for cell in gv.cell_list:
         cell.assign_populations(neutron_populations, photon_populations, electron_populations)
-    get_warnings(output_data)
+    gv.warnings = get_warnings(output_data)
     get_comments(output_data)
     get_duplicate_surfaces(output_data)
     particles.get_neutrons(output_data)
@@ -165,13 +165,15 @@ def get_warnings(output_data):
     Returns:
         None, but populates gv.warnings, a list of the warning messages
     """
+    warnings = []
     PATTERN_warnings = re.compile(r'warning')
     for line in output_data:
         if PATTERN_warnings.search(line):
-            if "warning message so far" not in line:
+            if "warning message so far" not in line and "warning messages so far" not in line:
                 warning = line[10:].strip().capitalize()
-                if warning not in gv.warnings:
-                    gv.warnings.append(warning)
+                if warning not in warnings:
+                    warnings.append(warning)
+    return warnings
 
 
 def get_comments(output_data):
