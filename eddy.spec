@@ -3,12 +3,12 @@
 block_cipher = None
 
 
-a = Analysis(['eddy.py'],
-             pathex=['C:\\Projects\\Eddy-Source'],
+a = Analysis(['C:\\Projects\\Eddy-Source\\eddymc\\eddy.py'],
+             pathex=['C:\\Projects\\Eddy-Source\\eddymc'],
              binaries=[],
-             datas=[('C:\\Projects\\Eddy-Source\\eddymc\\static\\style.css', '.\static'),
-                    ('C:\\Projects\\Eddy-Source\\eddymc\\static\\MCNP_template.html', '.\static'),
-                    ('C:\\Projects\\Eddy-Source\\eddymc\\static\\SCALE_template.html', '.\static'),
+             datas=[('C:\\Projects\\Eddy-Source\\eddymc\\static\\style.css', '.\\static'),
+                    ('C:\\Projects\\Eddy-Source\\eddymc\\static\\MCNP_template.html', '.\\static'),
+                    ('C:\\Projects\\Eddy-Source\\eddymc\\static\\SCALE_template.html', '.\\static'),
                     ],
              hiddenimports=[],
              hookspath=[],
@@ -37,4 +37,4 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='Eddy')
+               name='Eddy_0.1.3')
