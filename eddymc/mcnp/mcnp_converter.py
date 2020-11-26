@@ -64,8 +64,9 @@ def parse_output(output_data):
         get_active_cycles(output_data)
     else:
         tallies.get_tallies(output_data)
-        for tally in gv.tally_list:
-            tally.normalise_data()
+        if gv.scaling_factor != 1:
+            for tally in gv.tally_list:
+                tally.normalise_data()
 
 
 def get_date_time(output_data):

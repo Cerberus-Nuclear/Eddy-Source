@@ -1,4 +1,3 @@
-
 """ To run: just call python -m pytest while in this directory
 or add a configuration in pycharm
 """
@@ -6,6 +5,7 @@ or add a configuration in pycharm
 import pytest
 from eddymc.mcnp import tallies
 from tests import mcnp_examples
+
 try:
     import importlib.resources as pkg_resources
 except ImportError:
@@ -109,7 +109,7 @@ def f2_tally_data(tmpdir):
         "",
         " relative error is 0! fom and f(x) signal-to-noise ratio are both undefined. histories/minute = 5.169E+06",
         "",
-        ]
+    ]
     return tally_data
 
 
@@ -180,7 +180,7 @@ def f4_tally_data(tmpdir):
         "",
         " relative error is 0! fom and f(x) signal-to-noise ratio are both undefined. histories/minute = 8.438E+06",
         "",
-        ]
+    ]
     return tally_data
 
 
@@ -283,7 +283,7 @@ def f5_tally_data(tmpdir):
         "",
         " fom = (histories/minute)*(f(x) signal-to-noise ratio)**2 = (6.703E+06)*( 1.338E+00)**2 = (6.703E+06)*(1.789E+00) = 1.200E+07",
         "",
-        ]
+    ]
     return tally_data
 
 
@@ -356,7 +356,7 @@ def f6_tally_data(tmpdir):
         "",
         " fom = (histories/minute)*(f(x) signal-to-noise ratio)**2 = (2.081E+05)*( 8.410E-03)**2 = (2.081E+05)*(7.073E-05) = 1.472E+01",
         "",
-        ]
+    ]
     return tally_data
 
 
@@ -474,7 +474,7 @@ def f6_plus_tally_data(tmpdir):
         " 2.51+01     11 3.96-09  -8.403 *           |            |           |            |            |            |           |           ",
         "  total  129733 4.32-04         d-----------d------------d-----------d------------d------------d------------d-----------d-----------",
         "",
-        ]
+    ]
     return tally_data
 
 
@@ -574,84 +574,66 @@ def test_f5_init():
     # this will actually need several tests for different possibilities
 
 
-def test_f6_init_creates_object():
+def test_f6_init_creates_object(f6_tally_data):
     # this will actually need several tests for different possibilities
     # arrange
-    tally_data = [
-        "1tally      396        nps =   300000000",
-        "           tally type 6    track length estimate of heating.            units   mev/gram       ",
-        "           particle(s): photons  ",
-        "",
-        "           masses  ",
-        "                   cell:      29           30                                                                      ",
-        "                         2.12285E+04  2.12285E+04",
-        " ",
-        " cell  29                                                                                                                              ",
-        "                 1.96685E-09 0.0141",
-        " ",
-        " cell  30                                                                                                                              ",
-        "                 1.94392E-09 0.0141",
-        "",
-        "",
-        " ===================================================================================================================================",
-        "",
-        "           results of 10 statistical checks for the estimated answer for the tally fluctuation chart (tfc) bin of tally      396",
-        "",
-        " tfc bin     --mean--      ---------relative error---------      ----variance of the variance----      --figure of merit--     -pdf-",
-        " behavior    behavior      value   decrease   decrease rate      value   decrease   decrease rate       value     behavior     slope",
-        "",
-        " desired      random       <0.10      yes      1/sqrt(nps)       <0.10      yes        1/nps           constant    random      >3.00",
-        " observed     random        0.01      yes          yes            0.00      yes         yes            constant    random      10.00",
-        " passed?        yes          yes      yes          yes             yes      yes         yes               yes        yes         yes",
-        "",
-        " ===================================================================================================================================",
-        "",
-        "",
-        " this tally meets the statistical criteria used to form confidence intervals: check the tally fluctuation chart to verify.",
-        " the results in other bins associated with this tally may not meet these statistical criteria.",
-        "",
-        " ----- estimated confidence intervals:  -----",
-        "",
-        " estimated asymmetric confidence interval(1,2,3 sigma): 1.9395E-09 to 1.9950E-09; 1.9117E-09 to 2.0228E-09; 1.8839E-09 to 2.0506E-09",
-        " estimated  symmetric confidence interval(1,2,3 sigma): 1.9391E-09 to 1.9946E-09; 1.9113E-09 to 2.0224E-09; 1.8835E-09 to 2.0502E-09",
-        "",
-        "1analysis of the results in the tally fluctuation chart bin (tfc) for tally 396 with nps = 300000000         print table 160",
-        "",
-        "",
-        " normed average tally per history  = 1.96685E-09          unnormed average tally per history  = 4.17533E-05",
-        " estimated tally relative error    = 0.0141               estimated variance of the variance  = 0.0012",
-        " relative error from zero tallies  = 0.0084               relative error from nonzero scores  = 0.0114",
-        "",
-        " number of nonzero history tallies =       14281          efficiency for the nonzero tallies  = 0.0000",
-        " history number of largest  tally  =   170078837          largest  unnormalized history tally = 1.78932E+01",
-        " (largest  tally)/(average tally)  = 4.28545E+05          (largest  tally)/(avg nonzero tally)= 2.04002E+01",
-        "",
-        " (confidence interval shift)/mean  = 0.0002               shifted confidence interval center  = 1.96724E-09",
-        "",
-        "",
-        " if the largest  history score sampled so far were to occur on the next history, the tfc bin quantities would change as follows:",
-        "",
-        "      estimated quantities           value at nps           value at nps+1           value(nps+1)/value(nps)-1.",
-        "",
-        "      mean                            1.96685E-09             1.96966E-09                     0.001428",
-        "      relative error                  1.41246E-02             1.41764E-02                     0.003667",
-        "      variance of the variance        1.21436E-03             1.29241E-03                     0.064266",
-        "      shifted center                  1.96724E-09             1.96725E-09                     0.000005",
-        "      figure of merit                 3.47754E+00             3.45218E+00                    -0.007295",
-        "",
-        " the estimated slope of the 200 largest  tallies starting at  5.17418E+00 appears to be decreasing at least exponentially.",
-        " the large score tail of the empirical history score probability density function appears to have no unsampled regions.",
-        "",
-        " fom = (histories/minute)*(f(x) signal-to-noise ratio)**2 = (2.081E+05)*( 4.088E-03)**2 = (2.081E+05)*(1.671E-05) = 3.478E+00",
-        "",
-        ]
+    tally_data = f6_tally_data
     # act
     F6_object = tallies.F6Tally(tally_data)
     # assert
     assert type(F6_object) == tallies.F6Tally
+    assert F6_object.tally_type == "track length estimate of heating. units mev/gram"
+    assert F6_object.particles == "neutrons"
+    assert F6_object.f_type == "F6"
+    assert F6_object.dose_functions == "This tally is not modified by any dose function"
 
 
-def test_f6_init_creates_f6plus_object():
-    pass
+def test_f6_init_creates_f6plus_object(f6_plus_tally_data):
+    # arrange
+    tally_data = f6_plus_tally_data
+    # act
+    F6_object = tallies.F6Tally(tally_data)
+    # assert
+    assert type(F6_object) == tallies.F6Tally
+    assert F6_object.tally_type == "energy deposition units mev/gram"
+    assert F6_object.particles == "neutrons"
+    assert F6_object.f_type == "F6+"
+    assert F6_object.dose_functions == "This tally is not modified by any dose function"
 
+
+def test_f6_init_calls_subclass_results(mocker, f6_tally_data):
+    # this will actually need several tests for different possibilities
+    # arrange
+    tally_data = f6_tally_data
+    mocked_subclass_get_results = mocker.patch('eddymc.mcnp.tallies.F6Tally.get_results', return_value=None)
+    mocked_superclass_get_results = mocker.patch('eddymc.mcnp.tallies.Tally.get_results', return_value=None)
+    # act
+    F6_object = tallies.F6Tally(tally_data)
+    # assert
+    mocked_subclass_get_results.assert_any_call(tally_data)
+    mocked_superclass_get_results.assert_not_called()
+
+
+def test_f6_init_adds_F6_to_types_list(mocker, f6_tally_data):
+    # arrange
+    tally_data = f6_tally_data
+    mocked_gv = mocker.patch('eddymc.mcnp.tallies.gv')
+    mocked_gv.f_types = []
+    # act
+    F6_object = tallies.F6Tally(tally_data)
+    # assert
+    assert "F6" in mocked_gv.f_types
+    assert "F6+" not in mocked_gv.f_types
+
+
+def test_f6_init_adds_F6_plus_to_types_list(mocker, f6_plus_tally_data):
+    # arrange
+    tally_data = f6_plus_tally_data
+    mocked_gv = mocker.patch('eddymc.mcnp.tallies.gv')
+    mocked_gv.f_types = []
+    # act
+    F6_object = tallies.F6Tally(tally_data)
+    # assert
+    assert "F6" not in mocked_gv.f_types
+    assert "F6+" in mocked_gv.f_types
 
