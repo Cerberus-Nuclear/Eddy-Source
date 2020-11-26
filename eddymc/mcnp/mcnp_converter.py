@@ -98,8 +98,8 @@ def get_runtime(output_data):
         output_data (list): The MCNP output file
 
     Returns:
-        ctme (str): The number of minutes the code ran for
-        nps (str): the number of particles run
+        ctme (str): The number of minutes the code ran for, or None if not found
+        nps (str): the number of particles run, or None if not found
     """
     ctme = None
     nps = None

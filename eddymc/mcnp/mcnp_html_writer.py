@@ -79,6 +79,8 @@ def get_html(filename, inline_css):
         date=datetime.datetime.now().strftime("%Y/%m/%d"),
         time=datetime.datetime.now().strftime("%H:%M:%S"),
         scaling_factor=gv.scaling_factor,
+        ctme=gv.ctme,
+        nps=gv.nps,
         parameters=gv.parameters,
         k_eff=gv.k_effective,
         tally_list=gv.tally_list,

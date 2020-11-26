@@ -59,6 +59,7 @@ class Tally:
         """
         start_PATTERN = re.compile(r"\s+results of 10 statistical checks.+")
         value = None
+        pass_fail = None
         for n, line in enumerate(self.data):
             if start_PATTERN.match(line):
                 value = self.data[n+6].split()
