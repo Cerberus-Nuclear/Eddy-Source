@@ -199,6 +199,40 @@
     </table>
     {% endfor %}
     {% endif %}
+
+    {% if 'F6' in tally_types or 'F6+' in tally_types %}
+    {% for particle in f6_tallies if f6_tallies[particle] %}
+    {% if particle == 'Collision Heating' %}
+    <h2>F6 Tally {{particle}} Values</h2>
+    {% else %}
+    <h2>F6 Tally {{particle.capitalize()[:-1]}} Values</h2>
+    {% endif %}
+    <table>
+        <tr>
+            <th>Tally Number</th>
+            <th>Cell Number</th>
+            <th>Value (uSv/h)</th>
+            <th>Error</th>
+        </tr>
+        {% for tally in f6_tallies[particle] %}
+        {% for region in tally.results %}
+        <tr>
+            <td>{{tally.tally_number}}</td>
+            <td>{{region['region'][5:]}}</td>
+            <td>{{"%.3e"|format(region['result'])}}</td>
+            <td style="
+                {% if region['variance'] > 0.1 %}background-color: tomato
+                {% elif region['variance'] == 0.0 %}background-color: orangered
+                {% endif %}
+                ">
+                {{region['variance']}}
+            </td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+    </table>
+    {% endfor %}
+    {% endif %}
 </div>
 
 

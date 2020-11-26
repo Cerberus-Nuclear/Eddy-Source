@@ -27,7 +27,7 @@ class Tally:
         self.tally_type = ' '.join(self.tally_type)
         self.particles = data[2].split()[1]
         self.dose_functions = self.get_dose_functions()
-        self.results = self.get_results(data)
+        self.results = self.get_results()
         self.statistical_checks = self.get_statistical_checks()
         self.passes = self.get_passes()
         gv.tally_list.append(self)
@@ -139,12 +139,13 @@ class F2Tally(Tally):
         super().__init__(data)
         gv.F2_tallies[self.particles].append(self)
 
-    def get_results(self, data):
+    def get_results(self):
         """
             Gets the tally results from the mcnp output file
             Args: self: the object, data: the mcnp output tally section
             Returns: regions: a dictionary holding the results for that tally
         """
+        data = self.data
         results = {}
         for num, line in enumerate(data):
             if "surface:" in line:
@@ -170,15 +171,17 @@ class F4Tally(Tally):
         super().__init__(data)
         gv.F4_tallies[self.particles].append(self)
 
-    def get_results(self, data):
+    def get_results(self):
         """Get the tally results from the mcnp output file
 
         Args:
             data (list): the section of the MCNP output file for this tally
 
         Returns:
-            regions (dict): The results for this tally
+            results(list): A list of dictionaries, each corresponding to a cell
+                            in this tally, with entries for region, result and variance.
         """
+        data = self.data
         results = []
         for num, line in enumerate(data):
             if (" cell  " in line) or (" surface  " in line):
@@ -204,12 +207,13 @@ class F5Tally(Tally):
         super().__init__(data)
         gv.F5_tallies[self.particles].append(self)
 
-    def get_results(self, data):
+    def get_results(self):
         """
             Gets the tally results from the mcnp output file
             Args: self: the object, data: the mcnp output tally section
             Returns: regions: a dictionary holding the results for that tally
         """
+        data = self.data
         results = {}
         for num, line in enumerate(data):
             if "detector located at" in line:
@@ -253,12 +257,32 @@ class F5Tally(Tally):
 class F6Tally(Tally):
     def __init__(self, data):
         super().__init__(data)
+        if self.f_type == "F6+":
+            self.particles = "Collision Heating"
         gv.F6_tallies[self.particles].append(self)
 
-    def get_results(self, data):
-        # TODO: DOCSTRING
-        # TODO: IMPLEMENT
-        return None
+
+    def get_results(self):
+        data = self.data
+        """Get the tally results from the MCNP output file
+        Args:
+            data (list): the section of the MCNP output file for this tally
+        Returns:
+            results (list): A list of dictionaries, each corresponding to a cell
+                            in this tally, with entries for region, mass, result 
+                            and variance.
+        """
+        results = []
+        # TODO: get cell mass as well as other results
+        PATTERN_f6_cell = re.compile(r'^\s+cell\s+\d+')
+        for num, line in enumerate(data):
+            if PATTERN_f6_cell.match(line):
+                results.append({
+                    "region": line.strip().capitalize(),
+                    "result": float(data[num+1].split()[0]),
+                    "variance": float(data[num+1].split()[1])
+                })
+        return results
 
     def normalise_data(self):
         # TODO: DOCSTRING

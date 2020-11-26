@@ -596,7 +596,7 @@ def test_f6_init_creates_f6plus_object(f6_plus_tally_data):
     # assert
     assert type(F6_object) == tallies.F6Tally
     assert F6_object.tally_type == "energy deposition units mev/gram"
-    assert F6_object.particles == "neutrons"
+    assert F6_object.particles == "Collision Heating"
     assert F6_object.f_type == "F6+"
     assert F6_object.dose_functions == "This tally is not modified by any dose function"
 
@@ -610,7 +610,7 @@ def test_f6_init_calls_subclass_results(mocker, f6_tally_data):
     # act
     F6_object = tallies.F6Tally(tally_data)
     # assert
-    mocked_subclass_get_results.assert_any_call(tally_data)
+    mocked_subclass_get_results.assert_any_call()
     mocked_superclass_get_results.assert_not_called()
 
 
@@ -631,9 +631,41 @@ def test_f6_init_adds_F6_plus_to_types_list(mocker, f6_plus_tally_data):
     tally_data = f6_plus_tally_data
     mocked_gv = mocker.patch('eddymc.mcnp.tallies.gv')
     mocked_gv.f_types = []
+    mocked_gv.F6_tallies = {'neutrons': [], 'photons': [], 'electrons': [], 'Collision Heating': [],}
     # act
     F6_object = tallies.F6Tally(tally_data)
     # assert
     assert "F6" not in mocked_gv.f_types
     assert "F6+" in mocked_gv.f_types
+    assert F6_object in mocked_gv.F6_tallies['Collision Heating']
+
+
+def test_f6_tally_get_results(mocker, f6_tally_data):
+    # arrange
+    tally = tallies.F6Tally(f6_tally_data)
+    # act
+    tally.results = tally.get_results()
+    # assert
+    assert type(tally.results) == list
+    assert tally.results[0]['region'] == "Cell  23"
+    assert tally.results[0]['result'] == 1.98631E-09
+    assert tally.results[0]['variance'] == 0.0069
+    assert tally.results[1]['region'] == "Cell  24"
+    assert tally.results[1]['result'] == 1.99881E-09
+    assert tally.results[1]['variance'] == 0.0069
+
+
+def test_f6_plus_tally_get_results(mocker, f6_plus_tally_data):
+    # arrange
+    tally = tallies.F6Tally(f6_plus_tally_data)
+    # act
+    tally.results = tally.get_results()
+    # assert
+    assert type(tally.results) == list
+    assert tally.results[0]['region'] == "Cell  27"
+    assert tally.results[0]['result'] == 4.44113E-09
+    assert tally.results[0]['variance'] == 0.0083
+    assert tally.results[1]['region'] == "Cell  28"
+    assert tally.results[1]['result'] == 4.46157E-09
+    assert tally.results[1]['variance'] == 0.0082
 

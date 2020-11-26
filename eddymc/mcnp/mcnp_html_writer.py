@@ -88,6 +88,7 @@ def get_html(filename, inline_css):
         f2_tallies=gv.F2_tallies,
         f4_tallies=gv.F4_tallies,
         f5_tallies=gv.F5_tallies,
+        f6_tallies=gv.F6_tallies,
         warnings=gv.warnings,
         comments=gv.comments,
         duplicate_surfaces=gv.duplicate_surfaces,
