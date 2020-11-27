@@ -267,20 +267,34 @@ class F6Tally(Tally):
         Args:
             data (list): the section of the MCNP output file for this tally
         Returns:
-            results (list): A list of dictionaries, each corresponding to a cell
+            results (dict): A dictionary of dictionaries of dictionaries, each corresponding to a cell
                             in this tally, with entries for region, mass, result 
                             and variance.
         """
-        results = []
-        # TODO: get cell mass as well as other results
+        results = {}
+        for num, line in enumerate(data):
+            if 'masses' in line:
+                masses_start = num
+                break
+        for num, line in enumerate(data[masses_start:], start=masses_start):
+            if 'cell  ' in line:
+                masses_end = num-1
+                break
+        mass_data = data[masses_start:masses_end]
+        for num, line in enumerate(mass_data):
+            if "cell" in line:
+                for n, mass in enumerate(mass_data[num+1].split()):
+                    cell_no = mass_data[num].split()[n+1]
+                    results[cell_no] = {'region': f"Cell {cell_no}", 'mass': float(mass)}
+
+
         PATTERN_f6_cell = re.compile(r'^\s+cell\s+\d+')
         for num, line in enumerate(data):
             if PATTERN_f6_cell.match(line):
-                results.append({
-                    "region": line.strip().capitalize(),
-                    "result": float(data[num+1].split()[0]),
-                    "variance": float(data[num+1].split()[1])
-                })
+                cell_no = line.split()[1]
+                results[cell_no]["result"] = float(data[num+1].split()[0])
+                results[cell_no]["variance"] = float(data[num+1].split()[1])
+
         return results
 
     def normalise_data(self):
@@ -289,8 +303,8 @@ class F6Tally(Tally):
             Args: self, scaling_factor: a float or int by which the region results are multiplied
             Returns: none, but modifies self.results
         """
-        for num, region in enumerate(self.results):
-            region['result'] *= gv.scaling_factor
+        for region in self.results:
+            self.results[region]['result'] *= gv.scaling_factor
 
 
 ############################################################

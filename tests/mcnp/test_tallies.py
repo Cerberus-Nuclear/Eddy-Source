@@ -837,13 +837,13 @@ def test_f6_tally_get_results(f6_tally_data):
     # act
     tally.results = tally.get_results()
     # assert
-    assert type(tally.results) == list
-    assert tally.results[0]['region'] == "Cell  3"
-    assert tally.results[0]['result'] == 2.45307E-05
-    assert tally.results[0]['variance'] == 0.0005
-    assert tally.results[1]['region'] == "Cell  4"
-    assert tally.results[1]['result'] == 2.00761E-05
-    assert tally.results[1]['variance'] == 0.0005
+    assert type(tally.results) == dict
+    assert tally.results['3']['region'] == "Cell 3"
+    assert tally.results['3']['result'] == 2.45307E-05
+    assert tally.results['3']['variance'] == 0.0005
+    assert tally.results['4']['region'] == "Cell 4"
+    assert tally.results['4']['result'] == 2.00761E-05
+    assert tally.results['4']['variance'] == 0.0005
 
 
 def test_f6_plus_tally_get_results(f6_plus_tally_data):
@@ -852,13 +852,13 @@ def test_f6_plus_tally_get_results(f6_plus_tally_data):
     # act
     tally.results = tally.get_results()
     # assert
-    assert type(tally.results) == list
-    assert tally.results[0]['region'] == "Cell  3"
-    assert tally.results[0]['result'] == 2.60440E-05
-    assert tally.results[0]['variance'] == 0.0005
-    assert tally.results[1]['region'] == "Cell  4"
-    assert tally.results[1]['result'] == 2.13145E-05
-    assert tally.results[1]['variance'] == 0.0005
+    assert type(tally.results) == dict
+    assert tally.results['3']['region'] == "Cell 3"
+    assert tally.results['3']['result'] == 2.60440E-05
+    assert tally.results['3']['variance'] == 0.0005
+    assert tally.results['4']['region'] == "Cell 4"
+    assert tally.results['4']['result'] == 2.13145E-05
+    assert tally.results['4']['variance'] == 0.0005
 
 
 def test_f6_tally_normalise_data(mocker, f6_tally_data):
@@ -869,5 +869,5 @@ def test_f6_tally_normalise_data(mocker, f6_tally_data):
     # act
     F6_object.normalise_data()
     # assert
-    assert F6_object.results[0]['result'] == 2.45307E-05 * 2
+    assert F6_object.results['3']['result'] == 2.45307E-05 * 2
 
