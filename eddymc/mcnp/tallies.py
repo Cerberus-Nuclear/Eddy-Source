@@ -43,7 +43,7 @@ class Tally:
 
         """
         if "this tally is modified by dose function" in self.data[3]:
-            return self.data[3].split()[7], self.data[3].split()[9]
+            return self.data[3].split()[7], self.data[3].split()[9][:-1]
         else:
             return "This tally is not modified by any dose function"
 
@@ -261,7 +261,6 @@ class F6Tally(Tally):
             self.particles = "Collision Heating"
         gv.F6_tallies[self.particles].append(self)
 
-
     def get_results(self):
         data = self.data
         """Get the tally results from the MCNP output file
@@ -285,9 +284,13 @@ class F6Tally(Tally):
         return results
 
     def normalise_data(self):
-        # TODO: DOCSTRING
-        # TODO: IMPLEMENT
-        pass
+        """
+            Applies scaling factor, which can be given as an argument to the core script.
+            Args: self, scaling_factor: a float or int by which the region results are multiplied
+            Returns: none, but modifies self.results
+        """
+        for num, region in enumerate(self.results):
+            region['result'] *= gv.scaling_factor
 
 
 ############################################################
