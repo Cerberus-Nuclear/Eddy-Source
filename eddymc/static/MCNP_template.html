@@ -211,21 +211,21 @@
         <tr>
             <th>Tally Number</th>
             <th>Cell Number</th>
-            <th>Value (uSv/h)</th>
+            <th>Value (MeV/g)</th>
             <th>Error</th>
         </tr>
         {% for tally in f6_tallies[particle] %}
         {% for region in tally.results %}
         <tr>
             <td>{{tally.tally_number}}</td>
-            <td>{{region['region'][5:]}}</td>
-            <td>{{"%.3e"|format(region['result'])}}</td>
+            <td>{{tally.results[region]['region'][5:]}}</td>
+            <td>{{"%.3e"|format(tally.results[region]['result'])}}</td>
             <td style="
-                {% if region['variance'] > 0.1 %}background-color: tomato
-                {% elif region['variance'] == 0.0 %}background-color: orangered
+                {% if tally.results[region]['variance'] > 0.1 %}background-color: tomato
+                {% elif tally.results[region]['variance'] == 0.0 %}background-color: orangered
                 {% endif %}
                 ">
-                {{region['variance']}}
+                {{tally.results[region]['variance']}}
             </td>
         </tr>
         {% endfor %}
@@ -443,6 +443,46 @@
     </div>
     {% endif %} {# This was "if F5 in tally_types" #}
 
+    {# F6 TALLY RESULTS #}
+    {% if ('F6' in tally_types) or ('F6+' in tally_types) %}
+    <div id="F6 tally breakdown">
+        <h1>F6 Tally Results</h1>
+        {% for particle in f6_tallies %}
+        {% for tally in f6_tallies[particle] %}
+        <div class="tally_breakdown">
+            <div class="tally_results">
+                <h2>Results for {{tally.particles.title()}} {{tally.tally_type[:].title()}}, Tally Number: {{tally.tally_number}}</h2>
+                <table>
+                    <tr>
+                        <th>Tally Number</th>
+                        <th>Cell Number</th>
+                        <th>Mass (g)</th>
+                        <th>Value (MeV/g)</th>
+                        <th>Error</th>
+                    </tr>
+                    {% for region in tally.results %}
+                    <tr>
+                        <td>{{tally.tally_number}}</td>
+                        <td>{{tally.results[region]['region'][5:]}}</td>
+                        <td>{{"%.3e"|format(tally.results[region]['mass'])}}</td>
+                        <td>{{"%.3e"|format(tally.results[region]['result'])}}</td>
+                        <td style="
+                            {% if tally.results[region]['variance'] > 0.1 %}background-color: tomato
+                            {% elif tally.results[region]['variance'] == 0.0 %}background-color: orangered
+                            {% endif %}
+                            ">
+                            {{tally.results[region]['variance']}}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {{ tally_check(tally=tally) }}
+        </div>
+        {% endfor %} {# This was "for tally in particle" #}
+        {% endfor %} {# This was "for particle in F5_tallies" #}
+    </div>
+    {% endif %} {# This was "if F6 in tally_types" #}
 
 </div>
 {% endif %} {# This is the "if tallies" #}
