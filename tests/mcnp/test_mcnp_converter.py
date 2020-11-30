@@ -37,6 +37,12 @@ def dumps_file(tmpdir):
     return file.split('\n')
 
 
+@pytest.fixture
+def crit_file(tmpdir):
+    file = pkg_resources.read_text(mcnp_examples, 'Criticality.out')
+    return file.split('\n')
+
+
 def test_read_file():
     # arrange
     file = os.path.dirname(mcnp_examples.__file__)
@@ -214,11 +220,17 @@ def test_get_duplicate_surfaces(dumps_file):
     assert duplicate_surfaces[0] == "Surface       34   and surface      501   are the same.      501   will be deleted."
 
 
-def test_get_keff():
-    pass
+def test_get_keff(crit_file):
     # arrange
     # act
+    k_eff = mcnp_converter.get_k_eff(crit_file)
     # assert
+    assert k_eff['first half k_eff'] == 0.78280
+    assert k_eff['first half stdev'] == 0.00061
+    assert k_eff['second half k_eff'] == 0.78235
+    assert k_eff['second half stdev'] == 0.00067
+    assert k_eff['final k_eff'] == 0.78257
+    assert k_eff['final stdev'] == 0.00045
 
 
 def test_get_active_cycles():

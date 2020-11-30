@@ -226,16 +226,16 @@ def get_k_eff(output_data):
     for num, line in enumerate(output_data):
         if PATTERN_k_eff.match(line):
             first_half = re.split(r'\s{2,}', output_data[num+2].strip())
-            k_eff['first half k_eff'] = first_half[1]
-            k_eff['first half stdev'] = first_half[2]
+            k_eff['first half k_eff'] = float(first_half[1])
+            k_eff['first half stdev'] = float(first_half[2])
 
             second_half = re.split(r'\s{2,}', output_data[num+3].strip())
-            k_eff['second half k_eff'] = second_half[1]
-            k_eff['second half stdev'] = second_half[2]
+            k_eff['second half k_eff'] = float(second_half[1])
+            k_eff['second half stdev'] = float(second_half[2])
 
             final_result = re.split(r'\s{2,}', output_data[num+4].strip())
-            k_eff['final k_eff'] = final_result[1]
-            k_eff['final stdev'] = final_result[2]
+            k_eff['final k_eff'] = float(final_result[1])
+            k_eff['final stdev'] = float(final_result[2])
     return k_eff
 
 
