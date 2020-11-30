@@ -26,34 +26,44 @@ class Tally:
         self.tally_type = data[1].split()[3:]
         self.tally_type = ' '.join(self.tally_type)
         self.particles = data[2].split()[1]
-        self.dose_functions = data[3].split()[7], data[3].split()[9]
-        self.results = self.get_results(data)
-        self.statistical_checks = self.get_statistical_checks(data)
+        self.dose_functions = self.get_dose_functions()
+        self.results = self.get_results()
+        self.statistical_checks = self.get_statistical_checks()
         self.passes = self.get_passes()
         gv.tally_list.append(self)
         if self.f_type not in gv.f_types:
             gv.f_types.append(self.f_type)
 
-    def get_results(self, data):
-        """This is a placeholder method; each subclass of Tally should have its own 'get_results' method"""
-        raise NotImplementedError(f"The {self.__class__} subclass should have its own normalise_data method")
-
-    def get_statistical_checks(self, data):
-        """Get the statistical check results from the mcnp output file
-
-        Args:
-            data (list): the section of the mcnp output for this tally
+    def get_dose_functions(self):
+        """Gets the dose function, if any, that the results of this tally are multiplied by
 
         Returns:
-            None, but creates self.statistical_checks, a dictionary with
-                the results of the statistical checks for this tally.
+            Either a tuple of the DE and DF functions, if they exist, otherwise a string
+            stating that this tally is not multiplied by a dose function.
+
+        """
+        if "this tally is modified by dose function" in self.data[3]:
+            return self.data[3].split()[7], self.data[3].split()[9][:-1]
+        else:
+            return "This tally is not modified by any dose function"
+
+    def get_results(self, data):
+        """This is a placeholder method; each subclass of Tally should have its own 'get_results' method"""
+        raise NotImplementedError(f"The {self.__class__} subclass should have its own get_results() method")
+
+    def get_statistical_checks(self):
+        """Get the statistical check results from the mcnp output file
+
+        Returns:
+            statistical_checks, a dictionary with the results of the statistical checks for this tally.
         """
         start_PATTERN = re.compile(r"\s+results of 10 statistical checks.+")
         value = None
-        for n, line in enumerate(data):
+        pass_fail = None
+        for n, line in enumerate(self.data):
             if start_PATTERN.match(line):
-                value = data[n+6].split()
-                pass_fail = data[n+7].split()
+                value = self.data[n+6].split()
+                pass_fail = self.data[n+7].split()
                 break
         if value:       # if statistical checks have been found
             statistical_checks = {
@@ -129,12 +139,13 @@ class F2Tally(Tally):
         super().__init__(data)
         gv.F2_tallies[self.particles].append(self)
 
-    def get_results(self, data):
+    def get_results(self):
         """
             Gets the tally results from the mcnp output file
             Args: self: the object, data: the mcnp output tally section
             Returns: regions: a dictionary holding the results for that tally
         """
+        data = self.data
         results = {}
         for num, line in enumerate(data):
             if "surface:" in line:
@@ -160,15 +171,17 @@ class F4Tally(Tally):
         super().__init__(data)
         gv.F4_tallies[self.particles].append(self)
 
-    def get_results(self, data):
+    def get_results(self):
         """Get the tally results from the mcnp output file
 
         Args:
             data (list): the section of the MCNP output file for this tally
 
         Returns:
-            regions (dict): The results for this tally
+            results(list): A list of dictionaries, each corresponding to a cell
+                            in this tally, with entries for region, result and variance.
         """
+        data = self.data
         results = []
         for num, line in enumerate(data):
             if (" cell  " in line) or (" surface  " in line):
@@ -194,12 +207,13 @@ class F5Tally(Tally):
         super().__init__(data)
         gv.F5_tallies[self.particles].append(self)
 
-    def get_results(self, data):
+    def get_results(self):
         """
             Gets the tally results from the mcnp output file
             Args: self: the object, data: the mcnp output tally section
             Returns: regions: a dictionary holding the results for that tally
         """
+        data = self.data
         results = {}
         for num, line in enumerate(data):
             if "detector located at" in line:
@@ -240,6 +254,59 @@ class F5Tally(Tally):
         self.results["result"] *= gv.scaling_factor
 
 
+class F6Tally(Tally):
+    def __init__(self, data):
+        super().__init__(data)
+        if self.f_type == "F6+":
+            self.particles = "Collision Heating"
+        gv.F6_tallies[self.particles].append(self)
+
+    def get_results(self):
+        data = self.data
+        """Get the tally results from the MCNP output file
+        Args:
+            data (list): the section of the MCNP output file for this tally
+        Returns:
+            results (dict): A dictionary of dictionaries of dictionaries, each corresponding to a cell
+                            in this tally, with entries for region, mass, result 
+                            and variance.
+        """
+        results = {}
+        for num, line in enumerate(data):
+            if 'masses' in line:
+                masses_start = num
+                break
+        for num, line in enumerate(data[masses_start:], start=masses_start):
+            if 'cell  ' in line:
+                masses_end = num-1
+                break
+        mass_data = data[masses_start:masses_end]
+        for num, line in enumerate(mass_data):
+            if "cell" in line:
+                for n, mass in enumerate(mass_data[num+1].split()):
+                    cell_no = mass_data[num].split()[n+1]
+                    results[cell_no] = {'region': f"Cell {cell_no}", 'mass': float(mass)}
+
+
+        PATTERN_f6_cell = re.compile(r'^\s+cell\s+\d+')
+        for num, line in enumerate(data):
+            if PATTERN_f6_cell.match(line):
+                cell_no = line.split()[1]
+                results[cell_no]["result"] = float(data[num+1].split()[0])
+                results[cell_no]["variance"] = float(data[num+1].split()[1])
+
+        return results
+
+    def normalise_data(self):
+        """
+            Applies scaling factor, which can be given as an argument to the core script.
+            Args: self, scaling_factor: a float or int by which the region results are multiplied
+            Returns: none, but modifies self.results
+        """
+        for region in self.results:
+            self.results[region]['result'] *= gv.scaling_factor
+
+
 ############################################################
 #  End of Tally class                                      #
 ############################################################
@@ -276,4 +343,6 @@ def get_tallies(data):
                         F4Tally(tally_data)
                     if tally_type == "5":
                         F5Tally(tally_data)
+                    if tally_type == "6" or tally_type == "6+":
+                        F6Tally(tally_data)
             break
