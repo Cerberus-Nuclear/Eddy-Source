@@ -31,6 +31,12 @@ def parameters_file(tmpdir):
     return file.split('\n')
 
 
+@pytest.fixture
+def dumps_file(tmpdir):
+    file = pkg_resources.read_text(mcnp_examples, 'Dumps.out')
+    return file.split('\n')
+
+
 def test_read_file():
     # arrange
     file = os.path.dirname(mcnp_examples.__file__)
@@ -198,12 +204,14 @@ def test_get_comments(f2_file):
     assert comments[6] == "Setting up hash-based fast table search for xsec tables"
 
 
-
-def test_get_duplicate_surfaces():
+def test_get_duplicate_surfaces(dumps_file):
     pass
     # arrange
     # act
+    duplicate_surfaces = mcnp_converter.get_duplicate_surfaces(dumps_file)
     # assert
+    assert len(duplicate_surfaces) == 8
+    assert duplicate_surfaces[0] == "Surface       34   and surface      501   are the same.      501   will be deleted."
 
 
 def test_get_keff():

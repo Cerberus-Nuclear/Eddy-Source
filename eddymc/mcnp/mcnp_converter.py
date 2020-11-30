@@ -55,7 +55,7 @@ def parse_output(output_data):
         cell.assign_populations(neutron_populations, photon_populations, electron_populations)
     gv.warnings = get_warnings(output_data)
     gv.comments = get_comments(output_data)
-    get_duplicate_surfaces(output_data)
+    gv.duplicate_surfaces = get_duplicate_surfaces(output_data)
     particles.get_neutrons(output_data)
     particles.get_photons(output_data)
     particles.get_electrons(output_data)
@@ -201,13 +201,15 @@ def get_duplicate_surfaces(output_data):
         output_data (list): The mcnp output
 
     Returns:
-        None, but populates gv.duplicate_surfaces, a list of the duplicate surfaces
+        duplicate_surfaces, a list of the duplicate surfaces
     """
+    duplicate_surfaces = []
     PATTERN_duplicates = re.compile(r'\ssurface\s+\d+.+and surface.+are the same.+')
     for line in output_data:
         if PATTERN_duplicates.match(line):
-            if line not in gv.duplicate_surfaces:
-                gv.duplicate_surfaces.append(line)
+            if line.strip().capitalize() not in duplicate_surfaces:
+                duplicate_surfaces.append(line.strip().capitalize())
+    return duplicate_surfaces
 
 
 def get_k_eff(output_data):
