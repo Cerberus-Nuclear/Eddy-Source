@@ -233,11 +233,14 @@ def test_get_keff(crit_file):
     assert k_eff['final stdev'] == 0.00045
 
 
-def test_get_active_cycles():
+def test_get_active_cycles(crit_file):
     pass
     # arrange
     # act
+    cycles = mcnp_converter.get_active_cycles(crit_file)
     # assert
+    assert cycles["inactive"] == 16
+    assert cycles["active"] == 184
 
 
 def test_main_calls_mcnp_html_writer(mocker):

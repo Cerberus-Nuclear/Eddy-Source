@@ -61,7 +61,7 @@ def parse_output(output_data):
     particles.get_electrons(output_data)
     if gv.crit_case:
         gv.k_effective = get_k_eff(output_data)
-        get_active_cycles(output_data)
+        gv.cycles = get_active_cycles(output_data)
     else:
         tallies.get_tallies(output_data)
         if gv.scaling_factor != 1:
@@ -254,7 +254,7 @@ def get_active_cycles(output_data):
         if "the minimum estimated standard deviation for the col/abs/tl keff estimator occurs with" in line:
             cycles["inactive"] = int(line.split()[12])
             cycles["active"] = int(line.split()[16])
-    gv.cycles = cycles
+    return cycles
 
 
 def main(filename, scaling_factor=1, crit_case=False):
