@@ -56,6 +56,8 @@ def test_read_file():
 
 def test_parse_output():
     # This one might need a lot of tests
+    # although there is almost no actual logic in this function,
+    # it is all calls to other functions
     pass
 
 
@@ -137,7 +139,8 @@ def test_get_parameters_positive():
                         "c",
                         "c ==============================================================================",
                         "c ============================= START CELL SECTION =============================",
-                        "c ==============================================================================",]
+                        "c ==============================================================================",
+                        ]
     # act
     variables = mcnp_converter.get_parameters(parameters_input)
     # assert
@@ -262,14 +265,11 @@ def test_main_writes_to_gv(mocker):
     sf = 1.0
     output = mocker.patch('eddymc.mcnp.mcnp_converter.gv')
     # mock the rest of the main() function so it doesn't make actual calls
-    mock_read_file = mocker.patch('eddymc.mcnp.mcnp_converter.read_file')
-    mock_parse_output = mocker.patch('eddymc.mcnp.mcnp_converter.parse_output')
-    mock_html_writer = mocker.patch('eddymc.mcnp.mcnp_converter.mcnp_html_writer.main')
+    mocker.patch('eddymc.mcnp.mcnp_converter.read_file')
+    mocker.patch('eddymc.mcnp.mcnp_converter.parse_output')
+    mocker.patch('eddymc.mcnp.mcnp_converter.mcnp_html_writer.main')
     # act
     mcnp_converter.main(file, sf)
     # assert
     assert output.scaling_factor == 1.0
     assert output.crit_case is False
-
-
-# TODO: add tests for parse_output (see line 34)
