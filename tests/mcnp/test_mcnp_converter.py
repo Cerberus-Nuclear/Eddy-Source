@@ -43,6 +43,12 @@ def crit_file(tmpdir):
     return file.split('\n')
 
 
+@pytest.fixture
+def failed_case(tmpdir):
+    file = pkg_resources.read_text(mcnp_examples, 'fatal_error.out')
+    return file.split('\n')
+
+
 def test_read_file():
     # arrange
     file = os.path.dirname(mcnp_examples.__file__)
@@ -187,6 +193,25 @@ def test_get_parameters_negative():
     variables = mcnp_converter.get_parameters(parameters_input)
     # assert
     assert not variables
+
+
+def test_get_fatal_errors_present(failed_case):
+    # arrange
+    # act
+    fatal_errors = mcnp_converter.get_fatal_errors(failed_case)
+    # assert
+    assert len(fatal_errors) == 3
+    assert fatal_errors[0] == "Surface       -16 not found for cell         4 card."
+    assert fatal_errors[1] == "Surface      -16 of cell        4 is not defined."
+    assert fatal_errors[2] == "1 tally volumes or areas were not input nor calculated."
+
+
+def test_get_fatal_errors_not_present(f2_file):
+    # arrange
+    # act
+    fatal_errors = mcnp_converter.get_fatal_errors(f2_file)
+    # assert
+    assert fatal_errors == []   # empty list
 
 
 def test_get_warnings(f2_file):

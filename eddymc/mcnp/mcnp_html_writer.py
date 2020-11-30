@@ -82,6 +82,7 @@ def get_html(filename, inline_css):
         ctme=gv.ctme,
         nps=gv.nps,
         parameters=gv.parameters,
+        fatal_errors=gv.fatal_errors,
         k_eff=gv.k_effective,
         tally_list=gv.tally_list,
         tally_types=gv.f_types,

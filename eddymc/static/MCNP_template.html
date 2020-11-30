@@ -106,6 +106,19 @@
 {% endif %}
 
 
+{% if fatal_errors %}
+<div id="fatal_errors">
+    <h1>WARNING: FATAL ERRORS OCCURRED DURING THIS RUN</h1>
+    <div id="fatal_messages">
+        <p style="font-weight: bold">The following fatal error messages were generated:</p>
+        {% for message in fatal_errors %}
+        <p>{{message}}</p>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+
 {% if tally_list %}
 <div id="results_summary">
     <h1>Results - Summary</h1>

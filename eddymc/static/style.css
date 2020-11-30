@@ -205,13 +205,18 @@ div {
     padding: 1px;
 }
 
-#warnings, #duplicates, #comments {
+#warnings, #duplicates, #comments, #fatal_errors {
     text-align: center;
     }
 
-#warning_messages, #duplicate_messages, #comment_messages {
+#warning_messages, #duplicate_messages, #comment_messages, #fatal_messages {
     display:inline-block;
     padding: 5px
+    }
+
+#fatal_messages, p {
+    text-align: left;
+    padding: 5px;
     }
 
 #warning_messages, p {

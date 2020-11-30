@@ -53,6 +53,7 @@ def parse_output(output_data):
     cells.create_cell_objects(cell_data)
     for cell in gv.cell_list:
         cell.assign_populations(neutron_populations, photon_populations, electron_populations)
+    gv.fatal_errors = get_fatal_errors(output_data)
     gv.warnings = get_warnings(output_data)
     gv.comments = get_comments(output_data)
     gv.duplicate_surfaces = get_duplicate_surfaces(output_data)
@@ -154,6 +155,23 @@ def get_parameters(input_data):
                 variables[variable] = float(value)
             break
     return variables
+
+
+def get_fatal_errors(output_data):
+    """Find the warnings in the MCNP output data
+
+    Args:
+        output_data (list): The MCNP output data
+
+    Returns:
+        fatal_errors, a list of the fatal error messages
+    """
+    fatal_errors = []
+    for line in output_data:
+        if "fatal error." in line:
+            message = line[14:].strip().capitalize()
+            fatal_errors.append(message)
+    return fatal_errors
 
 
 def get_warnings(output_data):
