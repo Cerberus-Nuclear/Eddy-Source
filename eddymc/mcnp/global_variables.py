@@ -15,6 +15,7 @@ F4_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
 F5_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
 F6_tallies = {'neutrons': [], 'photons': [], 'electrons': [], 'Collision Heating': []}
 tally_types = {}
+fatal_errors = []
 warnings = []
 comments = []
 duplicate_surfaces = []

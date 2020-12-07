@@ -53,15 +53,16 @@ def parse_output(output_data):
     cells.create_cell_objects(cell_data)
     for cell in gv.cell_list:
         cell.assign_populations(neutron_populations, photon_populations, electron_populations)
-    get_warnings(output_data)
-    get_comments(output_data)
-    get_duplicate_surfaces(output_data)
+    gv.fatal_errors = get_fatal_errors(output_data)
+    gv.warnings = get_warnings(output_data)
+    gv.comments = get_comments(output_data)
+    gv.duplicate_surfaces = get_duplicate_surfaces(output_data)
     particles.get_neutrons(output_data)
     particles.get_photons(output_data)
     particles.get_electrons(output_data)
     if gv.crit_case:
         gv.k_effective = get_k_eff(output_data)
-        get_active_cycles(output_data)
+        gv.cycles = get_active_cycles(output_data)
     else:
         tallies.get_tallies(output_data)
         if gv.scaling_factor != 1:
@@ -156,6 +157,23 @@ def get_parameters(input_data):
     return variables
 
 
+def get_fatal_errors(output_data):
+    """Find the warnings in the MCNP output data
+
+    Args:
+        output_data (list): The MCNP output data
+
+    Returns:
+        fatal_errors, a list of the fatal error messages
+    """
+    fatal_errors = []
+    for line in output_data:
+        if "fatal error." in line:
+            message = line[14:].strip().capitalize()
+            fatal_errors.append(message)
+    return fatal_errors
+
+
 def get_warnings(output_data):
     """Find the warnings in the MCNP output data
 
@@ -163,15 +181,17 @@ def get_warnings(output_data):
         output_data (list): The MCNP output data
 
     Returns:
-        None, but populates gv.warnings, a list of the warning messages
+        warnings, a list of the warning messages
     """
+    warnings = []
     PATTERN_warnings = re.compile(r'warning')
     for line in output_data:
         if PATTERN_warnings.search(line):
-            if "warning message so far" not in line:
+            if "warning message so far" not in line and "warning messages so far" not in line:
                 warning = line[10:].strip().capitalize()
-                if warning not in gv.warnings:
-                    gv.warnings.append(warning)
+                if warning not in warnings:
+                    warnings.append(warning)
+    return warnings
 
 
 def get_comments(output_data):
@@ -181,13 +201,15 @@ def get_comments(output_data):
         output_data (list): The mcnp output
 
     Returns:
-        None, but populates gv.comments, a list of the comments
+        comments, a list of the comments
     """
     PATTERN_comments = re.compile(r'comment\.\s+[A-Za-z0-9].+')    # Ignores blank comment lines
+    comments = []
     for line in output_data:
         if PATTERN_comments.search(line):
             comment = line[10:].strip().capitalize()
-            gv.comments.append(comment)
+            comments.append(comment)
+    return comments
 
 
 def get_duplicate_surfaces(output_data):
@@ -197,13 +219,15 @@ def get_duplicate_surfaces(output_data):
         output_data (list): The mcnp output
 
     Returns:
-        None, but populates gv.duplicate_surfaces, a list of the duplicate surfaces
+        duplicate_surfaces, a list of the duplicate surfaces
     """
+    duplicate_surfaces = []
     PATTERN_duplicates = re.compile(r'\ssurface\s+\d+.+and surface.+are the same.+')
     for line in output_data:
         if PATTERN_duplicates.match(line):
-            if line not in gv.duplicate_surfaces:
-                gv.duplicate_surfaces.append(line)
+            if line.strip().capitalize() not in duplicate_surfaces:
+                duplicate_surfaces.append(line.strip().capitalize())
+    return duplicate_surfaces
 
 
 def get_k_eff(output_data):
@@ -220,16 +244,16 @@ def get_k_eff(output_data):
     for num, line in enumerate(output_data):
         if PATTERN_k_eff.match(line):
             first_half = re.split(r'\s{2,}', output_data[num+2].strip())
-            k_eff['first half k_eff'] = first_half[1]
-            k_eff['first half stdev'] = first_half[2]
+            k_eff['first half k_eff'] = float(first_half[1])
+            k_eff['first half stdev'] = float(first_half[2])
 
             second_half = re.split(r'\s{2,}', output_data[num+3].strip())
-            k_eff['second half k_eff'] = second_half[1]
-            k_eff['second half stdev'] = second_half[2]
+            k_eff['second half k_eff'] = float(second_half[1])
+            k_eff['second half stdev'] = float(second_half[2])
 
             final_result = re.split(r'\s{2,}', output_data[num+4].strip())
-            k_eff['final k_eff'] = final_result[1]
-            k_eff['final stdev'] = final_result[2]
+            k_eff['final k_eff'] = float(final_result[1])
+            k_eff['final stdev'] = float(final_result[2])
     return k_eff
 
 
@@ -248,7 +272,7 @@ def get_active_cycles(output_data):
         if "the minimum estimated standard deviation for the col/abs/tl keff estimator occurs with" in line:
             cycles["inactive"] = int(line.split()[12])
             cycles["active"] = int(line.split()[16])
-    gv.cycles = cycles
+    return cycles
 
 
 def main(filename, scaling_factor=1, crit_case=False):

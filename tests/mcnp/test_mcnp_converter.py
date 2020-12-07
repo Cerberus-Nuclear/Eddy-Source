@@ -25,6 +25,30 @@ def f2_nps_file(tmpdir):
     return f2_nps.split('\n')
 
 
+@pytest.fixture
+def parameters_file(tmpdir):
+    file = pkg_resources.read_text(mcnp_examples, 'F4_F5_param.out')
+    return file.split('\n')
+
+
+@pytest.fixture
+def dumps_file(tmpdir):
+    file = pkg_resources.read_text(mcnp_examples, 'Dumps.out')
+    return file.split('\n')
+
+
+@pytest.fixture
+def crit_file(tmpdir):
+    file = pkg_resources.read_text(mcnp_examples, 'Criticality.out')
+    return file.split('\n')
+
+
+@pytest.fixture
+def failed_case(tmpdir):
+    file = pkg_resources.read_text(mcnp_examples, 'fatal_error.out')
+    return file.split('\n')
+
+
 def test_read_file():
     # arrange
     file = os.path.dirname(mcnp_examples.__file__)
@@ -38,6 +62,8 @@ def test_read_file():
 
 def test_parse_output():
     # This one might need a lot of tests
+    # although there is almost no actual logic in this function,
+    # it is all calls to other functions
     pass
 
 
@@ -72,7 +98,6 @@ def test_get_runtime_nps(f2_nps_file):
 
 
 def test_get_input(f2_file):
-    pass
     # arrange
     file = f2_file
     # act
@@ -85,52 +110,165 @@ def test_get_input(f2_file):
 
 
 def test_get_parameters_positive():
-    pass
     # arrange
+    parameters_input = ["Test MCNP example",
+                        "c",
+                        "c ==============================================================================",
+                        "c",
+                        "c",
+                        "c                 _______     _______ _      ____  _   _ ______",
+                        "c                / ____\ \   / / ____| |    / __ \| \ | |  ____|",
+                        "c               | |     \ \_/ / |    | |   | |  | |  \| | |__",
+                        "c               | |      \   /| |    | |   | |  | | . ` |  __|",
+                        "c               | |____   | | | |____| |___| |__| | |\  | |____",
+                        "c                \_____|  |_|  \_____|______\____/|_| \_|______|",
+                        "c",
+                        "c",
+                        "c",
+                        "c                                Version 0.19.2",
+                        "c",
+                        "c ######################### Cerberus Nuclear 2020 ############################",
+                        "c",
+                        "c",
+                        "c",
+                        "c",
+                        "c     USING THE FOLLOWING VARIABLES:",
+                        "c               width     =   10.00000",
+                        "c",
+                        "c",
+                        "c =============================== START TITLE ==================================",
+                        "c ==============================================================================",
+                        "c   MCNP example Case - concentric spheres",
+                        "c",
+                        "c",
+                        "c <width=10>",
+                        "c",
+                        "c ==============================================================================",
+                        "c ============================= START CELL SECTION =============================",
+                        "c ==============================================================================",
+                        ]
     # act
+    variables = mcnp_converter.get_parameters(parameters_input)
     # assert
+    assert variables['width'] == 10
 
 
 def test_get_parameters_negative():
+    # arrange
+    parameters_input = ["Test MCNP example",
+                        "c",
+                        "c ==============================================================================",
+                        "c",
+                        "c",
+                        "c                 _______     _______ _      ____  _   _ ______",
+                        "c                / ____\ \   / / ____| |    / __ \| \ | |  ____|",
+                        "c               | |     \ \_/ / |    | |   | |  | |  \| | |__",
+                        "c               | |      \   /| |    | |   | |  | | . ` |  __|",
+                        "c               | |____   | | | |____| |___| |__| | |\  | |____",
+                        "c                \_____|  |_|  \_____|______\____/|_| \_|______|",
+                        "c",
+                        "c",
+                        "c",
+                        "c                                Version 0.19.2",
+                        "c",
+                        "c ######################### Cerberus Nuclear 2020 ############################",
+                        "c",
+                        "c",
+                        "c",
+                        "c",
+                        "c     USING THE FOLLOWING VARIABLES:",
+                        "c",
+                        "c",
+                        "c =============================== START TITLE ==================================",
+                        "c ==============================================================================",
+                        "c   MCNP example Case - concentric spheres",
+                        "c",
+                        "c",
+                        "c <width=10>",
+                        "c",
+                        "c ==============================================================================",
+                        "c ============================= START CELL SECTION =============================",
+                        "c ==============================================================================", ]
+    # act
+    variables = mcnp_converter.get_parameters(parameters_input)
+    # assert
+    assert not variables
+
+
+def test_get_fatal_errors_present(failed_case):
+    # arrange
+    # act
+    fatal_errors = mcnp_converter.get_fatal_errors(failed_case)
+    # assert
+    assert len(fatal_errors) == 3
+    assert fatal_errors[0] == "Surface       -16 not found for cell         4 card."
+    assert fatal_errors[1] == "Surface      -16 of cell        4 is not defined."
+    assert fatal_errors[2] == "1 tally volumes or areas were not input nor calculated."
+
+
+def test_get_fatal_errors_not_present(f2_file):
+    # arrange
+    # act
+    fatal_errors = mcnp_converter.get_fatal_errors(f2_file)
+    # assert
+    assert fatal_errors == []   # empty list
+
+
+def test_get_warnings(f2_file):
+    # arrange
+    file = f2_file
+    # act
+    warnings = mcnp_converter.get_warnings(file)
+    # assert
+    assert len(warnings) == 4
+    assert warnings[0] == "1 materials had unnormalized fractions. print table 40."
+    assert warnings[1] == "8017.80c lacks gamma-ray production cross sections."
+    assert warnings[2] == "Material        1 has been set to a conductor."
+    assert warnings[3] == "2 photons from neutron collisions were created below a local photon energy cutoff and were not followed."
+
+
+def test_get_comments(f2_file):
+    # arrange
+    file = f2_file
+    # act
+    comments = mcnp_converter.get_comments(file)
+    # assert
+    assert len(comments) == 7
+    assert comments[0] == "Physics models disabled."
+    assert comments[6] == "Setting up hash-based fast table search for xsec tables"
+
+
+def test_get_duplicate_surfaces(dumps_file):
     pass
     # arrange
     # act
+    duplicate_surfaces = mcnp_converter.get_duplicate_surfaces(dumps_file)
     # assert
+    assert len(duplicate_surfaces) == 8
+    assert duplicate_surfaces[0] == "Surface       34   and surface      501   are the same.      501   will be deleted."
 
 
-def test_get_warnings():
+def test_get_keff(crit_file):
+    # arrange
+    # act
+    k_eff = mcnp_converter.get_k_eff(crit_file)
+    # assert
+    assert k_eff['first half k_eff'] == 0.78280
+    assert k_eff['first half stdev'] == 0.00061
+    assert k_eff['second half k_eff'] == 0.78235
+    assert k_eff['second half stdev'] == 0.00067
+    assert k_eff['final k_eff'] == 0.78257
+    assert k_eff['final stdev'] == 0.00045
+
+
+def test_get_active_cycles(crit_file):
     pass
     # arrange
     # act
+    cycles = mcnp_converter.get_active_cycles(crit_file)
     # assert
-
-
-def test_get_comments():
-    pass
-    # arrange
-    # act
-    # assert
-
-
-def test_get_duplicate_surfaces():
-    pass
-    # arrange
-    # act
-    # assert
-
-
-def test_get_keff():
-    pass
-    # arrange
-    # act
-    # assert
-
-
-def test_get_active_cycles():
-    pass
-    # arrange
-    # act
-    # assert
+    assert cycles["inactive"] == 16
+    assert cycles["active"] == 184
 
 
 def test_main_calls_mcnp_html_writer(mocker):
@@ -152,14 +290,11 @@ def test_main_writes_to_gv(mocker):
     sf = 1.0
     output = mocker.patch('eddymc.mcnp.mcnp_converter.gv')
     # mock the rest of the main() function so it doesn't make actual calls
-    mock_read_file = mocker.patch('eddymc.mcnp.mcnp_converter.read_file')
-    mock_parse_output = mocker.patch('eddymc.mcnp.mcnp_converter.parse_output')
-    mock_html_writer = mocker.patch('eddymc.mcnp.mcnp_converter.mcnp_html_writer.main')
+    mocker.patch('eddymc.mcnp.mcnp_converter.read_file')
+    mocker.patch('eddymc.mcnp.mcnp_converter.parse_output')
+    mocker.patch('eddymc.mcnp.mcnp_converter.mcnp_html_writer.main')
     # act
     mcnp_converter.main(file, sf)
     # assert
     assert output.scaling_factor == 1.0
     assert output.crit_case is False
-
-
-# TODO: add tests for parse_output (see line 34)
