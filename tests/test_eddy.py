@@ -36,6 +36,13 @@ def crit_file(tmpdir):
     return file
 
 
+@pytest.fixture
+def mcnp_input(tmpdir):
+    with open('mcnp_examples/F4.mcnp', 'r') as f:
+        file = f.readlines()
+    return file
+
+
 def test_crit_checker_positive(crit_file):
     # arrange
     text = crit_file
@@ -192,6 +199,24 @@ def test_main_calls_mcnp_converter(mocker, f2_file):
     # assert
     mocked_mcnp_converter.assert_called_with(name, sf, crit)
     mocked_scale_converter.assert_not_called()
+
+
+def test_input_file_doesnt_continue(mocker):
+    # arrange
+    name = 'mcnp_examples/F4.mcnp'
+    mocker.patch(
+        'eddymc.eddy.argparse.ArgumentParser.parse_args',
+        return_value=Namespace(file=None, scaling_factor=None),
+    )
+    mocked_scale_converter = mocker.patch('eddymc.scale.scale_converter.main')
+    mocked_mcnp_converter = mocker.patch('eddymc.mcnp.mcnp_converter.main')
+    # act
+    with pytest.raises(RuntimeError) as expected_failure:
+        eddy.main(filename=name, scaling_factor=1)
+    # assert
+    mocked_mcnp_converter.assert_not_called()
+    mocked_scale_converter.assert_not_called()
+    assert expected_failure
 
 
 def test_main_with_non_mc_input(mocker, text_file):
