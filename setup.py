@@ -5,15 +5,15 @@ with open("README.md", "r") as readme:
 
 setuptools.setup(
     name="eddy_mc", 
-    version="0.1.3",
+    version="0.2.0",
     author="Cerberus Nuclear",
     author_email="nuclear@cerberusnuclear.com",
     description="Eddy, the MCNP and SCALE HTML output converter",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Cerberus-Nuclear/Eddy-Source",
-    packages=['eddymc', 'eddymc\mcnp', 'eddymc\scale', 'eddymc\static'],
-    package_data={'eddymc\static': ['*']},
+    packages=['eddymc', 'eddymc//mcnp', 'eddymc//scale', 'eddymc//static'],
+    package_data={'eddymc//static': ['*']},
     install_requires=['Jinja2'],
     classifiers=[
         "Programming Language :: Python :: 3",
