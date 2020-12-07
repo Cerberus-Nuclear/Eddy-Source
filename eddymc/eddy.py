@@ -169,7 +169,7 @@ def main(filename=None, scaling_factor=None):
     filename, output_data, scaling_factor, crit_case = get_args(filename, scaling_factor)
     if 'SCALE' in output_data[2]:
         scale_converter.main(filename, scaling_factor)
-    elif 'MCNP' in output_data[0]:
+    elif 'Code Name & Version = MCNP' in output_data[0]:
         mcnp_converter.main(filename, scaling_factor, crit_case)
     else:
         raise RuntimeError("This file doesn't seem to be an MCNP or SCALE output?")
