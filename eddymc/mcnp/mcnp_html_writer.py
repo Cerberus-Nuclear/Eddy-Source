@@ -67,7 +67,7 @@ def get_html(filename, inline_css):
     mcnp_input = sanitize_input(gv.mcnp_input)
     #with open("static/MCNP_template.html", "r") as file:
     #    html_template = file.read()
-    html_template = pkg_resources.read_text(static, 'mcnp_template.html')
+    html_template = pkg_resources.read_text(static, 'MCNP_template.html')
     template = Template(html_template)
     html = template.render(
         filename=filename, # with path
