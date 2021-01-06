@@ -59,7 +59,7 @@ def get_html(filename, inline_css):
         html (str): the html output as a single string
     """
     scale_input = sanitize_input(gv.scale_input)
-    html_template = pkg_resources.read_text(static, 'scale_template.html')
+    html_template = pkg_resources.read_text(static, 'SCALE_template.html')
     template = Template(html_template)
     case_name, extension = os.path.splitext(filename)
     case_name = case_name.replace('\\', '/').split('/')[-1]
