@@ -10,7 +10,7 @@ from eddymc import eddy
 
 @pytest.fixture
 def f2_file(tmpdir):
-    with open('mcnp_examples/F2.out', 'r') as f:
+    with open('./mcnp_examples/F2.out', 'r') as f:
         file = f.readlines()
     return file
 
