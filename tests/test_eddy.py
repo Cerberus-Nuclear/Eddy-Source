@@ -17,28 +17,28 @@ def f2_file(tmpdir):
 
 @pytest.fixture
 def scale_file(tmpdir):
-    with open('scale_examples/cylinder_ce.out', 'r') as f:
+    with open('tests/scale_examples/cylinder_ce.out', 'r') as f:
         file = f.readlines()
     return file
 
 
 @pytest.fixture
 def text_file(tmpdir):
-    with open('mcnp_examples/not_an_mcnp_file.txt', 'r') as f:
+    with open('tests/mcnp_examples/not_an_mcnp_file.txt', 'r') as f:
         file = f.readlines()
     return file
 
 
 @pytest.fixture
 def crit_file(tmpdir):
-    with open('mcnp_examples/Criticality.out', 'r') as f:
+    with open('tests/mcnp_examples/Criticality.out', 'r') as f:
         file = f.readlines()
     return file
 
 
 @pytest.fixture
 def mcnp_input(tmpdir):
-    with open('mcnp_examples/F4.mcnp', 'r') as f:
+    with open('tests/mcnp_examples/F4.mcnp', 'r') as f:
         file = f.readlines()
     return file
 
