@@ -83,7 +83,7 @@ def test_get_filename_with_passed_name():
 
 def test_get_filename_from_tkinter(mocker):
     # arrange
-    mocker.stub("eddymc.eddy.Tk.withdraw")
+    mocker.patch("eddymc.eddy.Tk.withdraw")
     mocker.patch("eddymc.eddy.askopenfilename", return_value="mcnp_examples/F2.out")
     # act
     file = eddy.get_filename()
