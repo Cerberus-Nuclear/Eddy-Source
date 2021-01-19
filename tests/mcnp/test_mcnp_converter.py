@@ -52,7 +52,8 @@ def failed_case(tmpdir):
 def test_read_file():
     # arrange
     file = os.path.dirname(mcnp_examples.__file__)
-    file += "\\F2.out"
+    file += "//F2.out"
+    #file = 'mcnp_examples/F2.out'
     # act
     data = mcnp_converter.read_file(file)
     # assert

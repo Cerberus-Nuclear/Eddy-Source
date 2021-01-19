@@ -1,6 +1,11 @@
 
 import pytest
 from eddymc.scale import mixtures
+from tests import scale_examples
+try:
+    import importlib.resources as pkg_resources
+except ImportError:
+    import importlib_resources as pkg_resources
 
 
 @pytest.fixture
