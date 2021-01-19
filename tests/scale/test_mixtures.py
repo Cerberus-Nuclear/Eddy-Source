@@ -13,6 +13,7 @@ def ce_file(tmpdir):
     file = pkg_resources.read_text(scale_examples, 'cylinder_ce.out')
     return file.split('\n')
 
+
 @pytest.fixture
 def multigroup_file(tmpdir):
     file = pkg_resources.read_text(scale_examples, 'cylinder_multigroup.out')
