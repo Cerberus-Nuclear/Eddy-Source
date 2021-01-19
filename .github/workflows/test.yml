@@ -19,6 +19,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Check location
+    - name: pytest
       run: |
-        pwd
+        cd tests
+        pytest
