@@ -83,14 +83,12 @@ def test_get_filename_with_passed_name():
 
 def test_get_filename_from_tkinter(mocker):
     # arrange
-    tk_mock = mocker.patch("eddymc.eddy.Tk.withdraw", return_value=None)
-    askopen_mock = mocker.patch("eddymc.eddy.askopenfilename", return_value="mcnp_examples/F2.out")
+    mocker.patch("eddymc.eddy.Tk.withdraw", return_value=None)
+    mocker.patch("eddymc.eddy.askopenfilename", return_value="mcnp_examples/F2.out")
     # act
     file = eddy.get_filename()
     # assert
-    assert tk_mock.iscalled()
-    assert askopen_mock.iscalled()
-    #assert file == 'mcnp_examples/F2.out'
+    assert file == 'mcnp_examples/F2.out'
 
 
 def test_get_filename_if_file_missing():

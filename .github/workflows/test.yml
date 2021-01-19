@@ -19,10 +19,11 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        export DISPLAY=:1001
+        export DISPLAY=:0.0
         echo $DISPLAY
 
     - name: pytest
       run: |
         cd tests
-        pytest
+        echo DISPLAY:
+        echo $DISPLAY
