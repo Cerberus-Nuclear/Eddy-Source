@@ -6,34 +6,35 @@ or add a configuration in pycharm
 import pytest
 from argparse import Namespace
 from eddymc import eddy
+from tests import mcnp_examples, scale_examples
+try:
+    import importlib.resources as pkg_resources
+except ImportError:
+    import importlib_resources as pkg_resources
 
 
 @pytest.fixture
 def f2_file(tmpdir):
-    with open('tests/mcnp_examples/F2.out', 'r') as f:
-        file = f.readlines()
-    return file
+    f2 = pkg_resources.read_text(mcnp_examples, 'F2.out')
+    return f2.split('\n')
 
 
 @pytest.fixture
 def scale_file(tmpdir):
-    with open('tests/scale_examples/cylinder_ce.out', 'r') as f:
-        file = f.readlines()
-    return file
+    file = pkg_resources.read_text(scale_examples, 'cylinder_ce.out')
+    return file.split('\n')
 
 
 @pytest.fixture
 def text_file(tmpdir):
-    with open('tests/mcnp_examples/not_an_mcnp_file.txt', 'r') as f:
-        file = f.readlines()
-    return file
+    file = pkg_resources.read_text(mcnp_examples, 'not_an_mcnp_file.txt')
+    return file.split('\n')
 
 
 @pytest.fixture
 def crit_file(tmpdir):
-    with open('tests/mcnp_examples/Criticality.out', 'r') as f:
-        file = f.readlines()
-    return file
+    file = pkg_resources.read_text(mcnp_examples, 'Criticality.out')
+    return file.split('\n')
 
 
 @pytest.fixture
@@ -132,10 +133,11 @@ def test_get_scaling_factor_with_invalid_arg_passed():
         eddy.get_scaling_factor(sf)
 
 
-def test_get_args_with_passed_arguments(mocker, f2_file):
+def test_get_args_with_passed_arguments(mocker):
     # arrange
     name = 'mcnp_examples/F2.out'
-    data = f2_file
+    with open('mcnp_examples/F2.out', 'r') as file:
+        data = file.readlines()
     sf = 3.141592
     mocker.patch(
         'eddymc.eddy.argparse.ArgumentParser.parse_args',
