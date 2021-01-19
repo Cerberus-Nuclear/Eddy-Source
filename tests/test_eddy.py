@@ -119,6 +119,7 @@ def test_get_scaling_factor_with_value_passed_as_string():
 
 def test_get_scaling_factor_from_tkinter(mocker):
     # arrange
+    mocker.patch("eddymc.eddy.Tk.withdraw", return_value=None)
     mocker.patch("eddymc.eddy.simpledialog.askfloat", return_value=3.141592)
     # act
     scaling_factor = eddy.get_scaling_factor()
