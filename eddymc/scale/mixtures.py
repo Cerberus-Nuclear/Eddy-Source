@@ -38,7 +38,7 @@ class Mixture:
         """
         isotopes = {}
         for line in self.data[2:]:
-            if line == '\n':
+            if line == '\n' or line == '':
                 continue
             else:
                 nuclide = line.split()[0]
@@ -62,7 +62,7 @@ class Mixture:
         """
         isotopes = {}
         for line in self.data[2:]:
-            if line == '\n':
+            if line == '\n' or line == '':
                 continue
             else:
                 nuclide = line.split()[0]

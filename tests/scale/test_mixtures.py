@@ -10,45 +10,37 @@ except ImportError:
 
 @pytest.fixture
 def ce_file(tmpdir):
-    #with open('scale_examples/cylinder_ce.out', 'r') as f:
-    #    file = f.readlines()
-    #return file
     file = pkg_resources.read_text(scale_examples, 'cylinder_ce.out')
     return file.split('\n')
 
 @pytest.fixture
 def multigroup_file(tmpdir):
-    with open('scale_examples/cylinder_multigroup.out', 'r') as f:
-        file = f.readlines()
-    return file
+    file = pkg_resources.read_text(scale_examples, 'cylinder_multigroup.out')
+    return file.split('\n')
 
 
 @pytest.fixture
 def single_mixture_ce(tmpdir):
-    with open('./scale_examples/single_mixture_ce.txt', 'r') as f:
-        file = f.readlines()
-    return file
+    file = pkg_resources.read_text(scale_examples, 'single_mixture_ce.txt')
+    return file.split('\n')
 
 
 @pytest.fixture
 def single_mixture_multigroup(tmpdir):
-    with open('./scale_examples/single_mixture_multigroup.txt', 'r') as f:
-        file = f.readlines()
-    return file
+    file = pkg_resources.read_text(scale_examples, 'single_mixture_multigroup.txt')
+    return file.split('\n')
 
 
 @pytest.fixture
 def ce_table(tmpdir):
-    with open('./scale_examples/mixture_table_ce.txt', 'r') as f:
-        file = f.readlines()
-    return file
+    file = pkg_resources.read_text(scale_examples, 'mixture_table_ce.txt')
+    return file.split('\n')
 
 
 @pytest.fixture
 def multigroup_table(tmpdir):
-    with open('./scale_examples/mixture_table_multigroup.txt', 'r') as f:
-        file = f.readlines()
-    return file
+    file = pkg_resources.read_text(scale_examples, 'mixture_table_multigroup.txt')
+    return file.split('\n')
 
 
 def test_get_mixture_data_ce(ce_file):
@@ -79,7 +71,8 @@ def test_create_mixtures_ce(ce_table, single_mixture_ce, mocker):
     # assert
     mocked_Mixture_init.assert_called()
     assert mocked_Mixture_init.call_count == 3
-    assert mocked_Mixture_init.call_args_list[0].args[0] == single_mixture
+    # because of the different file reader methods, the actual result has a blank line at the end
+    assert mocked_Mixture_init.call_args_list[0].args[0] == single_mixture[:-1]
 
 
 def test_create_mixtures_multigroup(multigroup_table, single_mixture_multigroup, mocker):
@@ -92,8 +85,8 @@ def test_create_mixtures_multigroup(multigroup_table, single_mixture_multigroup,
     # assert
     mocked_Mixture_init.assert_called()
     assert mocked_Mixture_init.call_count == 3
-    assert mocked_Mixture_init.call_args_list[0].args[0] == single_mixture
-
+    # because of the different file reader methods, the actual result has a blank line at the end
+    assert mocked_Mixture_init.call_args_list[0].args[0] == single_mixture[:-1]
 
 
 def test_mixture_init_ce_library(single_mixture_ce, mocker):
