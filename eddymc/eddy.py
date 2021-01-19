@@ -83,7 +83,7 @@ def get_filename(filename=None):
     """
     # open tkinter window for file selection
     if not filename:
-        Tk().withdraw()
+        #Tk().withdraw()
         filename = askopenfilename(
             title="Select Output File",
             filetypes=(("output files", "*.out"), ("all files", "*.*"))
@@ -102,7 +102,7 @@ def get_scaling_factor(scaling_factor=None):
     """
     if not scaling_factor:
         # open tkinter window to ask for scaling factor
-        Tk().withdraw()
+        #Tk().withdraw()
         scaling_factor = simpledialog.askfloat(
             title="Scaling Factor",
             prompt="Please enter a scaling factor to multiply your results by", initialvalue=1,
