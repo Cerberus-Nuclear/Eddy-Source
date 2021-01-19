@@ -83,6 +83,7 @@ def get_filename(filename=None):
     """
     # open tkinter window for file selection
     if not filename:
+        Tk().overrideredirect(True)
         Tk().withdraw()
         filename = askopenfilename(
             title="Select Output File",
