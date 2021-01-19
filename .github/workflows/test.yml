@@ -23,7 +23,4 @@ jobs:
     - name: pytest
       run: |
         cd tests
-        export DISPLAY=localhost:0
-        echo DISPLAY:
-        echo $DISPLAY
         pytest
