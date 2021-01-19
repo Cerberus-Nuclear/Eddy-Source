@@ -275,7 +275,7 @@ def test_get_active_cycles(crit_file):
 def test_main_calls_mcnp_html_writer(mocker):
     # arrange
     file = os.path.dirname(mcnp_examples.__file__)
-    file += "\\F2.out"
+    file += "/F2.out"
     sf = 1.0
     mocked_html_writer = mocker.patch('eddymc.mcnp.mcnp_converter.mcnp_html_writer.main')
     # act
@@ -287,7 +287,7 @@ def test_main_calls_mcnp_html_writer(mocker):
 def test_main_writes_to_gv(mocker):
     # arrange
     file = os.path.dirname(mcnp_examples.__file__)
-    file += "\\F2.out"
+    file += "/F2.out"
     sf = 1.0
     output = mocker.patch('eddymc.mcnp.mcnp_converter.gv')
     # mock the rest of the main() function so it doesn't make actual calls
