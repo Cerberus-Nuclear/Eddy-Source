@@ -22,3 +22,7 @@ jobs:
     - name: Check location
       run: |
         pwd
+    - name: move to tests
+      run: |
+        cd tests
+        pwd
