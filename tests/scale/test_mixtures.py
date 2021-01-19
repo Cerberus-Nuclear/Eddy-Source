@@ -10,14 +10,15 @@ except ImportError:
 
 @pytest.fixture
 def ce_file(tmpdir):
-    with open('./scale_examples/cylinder_ce.out', 'r') as f:
-        file = f.readlines()
-    return file
-
+    #with open('scale_examples/cylinder_ce.out', 'r') as f:
+    #    file = f.readlines()
+    #return file
+    file = pkg_resources.read_text(scale_examples, 'cylinder_ce.out')
+    return file.split('\n')
 
 @pytest.fixture
 def multigroup_file(tmpdir):
-    with open('./scale_examples/cylinder_multigroup.out', 'r') as f:
+    with open('scale_examples/cylinder_multigroup.out', 'r') as f:
         file = f.readlines()
     return file
 
