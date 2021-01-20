@@ -73,7 +73,7 @@ def test_create_mixtures_ce(ce_table, single_mixture_ce, mocker):
     mocked_Mixture_init.assert_called()
     assert mocked_Mixture_init.call_count == 3
     # because of the different file reader methods, the actual result has a blank line at the end
-    assert mocked_Mixture_init.call_args_list[0].args[0] == single_mixture[:-1]
+    assert mocked_Mixture_init.call_args_list[0][0][0] == single_mixture[:-1]
 
 
 def test_create_mixtures_multigroup(multigroup_table, single_mixture_multigroup, mocker):
@@ -87,7 +87,7 @@ def test_create_mixtures_multigroup(multigroup_table, single_mixture_multigroup,
     mocked_Mixture_init.assert_called()
     assert mocked_Mixture_init.call_count == 3
     # because of the different file reader methods, the actual result has a blank line at the end
-    assert mocked_Mixture_init.call_args_list[0].args[0] == single_mixture[:-1]
+    assert mocked_Mixture_init.call_args_list[0][0][0] == single_mixture[:-1]
 
 
 def test_mixture_init_ce_library(single_mixture_ce, mocker):
