@@ -38,7 +38,7 @@ class Mixture:
         """
         isotopes = {}
         for line in self.data[2:]:
-            if line == '\n':
+            if line == '\n' or line == '':
                 continue
             else:
                 nuclide = line.split()[0]
@@ -62,7 +62,7 @@ class Mixture:
         """
         isotopes = {}
         for line in self.data[2:]:
-            if line == '\n':
+            if line == '\n' or line == '':
                 continue
             else:
                 nuclide = line.split()[0]
@@ -87,7 +87,7 @@ def get_mixture_data(output_data):
     Returns:
         The lines from output_data concerning mixtures
     """
-    pattern_mix = re.compile(r'^\s*mixing table\s+')
+    pattern_mix = re.compile(r'^\s*mixing table\s*')
     for n, line in enumerate(output_data):
         if pattern_mix.match(line):
             for m, other_line in enumerate(output_data[n+1:], start=n+1):

@@ -52,7 +52,8 @@ def failed_case(tmpdir):
 def test_read_file():
     # arrange
     file = os.path.dirname(mcnp_examples.__file__)
-    file += "\\F2.out"
+    file += "//F2.out"
+    #file = 'mcnp_examples/F2.out'
     # act
     data = mcnp_converter.read_file(file)
     # assert
@@ -111,41 +112,41 @@ def test_get_input(f2_file):
 
 def test_get_parameters_positive():
     # arrange
-    parameters_input = ["Test MCNP example",
-                        "c",
-                        "c ==============================================================================",
-                        "c",
-                        "c",
-                        "c                 _______     _______ _      ____  _   _ ______",
-                        "c                / ____\ \   / / ____| |    / __ \| \ | |  ____|",
-                        "c               | |     \ \_/ / |    | |   | |  | |  \| | |__",
-                        "c               | |      \   /| |    | |   | |  | | . ` |  __|",
-                        "c               | |____   | | | |____| |___| |__| | |\  | |____",
-                        "c                \_____|  |_|  \_____|______\____/|_| \_|______|",
-                        "c",
-                        "c",
-                        "c",
-                        "c                                Version 0.19.2",
-                        "c",
-                        "c ######################### Cerberus Nuclear 2020 ############################",
-                        "c",
-                        "c",
-                        "c",
-                        "c",
-                        "c     USING THE FOLLOWING VARIABLES:",
-                        "c               width     =   10.00000",
-                        "c",
-                        "c",
-                        "c =============================== START TITLE ==================================",
-                        "c ==============================================================================",
-                        "c   MCNP example Case - concentric spheres",
-                        "c",
-                        "c",
-                        "c <width=10>",
-                        "c",
-                        "c ==============================================================================",
-                        "c ============================= START CELL SECTION =============================",
-                        "c ==============================================================================",
+    parameters_input = [r"Test MCNP example",
+                        r"c",
+                        r"c ==============================================================================",
+                        r"c",
+                        r"c",
+                        r"c                 _______     _______ _      ____  _   _ ______",
+                        r"c                / ____\ \   / / ____| |    / __ \| \ | |  ____|",
+                        r"c               | |     \ \_/ / |    | |   | |  | |  \| | |__",
+                        r"c               | |      \   /| |    | |   | |  | | . ` |  __|",
+                        r"c               | |____   | | | |____| |___| |__| | |\  | |____",
+                        r"c                \_____|  |_|  \_____|______\____/|_| \_|______|",
+                        r"c",
+                        r"c",
+                        r"c",
+                        r"c                                Version 0.19.2",
+                        r"c",
+                        r"c ######################### Cerberus Nuclear 2020 ############################",
+                        r"c",
+                        r"c",
+                        r"c",
+                        r"c",
+                        r"c     USING THE FOLLOWING VARIABLES:",
+                        r"c               width     =   10.00000",
+                        r"c",
+                        r"c",
+                        r"c =============================== START TITLE ==================================",
+                        r"c ==============================================================================",
+                        r"c   MCNP example Case - concentric spheres",
+                        r"c",
+                        r"c",
+                        r"c <width=10>",
+                        r"c",
+                        r"c ==============================================================================",
+                        r"c ============================= START CELL SECTION =============================",
+                        r"c ==============================================================================",
                         ]
     # act
     variables = mcnp_converter.get_parameters(parameters_input)
@@ -155,40 +156,40 @@ def test_get_parameters_positive():
 
 def test_get_parameters_negative():
     # arrange
-    parameters_input = ["Test MCNP example",
-                        "c",
-                        "c ==============================================================================",
-                        "c",
-                        "c",
-                        "c                 _______     _______ _      ____  _   _ ______",
-                        "c                / ____\ \   / / ____| |    / __ \| \ | |  ____|",
-                        "c               | |     \ \_/ / |    | |   | |  | |  \| | |__",
-                        "c               | |      \   /| |    | |   | |  | | . ` |  __|",
-                        "c               | |____   | | | |____| |___| |__| | |\  | |____",
-                        "c                \_____|  |_|  \_____|______\____/|_| \_|______|",
-                        "c",
-                        "c",
-                        "c",
-                        "c                                Version 0.19.2",
-                        "c",
-                        "c ######################### Cerberus Nuclear 2020 ############################",
-                        "c",
-                        "c",
-                        "c",
-                        "c",
-                        "c     USING THE FOLLOWING VARIABLES:",
-                        "c",
-                        "c",
-                        "c =============================== START TITLE ==================================",
-                        "c ==============================================================================",
-                        "c   MCNP example Case - concentric spheres",
-                        "c",
-                        "c",
-                        "c <width=10>",
-                        "c",
-                        "c ==============================================================================",
-                        "c ============================= START CELL SECTION =============================",
-                        "c ==============================================================================", ]
+    parameters_input = [r"Test MCNP example",
+                        r"c",
+                        r"c ==============================================================================",
+                        r"c",
+                        r"c",
+                        r"c                 _______     _______ _      ____  _   _ ______",
+                        r"c                / ____\ \   / / ____| |    / __ \| \ | |  ____|",
+                        r"c               | |     \ \_/ / |    | |   | |  | |  \| | |__",
+                        r"c               | |      \   /| |    | |   | |  | | . ` |  __|",
+                        r"c               | |____   | | | |____| |___| |__| | |\  | |____",
+                        r"c                \_____|  |_|  \_____|______\____/|_| \_|______|",
+                        r"c",
+                        r"c",
+                        r"c",
+                        r"c                                Version 0.19.2",
+                        r"c",
+                        r"c ######################### Cerberus Nuclear 2020 ############################",
+                        r"c",
+                        r"c",
+                        r"c",
+                        r"c",
+                        r"c     USING THE FOLLOWING VARIABLES:",
+                        r"c",
+                        r"c",
+                        r"c =============================== START TITLE ==================================",
+                        r"c ==============================================================================",
+                        r"c   MCNP example Case - concentric spheres",
+                        r"c",
+                        r"c",
+                        r"c <width=10>",
+                        r"c",
+                        r"c ==============================================================================",
+                        r"c ============================= START CELL SECTION =============================",
+                        r"c ==============================================================================", ]
     # act
     variables = mcnp_converter.get_parameters(parameters_input)
     # assert
@@ -274,7 +275,7 @@ def test_get_active_cycles(crit_file):
 def test_main_calls_mcnp_html_writer(mocker):
     # arrange
     file = os.path.dirname(mcnp_examples.__file__)
-    file += "\\F2.out"
+    file += "/F2.out"
     sf = 1.0
     mocked_html_writer = mocker.patch('eddymc.mcnp.mcnp_converter.mcnp_html_writer.main')
     # act
@@ -286,7 +287,7 @@ def test_main_calls_mcnp_html_writer(mocker):
 def test_main_writes_to_gv(mocker):
     # arrange
     file = os.path.dirname(mcnp_examples.__file__)
-    file += "\\F2.out"
+    file += "/F2.out"
     sf = 1.0
     output = mocker.patch('eddymc.mcnp.mcnp_converter.gv')
     # mock the rest of the main() function so it doesn't make actual calls
