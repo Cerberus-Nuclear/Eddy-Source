@@ -83,6 +83,7 @@ def get_html(filename, inline_css):
         nps=gv.nps,
         parameters=gv.parameters,
         fatal_errors=gv.fatal_errors,
+        lost_particles=gv.lost_particles,
         k_eff=gv.k_effective,
         tally_list=gv.tally_list,
         tally_types=gv.f_types,
