@@ -205,6 +205,11 @@ div {
     padding: 1px;
 }
 
+.termination_warning {
+    color: red;
+    font-size: 32px;
+}
+
 #warnings, #duplicates, #comments, #fatal_errors {
     text-align: center;
     }

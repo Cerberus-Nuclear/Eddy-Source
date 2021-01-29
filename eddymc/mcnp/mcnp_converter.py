@@ -46,6 +46,7 @@ def parse_output(output_data):
     gv.ctme, gv.nps = get_runtime(output_data)
     gv.mcnp_input = get_input(output_data)
     gv.parameters = get_parameters(gv.mcnp_input)
+    gv.lost_particles = check_lost_particles(output_data)
     cell_data = cells.find_cells(output_data)
     neutron_populations = cells.get_particle_populations(output_data, 'neutron')
     photon_populations = cells.get_particle_populations(output_data, 'photon')
@@ -155,6 +156,20 @@ def get_parameters(input_data):
                 variables[variable] = float(value)
             break
     return variables
+
+
+def check_lost_particles(output_data):
+    """Check whether the run was terminated because 10 or more particles got lost
+
+    Args:
+        output_data (list): The MCNP output data
+    Returns:
+        True if run terminated due to lost particles, otherwise False
+    """
+    for line in output_data:
+        if "run terminated because" in line and "particles got lost" in line:
+            return True
+    return False
 
 
 def get_fatal_errors(output_data):

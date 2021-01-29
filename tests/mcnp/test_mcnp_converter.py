@@ -32,6 +32,12 @@ def parameters_file(tmpdir):
 
 
 @pytest.fixture
+def lost_particle_file(tmpdir):
+    file = pkg_resources.read_text(mcnp_examples, 'lost_particles.out')
+    return file.split('\n')
+
+
+@pytest.fixture
 def dumps_file(tmpdir):
     file = pkg_resources.read_text(mcnp_examples, 'Dumps.out')
     return file.split('\n')
@@ -194,6 +200,24 @@ def test_get_parameters_negative():
     variables = mcnp_converter.get_parameters(parameters_input)
     # assert
     assert not variables
+
+
+def test_check_lost_particles_positive(lost_particle_file):
+    # arrange
+    file = lost_particle_file
+    # act
+    lost_particles = mcnp_converter.check_lost_particles(file)
+    # assert
+    assert lost_particles == True
+
+
+def test_check_lost_particles_negative(f2_file):
+    # arrange
+    file = f2_file
+    # act
+    lost_particles = mcnp_converter.check_lost_particles(file)
+    # assert
+    assert lost_particles == False
 
 
 def test_get_fatal_errors_present(failed_case):

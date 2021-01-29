@@ -26,3 +26,4 @@ nps = None
 mcnp_input = None
 crit_case = False
 cycles = {}
+lost_particles = False

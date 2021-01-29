@@ -108,13 +108,20 @@
 
 {% if fatal_errors %}
 <div id="fatal_errors">
-    <h1>WARNING: FATAL ERRORS OCCURRED DURING THIS RUN</h1>
+    <h1 class="termination_warning">WARNING: FATAL ERRORS OCCURRED DURING THIS RUN</h1>
     <div id="fatal_messages">
         <p style="font-weight: bold">The following fatal error messages were generated:</p>
         {% for message in fatal_errors %}
         <p>{{message}}</p>
         {% endfor %}
     </div>
+</div>
+{% endif %}
+
+
+{% if lost_particles %}
+<div id="lost_particles">
+    <h1 class="termination_warning">WARNING: THIS RUN WAS HALTED DUE TO 10 OR MORE PARTICLES BEING LOST</h1>
 </div>
 {% endif %}
 
