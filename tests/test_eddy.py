@@ -6,6 +6,7 @@ or add a configuration in pycharm
 import pytest
 from argparse import Namespace
 from eddymc import eddy
+from eddymc.mcnp import global_variables as gv
 from tests import mcnp_examples, scale_examples
 try:
     import importlib.resources as pkg_resources
@@ -263,3 +264,13 @@ def test_main_with_nonexistent_input_passed(mocker):
         eddy.main(name)
 
 
+def test_reset_when_looping(f2_file):
+    # arrange
+    file = "mcnp_examples/F2.out"
+    scaling_factor = 1
+    # act
+    # call eddy.main twice
+    eddy.main(file, scaling_factor)
+    eddy.main(file, scaling_factor)
+    # assert
+    assert len(gv.cell_list) == 5
