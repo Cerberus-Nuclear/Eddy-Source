@@ -34,14 +34,13 @@ import argparse
 from tkinter import Tk, simpledialog
 from tkinter.filedialog import askopenfilename
 # Local imports
-# none
 
 if __name__ == "__main__":
-    from scale import scale_converter
-    from mcnp import mcnp_converter
+    from scale import scale_converter, scale_global_variables as sgv
+    from mcnp import mcnp_converter, global_variables as gv
 else:
-    from .scale import scale_converter
-    from .mcnp import mcnp_converter
+    from .scale import scale_converter, scale_global_variables as sgv
+    from .mcnp import mcnp_converter, global_variables as gv
 
 
 def check_if_crit(output_data):
@@ -155,6 +154,48 @@ def get_args(filename=None, scaling_factor=None):
     return filename, output_data, scaling_factor, crit_case
 
 
+def reset():
+    """This function resets all the global variables
+    in both the mcnp and scale files to correct a bug when
+    eddy.main is called within a loop, or called multiple times.
+    It is intended that this should be replaced by removing the
+    global_variables files and implementing a new EddyCase class
+    to hold the information."""
+    gv.f = None
+    gv.scaling_factor = 1
+    gv.date_time = {}
+    gv.rundate = None
+    gv.runtime = None
+    gv.parameters = {}
+    gv.cell_list = []
+    gv.tally_list = []
+    gv.f_types = []
+    gv.F2_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
+    gv.F4_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
+    gv.F5_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
+    gv.F6_tallies = {'neutrons': [], 'photons': [], 'electrons': [], 'Collision Heating': []}
+    gv.tally_types = {}
+    gv.fatal_errors = []
+    gv.warnings = []
+    gv.comments = []
+    gv.duplicate_surfaces = []
+    gv.particle_list = []
+    gv.k_effective = {}
+    gv.ctme = None
+    gv.nps = None
+    gv.mcnp_input = None
+    gv.crit_case = False
+    gv.cycles = {}
+    gv.lost_particles = False
+
+    sgv.scaling_factor = 1
+    sgv.tally_list = []
+    sgv.rundate = None
+    sgv.runtime = None
+    sgv.mixture_list = []
+    sgv.scale_input = None
+
+
 def main(filename=None, scaling_factor=None):
     """Entry point to Eddy. Can take filename and scaling factor as arguments.
     Call get_args to find the filename & scaling factor if not provided, and also get the
@@ -166,6 +207,7 @@ def main(filename=None, scaling_factor=None):
         filename (optional) (str): the file path (including the name) of the output file
         scaling_factor (optional) (float): A number by which the results will be multiplied
     """
+    reset()
     filename, output_data, scaling_factor, crit_case = get_args(filename, scaling_factor)
     if 'SCALE' in output_data[2]:
         scale_converter.main(filename, scaling_factor)
