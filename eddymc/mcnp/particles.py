@@ -16,7 +16,6 @@ class Particle:
     """
 
     def __init__(self, creation_data, loss_data, total_data, particle_type):
-        gv.particle_list.append(self)
         self.attributes = []
         self.particle_type = particle_type
         for item in creation_data:
