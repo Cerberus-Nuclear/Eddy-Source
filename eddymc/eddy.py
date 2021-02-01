@@ -37,7 +37,8 @@ from tkinter.filedialog import askopenfilename
 
 if __name__ == "__main__":
     from scale import scale_converter, scale_global_variables as sgv
-    from mcnp import mcnp_converter, global_variables as gv
+    from mcnp import mcnp_hmtl_writer
+    from mcnp.eddy_case import EddyCase
 else:
     from .scale import scale_converter, scale_global_variables as sgv
     from .mcnp import mcnp_converter, global_variables as gv
@@ -212,7 +213,14 @@ def main(filename=None, scaling_factor=None):
     if 'SCALE' in output_data[2]:
         scale_converter.main(filename, scaling_factor)
     elif 'Code Name & Version = MCNP' in output_data[0]:
-        mcnp_converter.main(filename, scaling_factor, crit_case)
+        case = EddyCase(
+            filepath=filename,
+            scaling_factor=scaling_factor,
+            file=output_data,
+            crit_case=crit_case,
+        )
+        print(case)
+        #mcnp_hmtl_writer.main(case)
     else:
         raise RuntimeError("This file doesn't seem to be an MCNP or SCALE output?")
 
