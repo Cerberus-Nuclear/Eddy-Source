@@ -33,15 +33,16 @@ import os.path
 import argparse
 from tkinter import Tk, simpledialog
 from tkinter.filedialog import askopenfilename
-# Local imports
 
+# Local imports
 if __name__ == "__main__":
     from scale import scale_converter, scale_global_variables as sgv
-    from mcnp import mcnp_hmtl_writer
+    from mcnp import mcnp_html_writer
     from mcnp.eddy_case import EddyCase
 else:
     from .scale import scale_converter, scale_global_variables as sgv
-    from .mcnp import mcnp_converter, global_variables as gv
+    from .mcnp import mcnp_html_writer
+    from .mcnp.eddy_case import EddyCase
 
 
 def check_if_crit(output_data):
@@ -157,37 +158,11 @@ def get_args(filename=None, scaling_factor=None):
 
 def reset():
     """This function resets all the global variables
-    in both the mcnp and scale files to correct a bug when
+    in the scale file to correct a bug when
     eddy.main is called within a loop, or called multiple times.
     It is intended that this should be replaced by removing the
-    global_variables files and implementing a new EddyCase class
+    global_variables files and implementing a new EddyScaleCase class
     to hold the information."""
-    gv.f = None
-    gv.scaling_factor = 1
-    gv.date_time = {}
-    gv.rundate = None
-    gv.runtime = None
-    gv.parameters = {}
-    gv.cell_list = []
-    gv.tally_list = []
-    gv.f_types = []
-    gv.F2_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
-    gv.F4_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
-    gv.F5_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
-    gv.F6_tallies = {'neutrons': [], 'photons': [], 'electrons': [], 'Collision Heating': []}
-    gv.tally_types = {}
-    gv.fatal_errors = []
-    gv.warnings = []
-    gv.comments = []
-    gv.duplicate_surfaces = []
-    gv.particle_list = []
-    gv.k_effective = {}
-    gv.ctme = None
-    gv.nps = None
-    gv.mcnp_input = None
-    gv.crit_case = False
-    gv.cycles = {}
-    gv.lost_particles = False
 
     sgv.scaling_factor = 1
     sgv.tally_list = []
@@ -208,9 +183,10 @@ def main(filename=None, scaling_factor=None):
         filename (optional) (str): the file path (including the name) of the output file
         scaling_factor (optional) (float): A number by which the results will be multiplied
     """
-    reset()
+
     filename, output_data, scaling_factor, crit_case = get_args(filename, scaling_factor)
     if 'SCALE' in output_data[2]:
+        reset()
         scale_converter.main(filename, scaling_factor)
     elif 'Code Name & Version = MCNP' in output_data[0]:
         case = EddyCase(
@@ -219,8 +195,7 @@ def main(filename=None, scaling_factor=None):
             file=output_data,
             crit_case=crit_case,
         )
-        print(case)
-        #mcnp_hmtl_writer.main(case)
+        mcnp_html_writer.main(case)
     else:
         raise RuntimeError("This file doesn't seem to be an MCNP or SCALE output?")
 

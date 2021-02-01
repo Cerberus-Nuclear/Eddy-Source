@@ -7,8 +7,8 @@
 """
 
 import re
-from cells import Cell
-from particles import Particle
+from .cells import Cell
+from .particles import Particle
 
 
 class EddyCase:
@@ -52,7 +52,6 @@ class EddyCase:
         # Particles
         self.particle_list = []
         for particle_type in ['neutron', 'photon', 'electron']:
-            particle_data = None
             particle_data = self.find_mcnp_particle_data(particle_type)
             if particle_data:
                 particle = self.create_particle(particle_type, particle_data)
@@ -347,7 +346,7 @@ class EddyCase:
             if PATTERN_run_terminated.match(line):
                 terminated = n
                 for m, new_line in enumerate(self.file[terminated:], start=terminated):
-                    if PATTERN_particle.match(new_line):
+                    if PATTERN_particle[particle].match(new_line):
                         particle_data = self.file[m:m + particle_data_lines[particle]]
                         break
         return particle_data
@@ -412,13 +411,15 @@ class EddyCase:
                                           'energy': float(creation[3]),
                                           }
             # Separate loss data
-            loss = data[line_num][64:]
-            # split the line into 4 columns
-            loss = [loss[indices[i]:indices[i + 1]].strip() for i in range(len(indices) - 1)]
-            loss_dict[loss[0]] = {'tracks': int(loss[1]),
-                                  'weight': float(loss[2]),
-                                  'energy': float(loss[3]),
-                                  }
+            loss_line = data[line_num][64:]
+            # for photons there are fewer loss values than creation values, so we check if the line has contents
+            if loss_line.isspace() is False:
+                # split the line into 4 columns
+                loss = [loss_line[indices[i]:indices[i + 1]].strip() for i in range(len(indices) - 1)]
+                loss_dict[loss[0]] = {'tracks': int(loss[1]),
+                                      'weight': float(loss[2]),
+                                      'energy': float(loss[3]),
+                                      }
 
         # get summary data for particle
         total_dict = {}

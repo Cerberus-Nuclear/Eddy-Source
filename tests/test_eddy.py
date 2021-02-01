@@ -6,7 +6,7 @@ or add a configuration in pycharm
 import pytest
 from argparse import Namespace
 from eddymc import eddy
-from eddymc.mcnp import global_variables as gv
+from eddymc.scale import scale_global_variables as sgv
 from tests import mcnp_examples, scale_examples
 try:
     import importlib.resources as pkg_resources
@@ -200,7 +200,7 @@ def test_main_calls_scale_converter(mocker, scale_file):
     mocked_mcnp_converter.assert_not_called()
 
 
-def test_main_calls_mcnp_converter(mocker, f2_file):
+def test_main_calls_eddy_case(mocker, f2_file):
     # arrange
     name = 'mcnp_examples/F2.out'
     data = f2_file
@@ -211,12 +211,24 @@ def test_main_calls_mcnp_converter(mocker, f2_file):
         return_value=Namespace(file=None, scaling_factor=None),
     )
     mocked_scale_converter = mocker.patch('eddymc.scale.scale_converter.main')
-    mocked_mcnp_converter = mocker.patch('eddymc.mcnp.mcnp_converter.main')
+    mocked_eddy_case = mocker.patch('eddymc.mcnp.eddy_case.EddyCase.__init__', return_value=None)
     # act
     eddy.main(filename=name, scaling_factor=sf)
     # assert
-    mocked_mcnp_converter.assert_called_with(name, sf, crit)
+    mocked_eddy_case.assert_called()
     mocked_scale_converter.assert_not_called()
+
+
+def test_main_calls_html_writer(mocker, f2_file):
+    # arrange
+    name = 'mcnp_examples/F2.out'
+    sf = 1234
+    mocked_html_writer = mocker.patch('eddymc.mcnp.mcnp_html_writer.main', return_value=None)
+    mocker.patch('eddymc.mcnp.eddy_case.EddyCase.__init__', return_value=None)
+    # act
+    eddy.main(filename=name, scaling_factor=sf)
+    # assert
+    mocked_html_writer.assert_called()
 
 
 def test_input_file_doesnt_continue(mocker):
@@ -264,13 +276,13 @@ def test_main_with_nonexistent_input_passed(mocker):
         eddy.main(name)
 
 
-def test_reset_when_looping(f2_file):
+def test_reset_when_looping_scale(scale_file):
     # arrange
-    file = "mcnp_examples/F2.out"
+    file = "scale_examples/cylinder_ce.out"
     scaling_factor = 1
     # act
     # call eddy.main twice
     eddy.main(file, scaling_factor)
     eddy.main(file, scaling_factor)
     # assert
-    assert len(gv.cell_list) == 5
+    assert len(sgv.tally_list) == 2
