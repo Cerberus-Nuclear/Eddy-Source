@@ -1,0 +1,14 @@
+
+name: Run Pytest on macOS, Linux and Windows
+
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    steps:
+     - uses: actions/checkout@v1
+     - run: echo ${{matrix.TARGET}}
