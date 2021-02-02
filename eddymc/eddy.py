@@ -23,8 +23,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 This module is the entry point for Eddy, the MCNP and SCALE to HTML output converter.
 If run as __main__, this script asks for an output file and scaling factor, 
-determines whether it is an MCNP or SCALE case, and calls either mcnp.mcnp_converter.py 
-or scale.scale_converter.py. 
+determines whether it is an MCNP or SCALE case, and for an MCNP case, creates an EddyCase object
+and sends it to mcnp.mcnp_html_writer.py
+or for a SCALE case calls scale.scale_converter.py.
 Alternatively, main() can be called directly by another module and provided with the same two arguments.
 """
 

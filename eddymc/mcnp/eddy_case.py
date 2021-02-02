@@ -47,10 +47,10 @@ class EddyCase:
         self.duplicate_surfaces = self.get_duplicate_surfaces()
         if self.crit_case is True:
             self.k_effective = self.get_k_eff()
-            self.active_cycles = self.get_active_cycles()
+            self.cycles = self.get_active_cycles()
         else:
             self.k_effective = None
-            self.active_cycles = None
+            self.cycles = None
 
         # Cells
         self.cell_data = self.get_cell_data()
@@ -86,7 +86,7 @@ class EddyCase:
             # TODO: sort this monstrosity of a function call out
             self.tally_list, self.f_types, self.F2_tallies, self.F4_tallies, self.F5_tallies, self.F6_tallies = self.get_tallies()
         # apply scaling factor
-            if self.scaling_factor is not 1:
+            if self.scaling_factor != 1:
                 for tally in self.tally_list:
                     tally.scale_result(self.scaling_factor)
 
@@ -449,7 +449,8 @@ class EddyCase:
                         tally_list.append(new_tally)
                         if new_tally.f_type not in f_types:
                             f_types.append(new_tally.f_type)
-                return tally_list, f_types, F2_tallies, F4_tallies, F5_tallies, F6_tallies
+                break
+        return tally_list, f_types, F2_tallies, F4_tallies, F5_tallies, F6_tallies
 
     @staticmethod
     def sort_mcnp_particle_data(particle, data):

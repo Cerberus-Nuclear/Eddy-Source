@@ -43,7 +43,7 @@ class Tally:
         else:
             return "This tally is not modified by any dose function"
 
-    def get_results(self, data):
+    def get_results(self):
         """This is a placeholder method; each subclass of Tally should have its own 'get_results' method"""
         raise NotImplementedError(f"The {self.__class__} subclass should have its own get_results() method")
 
@@ -103,7 +103,7 @@ class Tally:
                     passes += 1
         return passes
 
-    def scale_result(self):
+    def scale_result(self, scaling_factor):
         """Each subclass of Tally should have its own normalise_data method"""
         print("This Tally class appears not to have its own 'normalise_data() method.")
         raise NotImplementedError(f"The {self.__class__} subclass should have its own normalise_data method")
@@ -168,11 +168,8 @@ class F4Tally(Tally):
     def get_results(self):
         """Get the tally results from the mcnp output file
 
-        Args:
-            data (list): the section of the MCNP output file for this tally
-
         Returns:
-            results(list): A list of dictionaries, each corresponding to a cell
+            list: A list of dictionaries, each corresponding to a cell
                             in this tally, with entries for region, result and variance.
         """
         data = self.data

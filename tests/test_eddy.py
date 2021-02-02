@@ -192,12 +192,12 @@ def test_main_calls_scale_converter(mocker, scale_file):
         return_value=Namespace(file=None, scaling_factor=None),
     )
     mocked_scale_converter = mocker.patch('eddymc.scale.scale_converter.main')
-    mocked_mcnp_converter = mocker.patch('eddymc.mcnp.mcnp_converter.main')
+    mocked_eddy_case = mocker.patch('eddymc.mcnp.eddy_case.EddyCase.__init__')
     # act
     eddy.main(filename=name, scaling_factor=sf)
     # assert
     mocked_scale_converter.assert_called_with(name, sf)
-    mocked_mcnp_converter.assert_not_called()
+    mocked_eddy_case.assert_not_called()
 
 
 def test_main_calls_eddy_case(mocker, f2_file):
@@ -241,12 +241,12 @@ def test_input_file_doesnt_continue(mocker):
         return_value=Namespace(file=None, scaling_factor=None),
     )
     mocked_scale_converter = mocker.patch('eddymc.scale.scale_converter.main')
-    mocked_mcnp_converter = mocker.patch('eddymc.mcnp.mcnp_converter.main')
+    mocked_eddy_case = mocker.patch('eddymc.mcnp.eddy_case.EddyCase.__init__')
     # act
     with pytest.raises(RuntimeError) as expected_failure:
         eddy.main(filename=name, scaling_factor=1)
     # assert
-    mocked_mcnp_converter.assert_not_called()
+    mocked_eddy_case.assert_not_called()
     mocked_scale_converter.assert_not_called()
     assert expected_failure
 

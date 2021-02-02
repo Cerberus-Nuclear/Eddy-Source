@@ -13,9 +13,7 @@
 """
 # imports from standard library
 import re
-from pathlib import Path
 # local imports
-from . import global_variables as gv
 
 
 class Cell:
@@ -33,7 +31,6 @@ class Cell:
         self.neutron_importance = info['neutron_importance']
         self.photon_importance = info['photon_importance']
         self.electron_importance = info['electron_importance']
-        gv.cell_list.append(self)
 
     def assign_populations(self, neutron_pop=None, photon_pop=None, electron_pop=None):
         """Assign neutron, photon and electron population data to each cell.
@@ -194,7 +191,6 @@ def get_particle_populations(output_data, particle):
     PATTERN_run_terminated = re.compile(r'^\+\s+\d\d/\d\d/\d\d(.+)')
     PATTERN_particle_populations = re.compile(fr'^1{particle}\s+activity\sin\seach\scell.+')
     PATTERN_end_populations = re.compile(r'\s+total.+')
-    particle_populations = None
     for n, line in enumerate(output_data):
         if PATTERN_run_terminated.match(line):
             terminated = n

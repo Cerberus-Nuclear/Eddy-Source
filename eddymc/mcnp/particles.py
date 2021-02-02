@@ -6,8 +6,6 @@
 
 # Standard library imports
 import re
-# local imports
-from . import global_variables as gv
 
 
 class Particle:
