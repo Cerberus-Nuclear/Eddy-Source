@@ -48,6 +48,10 @@ else:
     from .mcnp.eddy_mcnp_case import EddyMCNPCase
 
 
+class NotAcceptedFileTypeError(Exception):
+    """Raised when the file selected is not recognised as a SCALE or MCNP output"""
+
+
 def main(filename=None, scaling_factor=None):
     """Entry point to Eddy. Can take filename and scaling factor as arguments.
     Call get_args to find the filename & scaling factor if not provided, and also get the
@@ -59,6 +63,7 @@ def main(filename=None, scaling_factor=None):
         filename (str): the file path (including the name) of the output file
         scaling_factor (float): A number by which the results will be multiplied
     """
+
 
     filename, output_data, scaling_factor, crit_case = get_args(filename, scaling_factor)
 
@@ -78,10 +83,11 @@ def main(filename=None, scaling_factor=None):
         )
         html = mcnp_html_writer.get_html(case)
     else:
-        raise RuntimeError("This file doesn't seem to be an MCNP or SCALE output?")
+        raise NotAcceptedFileTypeError("This file doesn't seem to be an MCNP or SCALE output?")
     output_file, extension = os.path.splitext(filename)
     output_file += '.html'
     write_output(output_file, html)
+    print(f"Eddy run complete, {output_file} created.\n")
 
 
 def get_args(filename=None, scaling_factor=None):
@@ -118,7 +124,7 @@ def get_args(filename=None, scaling_factor=None):
         # Ask for scaling factor for shielding cases, and check it is a valid float.
         scaling_factor = get_scaling_factor(scaling_factor)
 
-    print(f"Output file: {filename}")
+    print(f"Output file selected: {filename}")
     return filename, output_data, scaling_factor, crit_case
 
 
