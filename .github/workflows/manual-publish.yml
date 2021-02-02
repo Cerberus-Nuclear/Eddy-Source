@@ -1,7 +1,7 @@
 # .github/workflows/manual-publish.yml
 # This workflow manually creates a package and uploads to PyPI
 
-name: Manual Publish Package
+name: Manual Publish Package to PyPI
 on: [workflow_dispatch]
 jobs:
   deploy:

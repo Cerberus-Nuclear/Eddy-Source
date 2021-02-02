@@ -1,28 +1,28 @@
-# This is a test workflow
 
-name: Directory test
+name: Run Pytest on macOS, Linux and Windows (Python 3.7)
 
 on: [workflow_dispatch]
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.8
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Check location
-      run: |
-        pwd
-    - name: move to tests
+    - name: Test with pytest
       run: |
         cd tests
-        pwd
+        pytest

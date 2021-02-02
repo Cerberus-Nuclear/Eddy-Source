@@ -1,9 +1,16 @@
-# This workflow will install Python dependencies and run tests with multiple versions of Python
+# This workflow will run Eddy's full pytest suite on python versions 3.6, 3.7 and 3.8
+# every time there is a push to the master branch or a pull request on the master branch.
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Manually Run Pytest Python 3.7, 3.8, 3.9
+name: Continuous Integration - push to master
 
-on: [workflow_dispatch]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   deploy:
@@ -11,7 +18,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.7, 3.8, 3.9]
-    
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
