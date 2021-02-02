@@ -39,11 +39,11 @@ from tkinter.filedialog import askopenfilename
 if __name__ == "__main__":
     from scale import scale_converter, scale_global_variables as sgv
     from mcnp import mcnp_html_writer
-    from mcnp.eddy_case import EddyCase
+    from mcnp.eddy_mcnp_case import EddyMCNPCase
 else:
     from .scale import scale_converter, scale_global_variables as sgv
     from .mcnp import mcnp_html_writer
-    from .mcnp.eddy_case import EddyCase
+    from .mcnp.eddy_mcnp_case import EddyMCNPCase
 
 
 def check_if_crit(output_data):
@@ -173,11 +173,22 @@ def reset():
     sgv.scale_input = None
 
 
+def write_output(file, html):
+    """Write the HTML to the desired file
+
+    Args:
+        file (str): The filepath of the html file to be written
+        html (str): The contents to be written to the html file
+    """
+    with open(file, 'w') as f:
+        f.write(html)
+
+
 def main(filename=None, scaling_factor=None):
     """Entry point to Eddy. Can take filename and scaling factor as arguments.
     Call get_args to find the filename & scaling factor if not provided, and also get the
     output data and determine whether it is a crit case.
-    Call read_file() and determines whether it is an MCNP or SCALE case;
+    Determine whether it is an MCNP or SCALE case;
     call the relevant converter.
 
     Args:
@@ -190,13 +201,16 @@ def main(filename=None, scaling_factor=None):
         reset()
         scale_converter.main(filename, scaling_factor)
     elif 'Code Name & Version = MCNP' in output_data[0]:
-        case = EddyCase(
+        case = EddyMCNPCase(
             filepath=filename,
             scaling_factor=scaling_factor,
             file=output_data,
             crit_case=crit_case,
         )
-        mcnp_html_writer.main(case)
+        html = mcnp_html_writer.main(case)
+        output_file, extension = os.path.splitext(filename)
+        output_file += '.html'
+        write_output(output_file, html)
     else:
         raise RuntimeError("This file doesn't seem to be an MCNP or SCALE output?")
 

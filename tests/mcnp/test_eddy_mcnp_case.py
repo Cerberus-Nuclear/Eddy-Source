@@ -3,7 +3,7 @@ or add a configuration in pycharm
 """
 
 import pytest
-from eddymc.mcnp.eddy_case import EddyCase
+from eddymc.mcnp.eddy_mcnp_case import EddyMCNPCase
 from tests import mcnp_examples
 
 try:
@@ -12,7 +12,7 @@ except ImportError:
     import importlib_resources as pkg_resources
 
 
-class MockEddyCase(EddyCase):
+class MockEddyMCNPCase(EddyMCNPCase):
     def __init__(self, filepath, scaling_factor, file, crit_case=False):
         self.filepath = filepath
         self.name = filepath.replace('\\', '/').split('/')[-1]
@@ -23,7 +23,7 @@ class MockEddyCase(EddyCase):
 
 @pytest.fixture
 def simple_case(f2_file, tmpdir):
-    return MockEddyCase(
+    return MockEddyMCNPCase(
         filepath="mcnp_examples/F2.out",
         scaling_factor=1234,
         file=f2_file,
@@ -32,7 +32,7 @@ def simple_case(f2_file, tmpdir):
 
 @pytest.fixture
 def crit_case(crit_file, tmpdir):
-    return MockEddyCase(
+    return MockEddyMCNPCase(
         filepath="mcnp_examples/Criticality.out",
         file=crit_file,
         scaling_factor=1,
@@ -103,7 +103,7 @@ def test_object_created(f2_file):
     path = "mcnp_examples/F2.out"
     sf = 1234
     # act
-    case = EddyCase(filepath=path, scaling_factor=sf, file=f2_file, crit_case=False)
+    case = EddyMCNPCase(filepath=path, scaling_factor=sf, file=f2_file, crit_case=False)
     # assert
     assert case
 
@@ -230,7 +230,7 @@ def test_get_parameters_negative(simple_case):
 
 def test_check_lost_particles_positive(lost_particle_file):
     # arrange
-    case = MockEddyCase(
+    case = MockEddyMCNPCase(
         filepath="mcnp_examples/lost_particles.out",
         scaling_factor=1234,
         file=lost_particle_file,
@@ -252,7 +252,7 @@ def test_check_lost_particles_negative(simple_case):
 
 def test_get_fatal_errors_present(failed_case):
     # arrange
-    case = MockEddyCase(
+    case = MockEddyMCNPCase(
         filepath="mcnp_examples/fatal_error.out",
         scaling_factor=1234,
         file=failed_case,
@@ -299,7 +299,7 @@ def test_get_comments(simple_case):
 
 def test_get_duplicate_surfaces(dumps_file):
     # arrange
-    case = MockEddyCase(
+    case = MockEddyMCNPCase(
         filepath="mcnp_examples/Dumps.out",
         scaling_factor=1234,
         file=dumps_file,
@@ -362,7 +362,7 @@ def test_get_tallies_adds_f2_to_types_list(simple_case):
 
 def test_get_tallies_adds_f4_to_types_list(f4_file):
     # arrange
-    c = MockEddyCase(
+    c = MockEddyMCNPCase(
         filepath="mcnp_examples/F4.out",
         scaling_factor=1,
         file=f4_file,
@@ -380,7 +380,7 @@ def test_get_tallies_adds_f4_to_types_list(f4_file):
 
 def test_get_tallies_adds_f5_to_types_list(f5_file):
     # arrange
-    c = MockEddyCase(
+    c = MockEddyMCNPCase(
         filepath="mcnp_examples/F5.out",
         scaling_factor=1,
         file=f5_file,
@@ -398,7 +398,7 @@ def test_get_tallies_adds_f5_to_types_list(f5_file):
 
 def test_get_tallies_adds_f6_to_types_list(f6_file):
     # arrange
-    c = MockEddyCase(
+    c = MockEddyMCNPCase(
         filepath="mcnp_examples/F6.out",
         scaling_factor=1,
         file=f6_file,

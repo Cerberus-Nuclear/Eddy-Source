@@ -113,9 +113,8 @@ def main(case):
     """
     css = get_css()
     output = get_html(case, css)
-    output_file, extension = os.path.splitext(case.filepath)
-    output_file += '.html'
-    with open(output_file, 'w') as f:
-        f.write(output)
-
-
+    return output
+    # output_file, extension = os.path.splitext(case.filepath)
+    # output_file += '.html'
+    # with open(output_file, 'w') as f:
+    #    f.write(output)

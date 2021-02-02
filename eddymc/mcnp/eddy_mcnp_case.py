@@ -12,7 +12,7 @@ from .particles import Particle
 from .tallies import F2Tally, F4Tally, F5Tally, F6Tally
 
 
-class EddyCase:
+class EddyMCNPCase:
     """ An EddyCase object holds all the essential data for a single Eddy run,
     and its __init__ method is responsible for calling the other classes that
     Eddy uses.
