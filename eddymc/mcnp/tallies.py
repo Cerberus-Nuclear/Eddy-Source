@@ -9,7 +9,6 @@
 # standard library imports
 import re
 # local imports:
-from . import global_variables as gv
 
 
 class Tally:
@@ -30,9 +29,6 @@ class Tally:
         self.results = self.get_results()
         self.statistical_checks = self.get_statistical_checks()
         self.passes = self.get_passes()
-        gv.tally_list.append(self)
-        if self.f_type not in gv.f_types:
-            gv.f_types.append(self.f_type)
 
     def get_dose_functions(self):
         """Gets the dose function, if any, that the results of this tally are multiplied by
@@ -107,7 +103,7 @@ class Tally:
                     passes += 1
         return passes
 
-    def normalise_data(self):
+    def scale_result(self):
         """Each subclass of Tally should have its own normalise_data method"""
         print("This Tally class appears not to have its own 'normalise_data() method.")
         raise NotImplementedError(f"The {self.__class__} subclass should have its own normalise_data method")
@@ -137,7 +133,6 @@ class Tally:
 class F2Tally(Tally):
     def __init__(self, data):
         super().__init__(data)
-        gv.F2_tallies[self.particles].append(self)
 
     def get_results(self):
         """
@@ -157,19 +152,18 @@ class F2Tally(Tally):
                 break
         return results
 
-    def normalise_data(self):
-        """
-            Applies normalisation factor, which can be given as an argument to the core script.
-            Args: self, scaling_factor: a float or int by which the region results are multiplied
+    def scale_result(self, scaling_factor):
+        """Applies scaling factor to results
+            Args:
+                scaling_factor (float): a number by which the region results are multiplied
             Returns: none, but modifies self.results
         """
-        self.results["result"] *= gv.scaling_factor
+        self.results["result"] *= scaling_factor
 
 
 class F4Tally(Tally):
     def __init__(self, data):
         super().__init__(data)
-        gv.F4_tallies[self.particles].append(self)
 
     def get_results(self):
         """Get the tally results from the mcnp output file
@@ -192,20 +186,19 @@ class F4Tally(Tally):
                 })
         return results
 
-    def normalise_data(self):
-        """
-            Applies scaling factor, which can be given as an argument to the core script.
-            Args: self, scaling_factor: a float or int by which the region results are multiplied
+    def scale_result(self, scaling_factor):
+        """Applies scaling factor to results
+            Args:
+                scaling_factor (float): a number by which the region results are multiplied
             Returns: none, but modifies self.results
         """
         for num, region in enumerate(self.results):
-            region['result'] *= gv.scaling_factor
+            region['result'] *= scaling_factor
 
 
 class F5Tally(Tally):
     def __init__(self, data):
         super().__init__(data)
-        gv.F5_tallies[self.particles].append(self)
 
     def get_results(self):
         """
@@ -245,13 +238,13 @@ class F5Tally(Tally):
         else:
             print("This tally does not have statistical checks.")
 
-    def normalise_data(self):
-        """
-            Applies normalisation factor, which can be given as an argument to the core script.
-            Args: self, scaling_factor: a float or int by which the region results are multiplied
+    def scale_result(self, scaling_factor):
+        """Applies scaling factor to results
+            Args:
+                scaling_factor (float): a number by which the region results are multiplied
             Returns: none, but modifies self.results
         """
-        self.results["result"] *= gv.scaling_factor
+        self.results["result"] *= scaling_factor
 
 
 class F6Tally(Tally):
@@ -259,7 +252,6 @@ class F6Tally(Tally):
         super().__init__(data)
         if self.f_type == "F6+":
             self.particles = "Collision Heating"
-        gv.F6_tallies[self.particles].append(self)
 
     def get_results(self):
         data = self.data
@@ -297,14 +289,14 @@ class F6Tally(Tally):
 
         return results
 
-    def normalise_data(self):
-        """
-            Applies scaling factor, which can be given as an argument to the core script.
-            Args: self, scaling_factor: a float or int by which the region results are multiplied
+    def scale_result(self, scaling_factor):
+        """Applies scaling factor to results
+            Args:
+                scaling_factor (float): a number by which the region results are multiplied
             Returns: none, but modifies self.results
         """
         for region in self.results:
-            self.results[region]['result'] *= gv.scaling_factor
+            self.results[region]['result'] *= scaling_factor
 
 
 ############################################################

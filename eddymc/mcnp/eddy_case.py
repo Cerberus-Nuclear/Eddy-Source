@@ -9,10 +9,26 @@
 import re
 from .cells import Cell
 from .particles import Particle
+from .tallies import F2Tally, F4Tally, F5Tally, F6Tally
 
 
 class EddyCase:
+    """ An EddyCase object holds all the essential data for a single Eddy run,
+    and its __init__ method is responsible for calling the other classes that
+    Eddy uses.
+    """
     def __init__(self, filepath, scaling_factor, file, crit_case=False):
+        """ Most of the work done by eddy is handled within the __init__ function;
+        it calls all the instance methods that get information from the mcnp output file,
+        and puts them into attributes of the EddyCase object.
+
+        Args:
+            filepath (str): The path to the mcnp output file
+            scaling_factor (float): A number to multiply the tally results by
+            file (list): The contents of the mcnp output file
+            crit_case (bool): True if crit case, otherwise false
+        """
+
         self.filepath = filepath
         self.name = filepath.replace('\\', '/').split('/')[-1]
         self.scaling_factor = scaling_factor
@@ -57,9 +73,22 @@ class EddyCase:
                 particle = self.create_particle(particle_type, particle_data)
                 self.particle_list.append(particle)
 
-    # Tallies
+        # Tallies
+        # initialise empty variables
+        self.tally_list = []   # list of all tallies
+        self.f_types = []
+        self.F2_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
+        self.F4_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
+        self.F5_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
+        self.F6_tallies = {'neutrons': [], 'photons': [], 'electrons': [], 'Collision Heating': []}
         # get tallies
+        if self.crit_case is False:
+            # TODO: sort this monstrosity of a function call out
+            self.tally_list, self.f_types, self.F2_tallies, self.F4_tallies, self.F5_tallies, self.F6_tallies = self.get_tallies()
         # apply scaling factor
+            if self.scaling_factor is not 1:
+                for tally in self.tally_list:
+                    tally.scale_result(self.scaling_factor)
 
     def __repr__(self):
         return (f"This Eddy case considers file {self.name}\n"
@@ -352,10 +381,10 @@ class EddyCase:
         return particle_data
 
     def create_particle(self, particle, particle_data):
-        """Get the particle data from the output (via another function) then create a Particle object
+        """Get the relevant information from the particle data (by calling another method), then create a Particle object
 
         Args:
-            particle (str): Either neutron, photon or electron
+            particle (str): Either 'neutron', 'photon' or 'electron'
             particle_data (list): The part of the MCNP output with the particle data for this particle
 
         Returns:
@@ -368,6 +397,59 @@ class EddyCase:
             loss_data=loss_data,
             total_data=total_data,
         )
+
+    def get_tallies(self):
+        """Find the tally sections in the MCNP output.
+
+        Returns:
+            None, but creates Tally class objects.
+        """
+        tally_list = []   # list of all tallies
+        f_types = []
+        F2_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
+        F4_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
+        F5_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
+        F6_tallies = {'neutrons': [], 'photons': [], 'electrons': [], 'Collision Heating': []}
+
+        PATTERN_run_terminated = re.compile(r'^\+\s+\d\d/\d\d/\d\d(.+)')
+        PATTERN_tally_start = re.compile(r'^\s*1tally\s+\d+\s+nps.+')
+        PATTERN_tally_end = re.compile(r'(^\s*(1tally|1status).+)')
+        for n, line in enumerate(self.file):
+            if PATTERN_run_terminated.match(line):
+                terminated = n
+                for m, new_line in enumerate(self.file[terminated:], start=terminated):
+                    if PATTERN_tally_start.match(new_line):
+                        tally_start = m
+                        for o, other_line in enumerate(self.file[tally_start + 1:], start=tally_start + 1):
+                            if PATTERN_tally_end.match(other_line):
+                                tally_end = o
+                                break
+                        try:
+                            tally_data = self.file[tally_start:tally_end]
+                        except NameError:
+                            print("Eddy did not find the end of one of the tally data sections.")
+                            raise
+                        tally_type = tally_data[1].split()[2]
+                        # Create tally object
+                        if tally_type == "2":
+                            new_tally = F2Tally(tally_data)
+                            F2_tallies[new_tally.particles].append(new_tally)
+                        elif tally_type == "4":
+                            new_tally = F4Tally(tally_data)
+                            F4_tallies[new_tally.particles].append(new_tally)
+                        elif tally_type == "5":
+                            new_tally = F5Tally(tally_data)
+                            F5_tallies[new_tally.particles].append(new_tally)
+                        elif tally_type == "6" or tally_type == "6+":
+                            new_tally = F6Tally(tally_data)
+                            F6_tallies[new_tally.particles].append(new_tally)
+                        else:
+                            raise Exception("This tally type is not recognised")
+                        assert new_tally, "EddyCase.get_tallies failed to create a recognised tally"
+                        tally_list.append(new_tally)
+                        if new_tally.f_type not in f_types:
+                            f_types.append(new_tally.f_type)
+                return tally_list, f_types, F2_tallies, F4_tallies, F5_tallies, F6_tallies
 
     @staticmethod
     def sort_mcnp_particle_data(particle, data):

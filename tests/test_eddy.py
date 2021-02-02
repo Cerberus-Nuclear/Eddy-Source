@@ -212,6 +212,8 @@ def test_main_calls_eddy_case(mocker, f2_file):
     )
     mocked_scale_converter = mocker.patch('eddymc.scale.scale_converter.main')
     mocked_eddy_case = mocker.patch('eddymc.mcnp.eddy_case.EddyCase.__init__', return_value=None)
+    # The html writer is mocked because that's not what we're testing here
+    mocked_html_writer = mocker.patch('eddymc.mcnp.mcnp_html_writer.main', return_value=None)
     # act
     eddy.main(filename=name, scaling_factor=sf)
     # assert

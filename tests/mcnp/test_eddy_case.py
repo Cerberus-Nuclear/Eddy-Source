@@ -12,6 +12,34 @@ except ImportError:
     import importlib_resources as pkg_resources
 
 
+class MockEddyCase(EddyCase):
+    def __init__(self, filepath, scaling_factor, file, crit_case=False):
+        self.filepath = filepath
+        self.name = filepath.replace('\\', '/').split('/')[-1]
+        self.scaling_factor = scaling_factor
+        self.file = file
+        self.crit_case = crit_case
+
+
+@pytest.fixture
+def simple_case(f2_file, tmpdir):
+    return MockEddyCase(
+        filepath="mcnp_examples/F2.out",
+        scaling_factor=1234,
+        file=f2_file,
+        crit_case=False)
+
+
+@pytest.fixture
+def crit_case(crit_file, tmpdir):
+    return MockEddyCase(
+        filepath="mcnp_examples/Criticality.out",
+        file=crit_file,
+        scaling_factor=1,
+        crit_case=True
+    )
+
+
 @pytest.fixture
 def f2_file(tmpdir):
     f2 = pkg_resources.read_text(mcnp_examples, 'F2.out')
@@ -19,19 +47,55 @@ def f2_file(tmpdir):
 
 
 @pytest.fixture
-def simple_case(f2_file, tmpdir):
-    class MockEddyCase(EddyCase):
-        def __init__(self, filepath, scaling_factor, file, crit_case=False):
-            self.filepath = filepath
-            self.name = filepath.replace('\\', '/').split('/')[-1]
-            self.scaling_factor = scaling_factor
-            self.file = file
-            self.crit_case = crit_case
-    return MockEddyCase(
-        filepath="mcnp_examples/F2.out",
-        scaling_factor=1234,
-        file=f2_file,
-        crit_case=False)
+def f4_file(tmpdir):
+    # noinspection PyTypeChecker
+    f4 = pkg_resources.read_text(mcnp_examples, 'F4.out')
+    return f4.split('\n')
+
+
+@pytest.fixture
+def f5_file(tmpdir):
+    # noinspection PyTypeChecker
+    f5 = pkg_resources.read_text(mcnp_examples, 'F5.out')
+    return f5.split('\n')
+
+
+@pytest.fixture
+def f4_f5_file(tmpdir):
+    # noinspection PyTypeChecker
+    f4_f5 = pkg_resources.read_text(mcnp_examples, 'F4_F5_param.out')
+    return f4_f5.split('\n')
+
+
+@pytest.fixture
+def f6_file(tmpdir):
+    # noinspection PyTypeChecker
+    f6 = pkg_resources.read_text(mcnp_examples, 'F6.out')
+    return f6.split('\n')
+
+
+@pytest.fixture
+def lost_particle_file(tmpdir):
+    file = pkg_resources.read_text(mcnp_examples, 'lost_particles.out')
+    return file.split('\n')
+
+
+@pytest.fixture
+def failed_case(tmpdir):
+    file = pkg_resources.read_text(mcnp_examples, 'fatal_error.out')
+    return file.split('\n')
+
+
+@pytest.fixture
+def dumps_file(tmpdir):
+    file = pkg_resources.read_text(mcnp_examples, 'Dumps.out')
+    return file.split('\n')
+
+
+@pytest.fixture
+def crit_file(tmpdir):
+    file = pkg_resources.read_text(mcnp_examples, 'Criticality.out')
+    return file.split('\n')
 
 
 def test_object_created(f2_file):
@@ -162,3 +226,189 @@ def test_get_parameters_negative(simple_case):
     # assert
     # should be an empty dict
     assert not variables
+
+
+def test_check_lost_particles_positive(lost_particle_file):
+    # arrange
+    case = MockEddyCase(
+        filepath="mcnp_examples/lost_particles.out",
+        scaling_factor=1234,
+        file=lost_particle_file,
+        crit_case=False,
+    )
+    # act
+    lost_particles = case.check_lost_particles()
+    # assert
+    assert lost_particles is True
+
+
+def test_check_lost_particles_negative(simple_case):
+    # arrange
+    # act
+    lost_particles = simple_case.check_lost_particles()
+    # assert
+    assert lost_particles is False
+
+
+def test_get_fatal_errors_present(failed_case):
+    # arrange
+    case = MockEddyCase(
+        filepath="mcnp_examples/fatal_error.out",
+        scaling_factor=1234,
+        file=failed_case,
+        crit_case=False,
+    )
+    # act
+    fatal_errors = case.get_fatal_errors()
+    # assert
+    assert len(fatal_errors) == 3
+    assert fatal_errors[0] == "Surface       -16 not found for cell         4 card."
+    assert fatal_errors[1] == "Surface      -16 of cell        4 is not defined."
+    assert fatal_errors[2] == "1 tally volumes or areas were not input nor calculated."
+
+
+def test_get_fatal_errors_not_present(simple_case):
+    # arrange
+    # act
+    fatal_errors = simple_case.get_fatal_errors()
+    # assert
+    assert fatal_errors == []   # empty list
+
+
+def test_get_warnings(simple_case):
+    # arrange
+    # act
+    warnings = simple_case.get_warnings()
+    # assert
+    assert len(warnings) == 4
+    assert warnings[0] == "1 materials had unnormalized fractions. print table 40."
+    assert warnings[1] == "8017.80c lacks gamma-ray production cross sections."
+    assert warnings[2] == "Material        1 has been set to a conductor."
+    assert warnings[3] == "2 photons from neutron collisions were created below a local photon energy cutoff and were not followed."
+
+
+def test_get_comments(simple_case):
+    # arrange
+    # act
+    comments = simple_case.get_comments()
+    # assert
+    assert len(comments) == 7
+    assert comments[0] == "Physics models disabled."
+    assert comments[6] == "Setting up hash-based fast table search for xsec tables"
+
+
+def test_get_duplicate_surfaces(dumps_file):
+    # arrange
+    case = MockEddyCase(
+        filepath="mcnp_examples/Dumps.out",
+        scaling_factor=1234,
+        file=dumps_file,
+        crit_case=False,
+    )
+    # act
+    duplicate_surfaces = case.get_duplicate_surfaces()
+    # assert
+    assert len(duplicate_surfaces) == 8
+    assert duplicate_surfaces[0] == "Surface       34   and surface      501   are the same.      501   will be deleted."
+
+
+def test_get_keff(crit_file, crit_case):
+    # arrange
+    # act
+    k_eff = crit_case.get_k_eff()
+    # assert
+    assert k_eff['first half k_eff'] == 0.78280
+    assert k_eff['first half stdev'] == 0.00061
+    assert k_eff['second half k_eff'] == 0.78235
+    assert k_eff['second half stdev'] == 0.00067
+    assert k_eff['final k_eff'] == 0.78257
+    assert k_eff['final stdev'] == 0.00045
+
+
+def test_get_active_cycles(crit_file, crit_case):
+    # arrange
+    # act
+    cycles = crit_case.get_active_cycles()
+    # assert
+    assert cycles["inactive"] == 16
+    assert cycles["active"] == 184
+
+
+def test_get_tallies(simple_case):
+    # arrange
+    c = simple_case
+    # act
+    c.tally_list, c.f_types, c.F2_tallies, c.F4_tallies, c.F5_tallies, c.F6_tallies = c.get_tallies()
+    # assert
+    assert len(c.tally_list) == 3
+    assert c.f_types == ['F2']
+    assert len(c.F2_tallies['neutrons']) == 2
+    assert len(c.F2_tallies['photons']) == 1
+    assert len(c.F2_tallies['electrons']) == 0
+
+
+def test_get_tallies_adds_f2_to_types_list(simple_case):
+    # arrange
+    c = simple_case
+    # act
+    c.tally_list, c.f_types, c.F2_tallies, c.F4_tallies, c.F5_tallies, c.F6_tallies = c.get_tallies()
+    # assert
+    assert "F2" in c.f_types
+    assert "F4" not in c.f_types
+    assert "F5" not in c.f_types
+    assert "F6" not in c.f_types
+    assert "F6+" not in c.f_types
+
+
+def test_get_tallies_adds_f4_to_types_list(f4_file):
+    # arrange
+    c = MockEddyCase(
+        filepath="mcnp_examples/F4.out",
+        scaling_factor=1,
+        file=f4_file,
+        crit_case=False
+    )
+    # act
+    c.tally_list, c.f_types, c.F2_tallies, c.F4_tallies, c.F5_tallies, c.F6_tallies = c.get_tallies()
+    # assert
+    assert "F2" not in c.f_types
+    assert "F4" in c.f_types
+    assert "F5" not in c.f_types
+    assert "F6" not in c.f_types
+    assert "F6+" not in c.f_types
+
+
+def test_get_tallies_adds_f5_to_types_list(f5_file):
+    # arrange
+    c = MockEddyCase(
+        filepath="mcnp_examples/F5.out",
+        scaling_factor=1,
+        file=f5_file,
+        crit_case=False
+    )
+    # act
+    c.tally_list, c.f_types, c.F2_tallies, c.F4_tallies, c.F5_tallies, c.F6_tallies = c.get_tallies()
+    # assert
+    assert "F2" not in c.f_types
+    assert "F4" not in c.f_types
+    assert "F5" in c.f_types
+    assert "F6" not in c.f_types
+    assert "F6+" not in c.f_types
+
+
+def test_get_tallies_adds_f6_to_types_list(f6_file):
+    # arrange
+    c = MockEddyCase(
+        filepath="mcnp_examples/F6.out",
+        scaling_factor=1,
+        file=f6_file,
+        crit_case=False
+    )
+    # act
+    c.tally_list, c.f_types, c.F2_tallies, c.F4_tallies, c.F5_tallies, c.F6_tallies = c.get_tallies()
+    # assert
+    assert "F2" not in c.f_types
+    assert "F4" not in c.f_types
+    assert "F5" not in c.f_types
+    assert "F6" in c.f_types
+    assert "F6+" in c.f_types

@@ -600,17 +600,6 @@ def test_f2_init_creates_object(f2_tally_data):
     assert F2_object.dose_functions == ("DE2", "DF2")
 
 
-def test_f2_init_adds_f2_to_types_list(mocker, f2_tally_data):
-    # arrange
-    tally_data = f2_tally_data
-    mocked_gv = mocker.patch('eddymc.mcnp.tallies.gv')
-    mocked_gv.f_types = []
-    # act
-    tallies.F2Tally(tally_data)
-    # assert
-    assert "F2" in mocked_gv.f_types
-
-
 def test_f2_init_calls_subclass_results(mocker, f2_tally_data):
     # arrange
     tally_data = f2_tally_data
@@ -635,13 +624,11 @@ def test_f2_tally_get_results(f2_tally_data):
     assert tally.results['variance'] == 0.0001
 
 
-def test_f2_tally_normalise_data(mocker, f2_tally_data):
+def test_f2_tally_scale_result(f2_tally_data):
     # arrange
-    sf = mocker.patch('eddymc.mcnp.tallies.gv')
-    sf.scaling_factor = 3
     F2_object = tallies.F2Tally(f2_tally_data)
     # act
-    F2_object.normalise_data()
+    F2_object.scale_result(scaling_factor=3)
     # assert
     assert F2_object.results['result'] == 1.11143E-03 * 3
 
@@ -657,17 +644,6 @@ def test_f4_init_creates_object(f4_tally_data):
     assert F4_object.particles == "neutrons"
     assert F4_object.f_type == "F4"
     assert F4_object.dose_functions == ("DE4", "DF4")
-
-
-def test_f4_init_adds_f4_to_types_list(mocker, f4_tally_data):
-    # arrange
-    tally_data = f4_tally_data
-    mocked_gv = mocker.patch('eddymc.mcnp.tallies.gv')
-    mocked_gv.f_types = []
-    # act
-    tallies.F4Tally(tally_data)
-    # assert
-    assert "F4" in mocked_gv.f_types
 
 
 def test_f4_init_calls_subclass_results(mocker, f4_tally_data):
@@ -695,13 +671,11 @@ def test_f4_tally_get_results(f4_tally_data):
     assert tally.results[0]['variance'] == 0.0001
 
 
-def test_f4_tally_normalise_data(mocker, f4_tally_data):
+def test_f4_tally_scale_result(f4_tally_data):
     # arrange
-    sf = mocker.patch('eddymc.mcnp.tallies.gv')
-    sf.scaling_factor = 2
     F4_object = tallies.F4Tally(f4_tally_data)
     # act
-    F4_object.normalise_data()
+    F4_object.scale_result(scaling_factor=2)
     # assert
     assert F4_object.results[0]['result'] == 1.10032E-03 * 2
 
@@ -717,17 +691,6 @@ def test_f5_init_creates_object(f5_tally_data):
     assert F5_object.particles == "neutrons"
     assert F5_object.f_type == "F5"
     assert F5_object.dose_functions == ("DE5", "DF5")
-
-
-def test_f5_init_adds_f5_to_types_list(mocker, f5_tally_data):
-    # arrange
-    tally_data = f5_tally_data
-    mocked_gv = mocker.patch('eddymc.mcnp.tallies.gv')
-    mocked_gv.f_types = []
-    # act
-    tallies.F5Tally(tally_data)
-    # assert
-    assert "F5" in mocked_gv.f_types
 
 
 def test_f5_init_calls_subclass_results(mocker, f5_tally_data):
@@ -756,13 +719,11 @@ def test_f5_tally_get_results(f5_tally_data):
     assert tally.results['variance'] == 0.0003
 
 
-def test_f5_tally_normalise_data(mocker, f5_tally_data):
+def test_f5_tally_scale_result( f5_tally_data):
     # arrange
-    sf = mocker.patch('eddymc.mcnp.tallies.gv')
-    sf.scaling_factor = 3
     F5_object = tallies.F5Tally(f5_tally_data)
     # act
-    F5_object.normalise_data()
+    F5_object.scale_result(scaling_factor=3)
     # assert
     assert F5_object.results["result"] == 4.38636E-03 * 3
 
@@ -805,32 +766,6 @@ def test_f6_init_calls_subclass_results(mocker, f6_tally_data):
     mocked_superclass_get_results.assert_not_called()
 
 
-def test_f6_init_adds_f6_to_types_list(mocker, f6_tally_data):
-    # arrange
-    tally_data = f6_tally_data
-    mocked_gv = mocker.patch('eddymc.mcnp.tallies.gv')
-    mocked_gv.f_types = []
-    # act
-    tallies.F6Tally(tally_data)
-    # assert
-    assert "F6" in mocked_gv.f_types
-    assert "F6+" not in mocked_gv.f_types
-
-
-def test_f6_init_adds_f6_plus_to_types_list(mocker, f6_plus_tally_data):
-    # arrange
-    tally_data = f6_plus_tally_data
-    mocked_gv = mocker.patch('eddymc.mcnp.tallies.gv')
-    mocked_gv.f_types = []
-    mocked_gv.F6_tallies = {'neutrons': [], 'photons': [], 'electrons': [], 'Collision Heating': []}
-    # act
-    F6_object = tallies.F6Tally(tally_data)
-    # assert
-    assert "F6" not in mocked_gv.f_types
-    assert "F6+" in mocked_gv.f_types
-    assert F6_object in mocked_gv.F6_tallies['Collision Heating']
-
-
 def test_f6_tally_get_results(f6_tally_data):
     # arrange
     tally = tallies.F6Tally(f6_tally_data)
@@ -861,13 +796,11 @@ def test_f6_plus_tally_get_results(f6_plus_tally_data):
     assert tally.results['4']['variance'] == 0.0005
 
 
-def test_f6_tally_normalise_data(mocker, f6_tally_data):
+def test_f6_tally_scale_results(f6_tally_data):
     # arrange
-    sf = mocker.patch('eddymc.mcnp.tallies.gv')
-    sf.scaling_factor = 2
     F6_object = tallies.F6Tally(f6_tally_data)
     # act
-    F6_object.normalise_data()
+    F6_object.scale_result(scaling_factor=2)
     # assert
     assert F6_object.results['3']['result'] == 2.45307E-05 * 2
 
