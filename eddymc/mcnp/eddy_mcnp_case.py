@@ -347,7 +347,7 @@ class EddyMCNPCase:
                     mass=info[6],
                     neutron_importance=neutron_importance,
                     photon_importance=photon_importance,
-                    electron_importance=electron_importance
+                    electron_importance=electron_importance,
                     )
                 )
         return cell_list

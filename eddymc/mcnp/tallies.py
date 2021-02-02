@@ -299,39 +299,3 @@ class F6Tally(Tally):
 ############################################################
 #  End of Tally class                                      #
 ############################################################
-
-
-def get_tallies(data):
-    """Find the tally sections in the MCNP output.
-
-    Args:
-        data (list): the mcnp output
-
-    Returns:
-        None, but creates Tally class objects.
-    """
-    PATTERN_run_terminated = re.compile(r'^\+\s+\d\d/\d\d/\d\d(.+)')
-    PATTERN_tally_start = re.compile(r'^\s*1tally\s+\d+\s+nps.+')
-    PATTERN_tally_end = re.compile(r'(^\s*(1tally|1status).+)')
-    for n, line in enumerate(data):
-        if PATTERN_run_terminated.match(line):
-            terminated = n
-            for m, new_line in enumerate(data[terminated:], start=terminated):
-                if PATTERN_tally_start.match(new_line):
-                    tally_start = m
-                    for o, other_line in enumerate(data[tally_start+1:], start=tally_start+1):
-                        if PATTERN_tally_end.match(other_line):
-                            tally_end = o
-                            break
-                    tally_data = data[tally_start:tally_end]
-                    tally_type = tally_data[1].split()[2]
-                    # Create tally object
-                    if tally_type == "2":
-                        F2Tally(tally_data)
-                    if tally_type == "4":
-                        F4Tally(tally_data)
-                    if tally_type == "5":
-                        F5Tally(tally_data)
-                    if tally_type == "6" or tally_type == "6+":
-                        F6Tally(tally_data)
-            break
