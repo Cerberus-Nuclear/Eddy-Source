@@ -1,5 +1,5 @@
 
-name: Run Pytest on macOS, Linux and Windows (Python 3.7)
+name: Run Pytest on macOS, Linux and Windows (Python 3.8)
 
 on: [workflow_dispatch]
 
