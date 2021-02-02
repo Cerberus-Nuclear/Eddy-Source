@@ -334,7 +334,40 @@ def test_get_active_cycles(crit_file, crit_case):
     assert cycles["active"] == 184
 
 
-def test_get_tallies(simple_case):
+def test_get_cell_data(simple_case):
+    # arrange
+    # act
+    cell_section = simple_case.get_cell_data()
+    # assert
+    assert len(cell_section) == 12
+
+
+def test_create_cell_objects_calls_cell_init(simple_case, mocker):
+    # arrange
+    c = simple_case
+    c.cell_data = [
+        "1cells                                                                                                  print table 60",
+        "",
+        "                               atom        gram                                            neutron    photon     photon wt             ",
+        "              cell      mat   density     density     volume       mass            pieces importance importance generation             ",
+        "",
+        "        1        1        1  8.83440E-02 7.81000E+00 4.18879E+00 3.27145E+01           1  1.0000E+00 1.0000E+00 -1.000E+00             ",
+        "        2        2        2  5.02980E-05 1.20500E-03 4.06019E+03 4.89253E+00           1  1.0000E+00 1.0000E+00 -1.000E+00             ",
+        "        3        3        2  5.02980E-05 1.20500E-03 1.24411E+02 1.49916E-01           1  1.0000E+00 1.0000E+00 -1.000E+00             ",
+        "        4        4        2  5.02980E-05 1.20500E-03 1.38649E+03 1.67072E+00           1  1.0000E+00 1.0000E+00 -1.000E+00             ",
+        "        5        5        0  0.00000E+00 0.00000E+00 0.00000E+00 0.00000E+00           0  0.0000E+00 0.0000E+00 -1.000E+00             ",
+        "",
+        " total                                               5.57528E+03 3.94276E+01",
+        ]
+    mocker.patch('eddymc.mcnp.eddy_mcnp_case.EddyMCNPCase.get_particle_importance', return_value=1)
+    mock_cell_init = mocker.patch('eddymc.mcnp.cells.Cell.__init__', return_value=None)
+    # act
+    c.create_cells()
+    # assert
+    assert mock_cell_init.call_count == 5
+
+
+def test_get_tallies_f2(simple_case):
     # arrange
     c = simple_case
     # act
@@ -345,6 +378,58 @@ def test_get_tallies(simple_case):
     assert len(c.F2_tallies['neutrons']) == 2
     assert len(c.F2_tallies['photons']) == 1
     assert len(c.F2_tallies['electrons']) == 0
+
+
+def test_get_tallies_f4(f4_file):
+    # arrange
+    c = MockEddyMCNPCase(
+        filepath="mcnp_examples/F4.out",
+        scaling_factor=1234,
+        file=f4_file,
+        crit_case=False)
+    # act
+    c.tally_list, c.f_types, c.F2_tallies, c.F4_tallies, c.F5_tallies, c.F6_tallies = c.get_tallies()
+    # assert
+    assert len(c.tally_list) == 3
+    assert c.f_types == ['F4']
+    assert len(c.F4_tallies['neutrons']) == 1
+    assert len(c.F4_tallies['photons']) == 2
+    assert len(c.F4_tallies['electrons']) == 0
+
+
+def test_get_tallies_f5(f5_file):
+    # arrange
+    c = MockEddyMCNPCase(
+        filepath="mcnp_examples/F5.out",
+        scaling_factor=1234,
+        file=f5_file,
+        crit_case=False)
+    # act
+    c.tally_list, c.f_types, c.F2_tallies, c.F4_tallies, c.F5_tallies, c.F6_tallies = c.get_tallies()
+    # assert
+    assert len(c.tally_list) == 3
+    assert c.f_types == ['F5']
+    assert len(c.F5_tallies['neutrons']) == 1
+    assert len(c.F5_tallies['photons']) == 2
+    assert len(c.F5_tallies['electrons']) == 0
+
+
+def test_get_tallies_f6(f6_file):
+    # arrange
+    c = MockEddyMCNPCase(
+        filepath="mcnp_examples/F6.out",
+        scaling_factor=1234,
+        file=f6_file,
+        crit_case=False)
+    # act
+    c.tally_list, c.f_types, c.F2_tallies, c.F4_tallies, c.F5_tallies, c.F6_tallies = c.get_tallies()
+    # assert
+    assert len(c.tally_list) == 6
+    assert c.f_types == ['F6', 'F6+']
+    assert len(c.F6_tallies['neutrons']) == 2
+    assert len(c.F6_tallies['photons']) == 2
+    assert len(c.F6_tallies['electrons']) == 0
+    assert len(c.F6_tallies['Collision Heating']) == 2
 
 
 def test_get_tallies_adds_f2_to_types_list(simple_case):
