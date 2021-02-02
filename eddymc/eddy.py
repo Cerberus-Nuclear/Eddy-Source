@@ -23,8 +23,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 This module is the entry point for Eddy, the MCNP and SCALE to HTML output converter.
 If run as __main__, this script asks for an output file and scaling factor, 
-determines whether it is an MCNP or SCALE case, and calls either mcnp.mcnp_converter.py 
-or scale.scale_converter.py. 
+determines whether it is an MCNP or SCALE case, and creates the relevant EddyMCNPCase or EddySCALECase
+object, then calls the relevant HTML writer
+
 Alternatively, main() can be called directly by another module and provided with the same two arguments.
 """
 
@@ -33,87 +34,60 @@ import os.path
 import argparse
 from tkinter import Tk, simpledialog
 from tkinter.filedialog import askopenfilename
+
 # Local imports
-
 if __name__ == "__main__":
-    from scale import scale_converter, scale_global_variables as sgv
-    from mcnp import mcnp_converter, global_variables as gv
+    from scale import scale_html_writer
+    from scale.eddy_scale_case import EddySCALECase
+    from mcnp import mcnp_html_writer
+    from mcnp.eddy_mcnp_case import EddyMCNPCase
 else:
-    from .scale import scale_converter, scale_global_variables as sgv
-    from .mcnp import mcnp_converter, global_variables as gv
+    from .scale import scale_html_writer
+    from .scale.eddy_scale_case import EddySCALECase
+    from .mcnp import mcnp_html_writer
+    from .mcnp.eddy_mcnp_case import EddyMCNPCase
 
 
-def check_if_crit(output_data):
-    """Read through output data to check if case is crit or shielding
-
-    Args:
-        output_data (list): The text of the output file
-
-    Returns:
-        True if kcode found or False if not.
-
-    """
-    for line in output_data:
-        if 'kcode' in line.lower():
-            return True
-    return False
+class NotAcceptedFileTypeError(Exception):
+    """Raised when the file selected is not recognised as a SCALE or MCNP output"""
 
 
-def read_file(filename):
-    """Read in the output file.
+def main(filename=None, scaling_factor=None):
+    """Entry point to Eddy. Can take filename and scaling factor as arguments.
+    Call get_args to find the filename & scaling factor if not provided, and also get the
+    output data and determine whether it is a crit case.
+    Determine whether it is an MCNP or SCALE case;
+    call the relevant converter.
 
     Args:
-        filename (str): The name (and location) of the .out file
-
-    Returns:
-        data (list): The lines from the output file
+        filename (str): the file path (including the name) of the output file
+        scaling_factor (float): A number by which the results will be multiplied
     """
-    with open(filename, 'r') as file:
-        data = file.readlines()
-    return data
 
 
-def get_filename(filename=None):
-    """ Get the name and path of the MCNP output file
-    Args:
-        filename(str): The filename including filepath
-    Returns:
-        filename (str): The filename including filepath
-    """
-    # open tkinter window for file selection
-    if not filename:
-        Tk().withdraw()
-        filename = askopenfilename(
-            title="Select Output File",
-            filetypes=(("output files", "*.out"), ("all files", "*.*"))
-            )
+    filename, output_data, scaling_factor, crit_case = get_args(filename, scaling_factor)
 
-    # check file exists
-    assert os.path.isfile(filename), "That MCNP file does not exist in that location."
-    return filename
-
-
-def get_scaling_factor(scaling_factor=None):
-    """ Get the scaling factor to multiply results by for a shielding case
-    Args: None
-    Returns:
-        scaling_factor (float): The scaling factor
-    """
-    if not scaling_factor:
-        # open tkinter window to ask for scaling factor
-        Tk().withdraw()
-        scaling_factor = simpledialog.askfloat(
-            title="Scaling Factor",
-            prompt="Please enter a scaling factor to multiply your results by", initialvalue=1,
+    if 'SCALE' in output_data[2]:
+        case = EddySCALECase(
+            filepath=filename,
+            file=output_data,
+            scaling_factor=scaling_factor,
         )
-    # type checking for scaling factor
-    if type(scaling_factor) is not float:
-        try:
-            scaling_factor = float(scaling_factor)
-        except ValueError:
-            print("The scaling factor should be a floating-point (decimal) number")
-            raise
-    return scaling_factor
+        html = scale_html_writer.get_html(case)
+    elif 'Code Name & Version = MCNP' in output_data[0]:
+        case = EddyMCNPCase(
+            filepath=filename,
+            scaling_factor=scaling_factor,
+            file=output_data,
+            crit_case=crit_case,
+        )
+        html = mcnp_html_writer.get_html(case)
+    else:
+        raise NotAcceptedFileTypeError("This file doesn't seem to be an MCNP or SCALE output?")
+    output_file, extension = os.path.splitext(filename)
+    output_file += '.html'
+    write_output(output_file, html)
+    print(f"Eddy run complete, {output_file} created.\n")
 
 
 def get_args(filename=None, scaling_factor=None):
@@ -149,72 +123,93 @@ def get_args(filename=None, scaling_factor=None):
     else:
         # Ask for scaling factor for shielding cases, and check it is a valid float.
         scaling_factor = get_scaling_factor(scaling_factor)
-       
-    print(f"Output file: {filename}")
+
+    print(f"Output file selected: {filename}")
     return filename, output_data, scaling_factor, crit_case
 
 
-def reset():
-    """This function resets all the global variables
-    in both the mcnp and scale files to correct a bug when
-    eddy.main is called within a loop, or called multiple times.
-    It is intended that this should be replaced by removing the
-    global_variables files and implementing a new EddyCase class
-    to hold the information."""
-    gv.f = None
-    gv.scaling_factor = 1
-    gv.date_time = {}
-    gv.rundate = None
-    gv.runtime = None
-    gv.parameters = {}
-    gv.cell_list = []
-    gv.tally_list = []
-    gv.f_types = []
-    gv.F2_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
-    gv.F4_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
-    gv.F5_tallies = {'neutrons': [], 'photons': [], 'electrons': []}
-    gv.F6_tallies = {'neutrons': [], 'photons': [], 'electrons': [], 'Collision Heating': []}
-    gv.tally_types = {}
-    gv.fatal_errors = []
-    gv.warnings = []
-    gv.comments = []
-    gv.duplicate_surfaces = []
-    gv.particle_list = []
-    gv.k_effective = {}
-    gv.ctme = None
-    gv.nps = None
-    gv.mcnp_input = None
-    gv.crit_case = False
-    gv.cycles = {}
-    gv.lost_particles = False
+def get_filename(filename=None):
+    """ Get the name and path of the MCNP output file
+    Args:
+        filename(str): The filename including filepath
+    Returns:
+        filename (str): The filename including filepath
+    """
+    # open tkinter window for file selection
+    if not filename:
+        Tk().withdraw()
+        filename = askopenfilename(
+            title="Select Output File",
+            filetypes=(("output files", "*.out"), ("all files", "*.*"))
+            )
 
-    sgv.scaling_factor = 1
-    sgv.tally_list = []
-    sgv.rundate = None
-    sgv.runtime = None
-    sgv.mixture_list = []
-    sgv.scale_input = None
+    # check file exists
+    assert os.path.isfile(filename), "That MCNP file does not exist in that location."
+    return filename
 
 
-def main(filename=None, scaling_factor=None):
-    """Entry point to Eddy. Can take filename and scaling factor as arguments.
-    Call get_args to find the filename & scaling factor if not provided, and also get the
-    output data and determine whether it is a crit case.
-    Call read_file() and determines whether it is an MCNP or SCALE case;
-    call the relevant converter.
+def read_file(filename):
+    """Read in the output file.
 
     Args:
-        filename (optional) (str): the file path (including the name) of the output file
-        scaling_factor (optional) (float): A number by which the results will be multiplied
+        filename (str): The name (and location) of the .out file
+
+    Returns:
+        data (list): The lines from the output file
     """
-    reset()
-    filename, output_data, scaling_factor, crit_case = get_args(filename, scaling_factor)
-    if 'SCALE' in output_data[2]:
-        scale_converter.main(filename, scaling_factor)
-    elif 'Code Name & Version = MCNP' in output_data[0]:
-        mcnp_converter.main(filename, scaling_factor, crit_case)
-    else:
-        raise RuntimeError("This file doesn't seem to be an MCNP or SCALE output?")
+    with open(filename, 'r') as file:
+        data = file.readlines()
+    return data
+
+
+def check_if_crit(output_data):
+    """Read through output data to check if case is crit or shielding
+
+    Args:
+        output_data (list): The text of the output file
+
+    Returns:
+        True if kcode found or False if not.
+
+    """
+    for line in output_data:
+        if 'kcode' in line.lower():
+            return True
+    return False
+
+
+def get_scaling_factor(scaling_factor=None):
+    """ Get the scaling factor to multiply results by for a shielding case
+    Args: None
+    Returns:
+        scaling_factor (float): The scaling factor
+    """
+    if not scaling_factor:
+        # open tkinter window to ask for scaling factor
+        Tk().withdraw()
+        scaling_factor = simpledialog.askfloat(
+            title="Scaling Factor",
+            prompt="Please enter a scaling factor to multiply your results by", initialvalue=1,
+        )
+    # type checking for scaling factor
+    if type(scaling_factor) is not float:
+        try:
+            scaling_factor = float(scaling_factor)
+        except ValueError:
+            print("The scaling factor should be a floating-point (decimal) number")
+            raise
+    return scaling_factor
+
+
+def write_output(file, html):
+    """Write the HTML to the desired file
+
+    Args:
+        file (str): The filepath of the html file to be written
+        html (str): The contents to be written to the html file
+    """
+    with open(file, 'w') as f:
+        f.write(html)
 
 
 if __name__ == "__main__":

@@ -34,19 +34,3 @@ def f2_cell_section(tmpdir):
             " total                                               5.57528E+03 3.94276E+01",
             ]
 
-
-def test_find_cells(f2_file):
-    # arrange
-    # act
-    cell_section = cells.find_cells(f2_file)
-    # assert
-    assert len(cell_section) == 12
-
-
-def test_create_cell_objects_calls_init(mocker, f2_cell_section):
-    # arrange
-    cell_init = mocker.patch('eddymc.mcnp.cells.Cell.__init__', return_value=None)
-    # act
-    cells.create_cell_objects(f2_cell_section)
-    # assert
-    assert cell_init.call_count == 5

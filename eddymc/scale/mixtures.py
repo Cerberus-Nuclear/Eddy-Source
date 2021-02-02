@@ -5,8 +5,6 @@
 """This module contains all the code relating to SCALE mixtures."""
 # import from standard library:
 import re
-# local imports:
-from . import scale_global_variables as gv
 
 
 class Mixture:
@@ -26,7 +24,6 @@ class Mixture:
             self.isotopes = self.get_isotope_data_multigroup_format()
         else:
             self.isotopes = self.get_isotope_data_continuous_format()
-        gv.mixture_list.append(self)
 
     def get_isotope_data_multigroup_format(self):
         """Create a dictionary with the relevant parts of the mixture table
