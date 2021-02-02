@@ -27,7 +27,7 @@ def scale_file(tmpdir):
 
 @pytest.fixture
 def text_file(tmpdir):
-    file = pkg_resources.read_text(mcnp_examples, 'not_an_mcnp_file.txt')
+    file = pkg_resources.read_text(mcnp_examples, 'not_an_mcnp_file.out')
     return file.split('\n')
 
 
@@ -39,9 +39,8 @@ def crit_file(tmpdir):
 
 @pytest.fixture
 def mcnp_input(tmpdir):
-    with open('tests/mcnp_examples/F4.mcnp', 'r') as f:
-        file = f.readlines()
-    return file
+    file = pkg_resources.read_text(mcnp_examples, 'F4.mcnp')
+    return file.split('\n')
 
 
 def test_crit_checker_positive(crit_file):
@@ -180,86 +179,101 @@ def test_get_args_with_bad_passed_sf(mocker):
         eddy.get_args(name, sf)
 
 
-def test_main_calls_scale_converter(mocker, scale_file):
+def test_main_calls_eddy_scale_case(mocker, scale_file):
     # arrange
     name = 'scale_examples/cylinder_ce.out'
     data = scale_file
     sf = 3.141592
     crit = False
-    mocker.patch(
-        'eddymc.eddy.argparse.ArgumentParser.parse_args',
-        return_value=Namespace(file=None, scaling_factor=None),
-    )
-    mocked_scale_converter = mocker.patch('eddymc.scale.scale_converter.main')
-    mocked_mcnp_converter = mocker.patch('eddymc.mcnp.mcnp_converter.main')
+    mocker.patch('eddymc.eddy.get_args', return_value=(name, data, sf, crit,))
+    mocked_eddy_mcnp_case = mocker.patch('eddymc.mcnp.eddy_mcnp_case.EddyMCNPCase.__init__')
+    mocked_eddy_scale_case = mocker.patch('eddymc.scale.eddy_scale_case.EddySCALECase.__init__', return_value=None)
+    mocker.patch('eddymc.scale.scale_html_writer.get_html', return_value='test_html')
+    mocker.patch('eddymc.eddy.write_output')
     # act
     eddy.main(filename=name, scaling_factor=sf)
     # assert
-    mocked_scale_converter.assert_called_with(name, sf)
-    mocked_mcnp_converter.assert_not_called()
+    mocked_eddy_mcnp_case.assert_not_called()
+    mocked_eddy_scale_case.assert_called()
 
 
-def test_main_calls_mcnp_converter(mocker, f2_file):
+def test_main_calls_eddy_mcnp_case(mocker, f2_file):
     # arrange
     name = 'mcnp_examples/F2.out'
     data = f2_file
     sf = 3.141592
     crit = False
-    mocker.patch(
-        'eddymc.eddy.argparse.ArgumentParser.parse_args',
-        return_value=Namespace(file=None, scaling_factor=None),
-    )
-    mocked_scale_converter = mocker.patch('eddymc.scale.scale_converter.main')
-    mocked_mcnp_converter = mocker.patch('eddymc.mcnp.mcnp_converter.main')
+    mocker.patch('eddymc.eddy.get_args', return_value=(name, data, sf, crit,))
+    mocked_eddy_scale_case = mocker.patch('eddymc.scale.eddy_scale_case.EddySCALECase.__init__')
+    mocked_eddy_mcnp_case = mocker.patch('eddymc.mcnp.eddy_mcnp_case.EddyMCNPCase.__init__', return_value=None)
+    mocker.patch('eddymc.mcnp.mcnp_html_writer.get_html', return_value='test_html')
+    mocker.patch('eddymc.eddy.write_output')
     # act
     eddy.main(filename=name, scaling_factor=sf)
     # assert
-    mocked_mcnp_converter.assert_called_with(name, sf, crit)
-    mocked_scale_converter.assert_not_called()
+    mocked_eddy_mcnp_case.assert_called()
+    mocked_eddy_scale_case.assert_not_called()
 
 
-def test_input_file_doesnt_continue(mocker):
+def test_main_calls_html_writer(mocker, f2_file):
+    # arrange
+    name = 'mcnp_examples/F2.out'
+    sf = 1234
+    data = f2_file
+    crit = False
+    mocker.patch('eddymc.eddy.get_args', return_value=(name, data, sf, crit,))
+    mocked_html_writer = mocker.patch('eddymc.mcnp.mcnp_html_writer.get_html', return_value=None)
+    mocker.patch('eddymc.mcnp.eddy_mcnp_case.EddyMCNPCase.__init__', return_value=None)
+    mocker.patch('eddymc.eddy.write_output')
+    # act
+    eddy.main(filename=name, scaling_factor=sf)
+    # assert
+    mocked_html_writer.assert_called()
+
+
+def test_mcnp_input_file_doesnt_continue(mocker, mcnp_input):
     # arrange
     name = 'mcnp_examples/F4.mcnp'
-    mocker.patch(
-        'eddymc.eddy.argparse.ArgumentParser.parse_args',
-        return_value=Namespace(file=None, scaling_factor=None),
-    )
-    mocked_scale_converter = mocker.patch('eddymc.scale.scale_converter.main')
-    mocked_mcnp_converter = mocker.patch('eddymc.mcnp.mcnp_converter.main')
+    sf = 2
+    data = mcnp_input
+    crit = False
+    mocker.patch('eddymc.eddy.get_args', return_value=(name, data, sf, crit,))
+    mocked_eddy_scale_case = mocker.patch('eddymc.scale.eddy_scale_case.EddySCALECase.__init__')
+    mocked_eddy_mcnp_case = mocker.patch('eddymc.mcnp.eddy_mcnp_case.EddyMCNPCase.__init__.__init__')
     # act
-    with pytest.raises(RuntimeError) as expected_failure:
+    with pytest.raises(eddy.NotAcceptedFileTypeError) as expected_failure:
         eddy.main(filename=name, scaling_factor=1)
     # assert
-    mocked_mcnp_converter.assert_not_called()
-    mocked_scale_converter.assert_not_called()
+    mocked_eddy_mcnp_case.assert_not_called()
+    mocked_eddy_scale_case.assert_not_called()
     assert expected_failure
 
 
 def test_main_with_non_mc_input(mocker, text_file):
     # arrange
-    name = 'mcnp_examples/not_an_mcnp_file.txt'
+    name = 'mcnp_examples/not_an_mcnp_file.out'
     data = text_file
     sf = 3.141592
     crit = False
-    mocker.patch(
-        'eddymc.eddy.argparse.ArgumentParser.parse_args',
-        return_value=Namespace(file=None, scaling_factor=None),
-    )
-    # act, assert
-    with pytest.raises(RuntimeError):
+    mocker.patch('eddymc.eddy.get_args', return_value=(name, data, sf, crit,))
+    # act
+    with pytest.raises(eddy.NotAcceptedFileTypeError) as expected_failure:
         eddy.main(name, sf)
+    # assert
+    assert expected_failure
 
 
 def test_main_with_nonexistent_input_passed(mocker):
     # arrange
-    name = 'mcnp_examples/nonexistent_file.txt'
+    name = 'mcnp_examples/nonexistent_file.out'
     mocker.patch(
         'eddymc.eddy.argparse.ArgumentParser.parse_args',
         return_value=Namespace(file=None, scaling_factor=None),
     )
-    # act, assert
-    with pytest.raises(AssertionError):
+    # act
+    # actually fails in get_filename()
+    with pytest.raises(AssertionError) as expected_failure:
         eddy.main(name)
-
+    # assert
+    assert expected_failure
 

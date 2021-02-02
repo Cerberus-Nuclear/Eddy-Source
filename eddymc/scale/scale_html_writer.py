@@ -14,7 +14,6 @@ except ImportError:
 # Third party imports
 from jinja2 import Template
 #local imports
-from . import scale_global_variables as gv
 try:
     from .. import static
 except ValueError:
@@ -48,54 +47,36 @@ def sanitize_input(scale_input):
     return san_scale_input
 
 
-def get_html(filename, inline_css):
+def get_html(case):
     """Get the html output from the jinja template
 
     Args:
-        filename (str): The file path of the SCALE output file
-        inline_css (str): The css as a single string
+        case (EddySCALECase): The EddySCALECase object for this Eddy run
 
     Returns:
         html (str): the html output as a single string
     """
-    scale_input = sanitize_input(gv.scale_input)
+    inline_css = get_css()
+    scale_input = sanitize_input(case.scale_input)
     html_template = pkg_resources.read_text(static, 'SCALE_template.html')
     template = Template(html_template)
-    case_name, extension = os.path.splitext(filename)
-    case_name = case_name.replace('\\', '/').split('/')[-1]
     # render template as a unicode string
     html = template.render(
-        filename=filename,
-        case_name=case_name,
+        filename=case.filepath,
+        case_name=case.name,
         #logo=f"{os.getcwd()}/static/logo.png",
         inline_css=inline_css,
-        rundate=gv.rundate,
-        runtime=gv.runtime,
+        rundate=case.rundate,
+        runtime=case.runtime,
         date=datetime.datetime.now().strftime("%Y/%m/%d"),
         time=datetime.datetime.now().strftime("%H:%M:%S"),
-        scaling_factor=gv.scaling_factor,
-        tally_list=gv.tally_list,
-        mixture_list=gv.mixture_list,
+        scaling_factor=case.scaling_factor,
+        tally_list=case.tally_list,
+        mixture_list=case.mixture_list,
         input_deck=scale_input,
         )
     return html
 
 
-def main(filename):
-    """Provide entry point to this module and call other functions to create HTML,
-    write that completed html to the output file
-
-    Args:
-        filename (str): The file path of the SCALE output file
-
-    Returns:
-        None
-    """
-    inline_css = get_css()
-    output = get_html(filename, inline_css)
-    output_file, extension = os.path.splitext(filename)
-    output_file += '.html'
-    with open(output_file, 'w') as f:
-        f.write(output)
 
 
