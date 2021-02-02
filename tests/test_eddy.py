@@ -192,7 +192,7 @@ def test_main_calls_scale_converter(mocker, scale_file):
         return_value=Namespace(file=None, scaling_factor=None),
     )
     mocked_scale_converter = mocker.patch('eddymc.scale.scale_converter.main')
-    mocked_eddy_case = mocker.patch('eddymc.mcnp.eddy_case.EddyCase.__init__')
+    mocked_eddy_case = mocker.patch('eddymc.mcnp.eddy_mcnp_case.EddyMCNPCase.__init__')
     # act
     eddy.main(filename=name, scaling_factor=sf)
     # assert
@@ -211,9 +211,9 @@ def test_main_calls_eddy_case(mocker, f2_file):
         return_value=Namespace(file=None, scaling_factor=None),
     )
     mocked_scale_converter = mocker.patch('eddymc.scale.scale_converter.main')
-    mocked_eddy_case = mocker.patch('eddymc.mcnp.eddy_case.EddyCase.__init__', return_value=None)
-    # The html writer is mocked because that's not what we're testing here
-    mocked_html_writer = mocker.patch('eddymc.mcnp.mcnp_html_writer.main', return_value=None)
+    mocked_eddy_case = mocker.patch('eddymc.mcnp.eddy_mcnp_case.EddyMCNPCase.__init__', return_value=None)
+    mocker.patch('eddymc.mcnp.mcnp_html_writer.main', return_value='test_html')
+    mocker.patch('eddymc.eddy.write_output')
     # act
     eddy.main(filename=name, scaling_factor=sf)
     # assert
@@ -226,7 +226,8 @@ def test_main_calls_html_writer(mocker, f2_file):
     name = 'mcnp_examples/F2.out'
     sf = 1234
     mocked_html_writer = mocker.patch('eddymc.mcnp.mcnp_html_writer.main', return_value=None)
-    mocker.patch('eddymc.mcnp.eddy_case.EddyCase.__init__', return_value=None)
+    mocker.patch('eddymc.mcnp.eddy_mcnp_case.EddyMCNPCase.__init__', return_value=None)
+    mocker.patch('eddymc.eddy.write_output')
     # act
     eddy.main(filename=name, scaling_factor=sf)
     # assert
@@ -241,7 +242,7 @@ def test_input_file_doesnt_continue(mocker):
         return_value=Namespace(file=None, scaling_factor=None),
     )
     mocked_scale_converter = mocker.patch('eddymc.scale.scale_converter.main')
-    mocked_eddy_case = mocker.patch('eddymc.mcnp.eddy_case.EddyCase.__init__')
+    mocked_eddy_case = mocker.patch('eddymc.mcnp.eddy_mcnp_case.EddyMCNPCase.__init__.__init__')
     # act
     with pytest.raises(RuntimeError) as expected_failure:
         eddy.main(filename=name, scaling_factor=1)
