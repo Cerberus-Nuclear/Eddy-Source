@@ -51,26 +51,22 @@ def sanitize_input(mcnp_input):
     return san_mcnp_input
 
 
-def get_html(case, inline_css):
+def get_html(case):
     """Get the HTML from the jinja template
 
     Args:
-        case (EddyCase): The EddyCase object for this Eddy run
-        inline_css (str): The whole css file as a single string
+        case (EddyMCNPCase): The EddyMCNPCase object for this Eddy run
 
     Returns:
         html (str): The completed html output
     """
-    case_name, extension = os.path.splitext(case.filepath)
-    case_name = case_name.replace('\\', '/').split('/')[-1]
+    inline_css = get_css()
     mcnp_input = sanitize_input(case.mcnp_input)
-    #with open("static/MCNP_template.html", "r") as file:
-    #    html_template = file.read()
     html_template = pkg_resources.read_text(static, 'MCNP_template.html')
     template = Template(html_template)
     html = template.render(
         filename=case.filepath,
-        case_name=case_name,
+        case_name=case.name,
         #logo=f"{os.getcwd()}/static/logo.png",
         inline_css=inline_css,
         rundate=case.rundate,
@@ -99,22 +95,3 @@ def get_html(case, inline_css):
         cycles=case.cycles,
         )
     return html
-
-
-def main(case):
-    """Provide entry point to this module and call other functions to create HTML,
-    write that completed html to the output file
-
-    Args:
-        case (EddyCase): The EddyCase object for this Eddy run
-
-    Returns:
-        None
-    """
-    css = get_css()
-    output = get_html(case, css)
-    return output
-    # output_file, extension = os.path.splitext(case.filepath)
-    # output_file += '.html'
-    # with open(output_file, 'w') as f:
-    #    f.write(output)

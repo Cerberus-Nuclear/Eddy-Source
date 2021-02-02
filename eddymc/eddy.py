@@ -23,9 +23,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 This module is the entry point for Eddy, the MCNP and SCALE to HTML output converter.
 If run as __main__, this script asks for an output file and scaling factor, 
-determines whether it is an MCNP or SCALE case, and for an MCNP case, creates an EddyCase object
-and sends it to mcnp.mcnp_html_writer.py
-or for a SCALE case calls scale.scale_converter.py.
+determines whether it is an MCNP or SCALE case, and creates the relevant EddyMCNPCase or EddySCALECase
+object, then calls the relevant HTML writer
+
 Alternatively, main() can be called directly by another module and provided with the same two arguments.
 """
 
@@ -37,11 +37,13 @@ from tkinter.filedialog import askopenfilename
 
 # Local imports
 if __name__ == "__main__":
-    from scale import scale_converter, scale_global_variables as sgv
+    from scale import scale_html_writer
+    from scale.eddy_scale_case import EddySCALECase
     from mcnp import mcnp_html_writer
     from mcnp.eddy_mcnp_case import EddyMCNPCase
 else:
-    from .scale import scale_converter, scale_global_variables as sgv
+    from .scale import scale_html_writer
+    from .scale.eddy_scale_case import EddySCALECase
     from .mcnp import mcnp_html_writer
     from .mcnp.eddy_mcnp_case import EddyMCNPCase
 
@@ -157,22 +159,6 @@ def get_args(filename=None, scaling_factor=None):
     return filename, output_data, scaling_factor, crit_case
 
 
-def reset():
-    """This function resets all the global variables
-    in the scale file to correct a bug when
-    eddy.main is called within a loop, or called multiple times.
-    It is intended that this should be replaced by removing the
-    global_variables files and implementing a new EddyScaleCase class
-    to hold the information."""
-
-    sgv.scaling_factor = 1
-    sgv.tally_list = []
-    sgv.rundate = None
-    sgv.runtime = None
-    sgv.mixture_list = []
-    sgv.scale_input = None
-
-
 def write_output(file, html):
     """Write the HTML to the desired file
 
@@ -198,8 +184,12 @@ def main(filename=None, scaling_factor=None):
 
     filename, output_data, scaling_factor, crit_case = get_args(filename, scaling_factor)
     if 'SCALE' in output_data[2]:
-        reset()
-        scale_converter.main(filename, scaling_factor)
+        case = EddySCALECase(
+            filepath=filename,
+            file=output_data,
+            scaling_factor=scaling_factor,
+        )
+        html = scale_html_writer.get_html(case)
     elif 'Code Name & Version = MCNP' in output_data[0]:
         case = EddyMCNPCase(
             filepath=filename,
@@ -207,12 +197,12 @@ def main(filename=None, scaling_factor=None):
             file=output_data,
             crit_case=crit_case,
         )
-        html = mcnp_html_writer.main(case)
-        output_file, extension = os.path.splitext(filename)
-        output_file += '.html'
-        write_output(output_file, html)
+        html = mcnp_html_writer.get_html(case)
     else:
         raise RuntimeError("This file doesn't seem to be an MCNP or SCALE output?")
+    output_file, extension = os.path.splitext(filename)
+    output_file += '.html'
+    write_output(output_file, html)
 
 
 if __name__ == "__main__":

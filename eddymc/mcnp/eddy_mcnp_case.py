@@ -2,7 +2,7 @@
 # Peter Evans
 # Cerberus Nuclear Ltd
 
-"""This module contains the EddyCase class, which holds all the data relevant to a particular run.
+"""This module contains the EddyMCNPCase class, which holds all the data relevant to a particular MCNP run.
 
 """
 
@@ -91,7 +91,7 @@ class EddyMCNPCase:
                     tally.scale_result(self.scaling_factor)
 
     def __repr__(self):
-        return (f"This Eddy case considers file {self.name}\n"
+        return (f"This Eddy MCNP case considers file {self.name}\n"
                 f"from {self.filepath}\n"
                 f"The scaling factor is {self.scaling_factor}\n"
                 f"Criticality case: {self.crit_case}\n")

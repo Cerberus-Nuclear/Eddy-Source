@@ -4,9 +4,6 @@
 
 """ This module contains all the code relating to SCALE tallies """
 
-# local imports
-from . import scale_global_variables as gv
-
 
 class Tally:
     """Each SCALE tally is represented by a Tally object."""
@@ -23,7 +20,6 @@ class Tally:
             self.rel_uncertainty = float(data[6].split()[4])
         else:
             self.rel_uncertainty = 0.0
-        gv.tally_list.append(self)
         statistical_checks = data[6][69:80].split()
         self.passes = 0
         for check in statistical_checks:
@@ -34,11 +30,13 @@ class Tally:
             self.checks[check] = ('Pass' if result == 'X' else 'Fail')
 
 
-    @classmethod
-    def scale_results(cls):
-        """Scale the results of each tally by the project-level scaling factor"""
-        for tally in gv.tally_list:
-            tally.response *= gv.scaling_factor
+    def scale_results(self, scaling_factor):
+        """Scale the results of each tally by the project-level scaling factor
+
+        Args:
+            scaling_factor (float): A number to multiply results by
+            """
+        self.response *= scaling_factor
 
 
 # END OF TALLY CLASS

@@ -6,7 +6,6 @@ or add a configuration in pycharm
 import pytest
 from argparse import Namespace
 from eddymc import eddy
-from eddymc.scale import scale_global_variables as sgv
 from tests import mcnp_examples, scale_examples
 try:
     import importlib.resources as pkg_resources
@@ -181,26 +180,27 @@ def test_get_args_with_bad_passed_sf(mocker):
         eddy.get_args(name, sf)
 
 
-def test_main_calls_scale_converter(mocker, scale_file):
+def test_main_calls_eddy_scale_case(mocker, scale_file):
     # arrange
     name = 'scale_examples/cylinder_ce.out'
     data = scale_file
     sf = 3.141592
-    crit = False
     mocker.patch(
         'eddymc.eddy.argparse.ArgumentParser.parse_args',
         return_value=Namespace(file=None, scaling_factor=None),
     )
-    mocked_scale_converter = mocker.patch('eddymc.scale.scale_converter.main')
-    mocked_eddy_case = mocker.patch('eddymc.mcnp.eddy_mcnp_case.EddyMCNPCase.__init__')
+    mocked_eddy_mcnp_case = mocker.patch('eddymc.mcnp.eddy_mcnp_case.EddyMCNPCase.__init__')
+    mocked_eddy_scale_case = mocker.patch('eddymc.scale.eddy_scale_case.EddySCALECase.__init__', return_value=None)
+    mocker.patch('eddymc.scale.scale_html_writer.get_html', return_value='test_html')
+    mocker.patch('eddymc.eddy.write_output')
     # act
     eddy.main(filename=name, scaling_factor=sf)
     # assert
-    mocked_scale_converter.assert_called_with(name, sf)
-    mocked_eddy_case.assert_not_called()
+    mocked_eddy_mcnp_case.assert_not_called()
+    mocked_eddy_scale_case.assert_called()
 
 
-def test_main_calls_eddy_case(mocker, f2_file):
+def test_main_calls_eddy_mcnp_case(mocker, f2_file):
     # arrange
     name = 'mcnp_examples/F2.out'
     data = f2_file
@@ -210,22 +210,22 @@ def test_main_calls_eddy_case(mocker, f2_file):
         'eddymc.eddy.argparse.ArgumentParser.parse_args',
         return_value=Namespace(file=None, scaling_factor=None),
     )
-    mocked_scale_converter = mocker.patch('eddymc.scale.scale_converter.main')
-    mocked_eddy_case = mocker.patch('eddymc.mcnp.eddy_mcnp_case.EddyMCNPCase.__init__', return_value=None)
-    mocker.patch('eddymc.mcnp.mcnp_html_writer.main', return_value='test_html')
+    mocked_eddy_scale_case = mocker.patch('eddymc.scale.eddy_scale_case.EddySCALECase.__init__')
+    mocked_eddy_mcnp_case = mocker.patch('eddymc.mcnp.eddy_mcnp_case.EddyMCNPCase.__init__', return_value=None)
+    mocker.patch('eddymc.mcnp.mcnp_html_writer.get_html', return_value='test_html')
     mocker.patch('eddymc.eddy.write_output')
     # act
     eddy.main(filename=name, scaling_factor=sf)
     # assert
-    mocked_eddy_case.assert_called()
-    mocked_scale_converter.assert_not_called()
+    mocked_eddy_mcnp_case.assert_called()
+    mocked_eddy_scale_case.assert_not_called()
 
 
 def test_main_calls_html_writer(mocker, f2_file):
     # arrange
     name = 'mcnp_examples/F2.out'
     sf = 1234
-    mocked_html_writer = mocker.patch('eddymc.mcnp.mcnp_html_writer.main', return_value=None)
+    mocked_html_writer = mocker.patch('eddymc.mcnp.mcnp_html_writer.get_html', return_value=None)
     mocker.patch('eddymc.mcnp.eddy_mcnp_case.EddyMCNPCase.__init__', return_value=None)
     mocker.patch('eddymc.eddy.write_output')
     # act
@@ -241,14 +241,14 @@ def test_input_file_doesnt_continue(mocker):
         'eddymc.eddy.argparse.ArgumentParser.parse_args',
         return_value=Namespace(file=None, scaling_factor=None),
     )
-    mocked_scale_converter = mocker.patch('eddymc.scale.scale_converter.main')
-    mocked_eddy_case = mocker.patch('eddymc.mcnp.eddy_mcnp_case.EddyMCNPCase.__init__.__init__')
+    mocked_eddy_scale_case = mocker.patch('eddymc.scale.eddy_scale_case.EddySCALECase.__init__')
+    mocked_eddy_mcnp_case = mocker.patch('eddymc.mcnp.eddy_mcnp_case.EddyMCNPCase.__init__.__init__')
     # act
     with pytest.raises(RuntimeError) as expected_failure:
         eddy.main(filename=name, scaling_factor=1)
     # assert
-    mocked_eddy_case.assert_not_called()
-    mocked_scale_converter.assert_not_called()
+    mocked_eddy_mcnp_case.assert_not_called()
+    mocked_eddy_scale_case.assert_not_called()
     assert expected_failure
 
 
@@ -278,14 +278,3 @@ def test_main_with_nonexistent_input_passed(mocker):
     with pytest.raises(AssertionError):
         eddy.main(name)
 
-
-def test_reset_when_looping_scale(scale_file):
-    # arrange
-    file = "scale_examples/cylinder_ce.out"
-    scaling_factor = 1
-    # act
-    # call eddy.main twice
-    eddy.main(file, scaling_factor)
-    eddy.main(file, scaling_factor)
-    # assert
-    assert len(sgv.tally_list) == 2
