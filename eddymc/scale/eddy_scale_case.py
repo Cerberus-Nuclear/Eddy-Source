@@ -23,7 +23,7 @@ class EddySCALECase:
         self.rundate, self.runtime = self.get_runtime()
 
         # Tallies
-        self.tally_data = self.get_tally_data(file)
+        self.tally_data = self.get_tally_data()
         self.tally_list = self.create_tallies()
         self.scale_tally_results()
 
