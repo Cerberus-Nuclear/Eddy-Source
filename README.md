@@ -30,10 +30,24 @@ eddy.main()
 
 where `eddy.main()` can take the same two optional arguments; the filepath for the MCNP output and a scaling factor. If these are not supplied, the GUI will appear to request them when `eddy.main()` is called.
 
+Features include:
+- Eddy can convert F2, F4, F5, F6 and F6+ tallies
+- Eddy can accept average tallies, given in the form `F4:N (4 5)`
+- Eddy can take an MCNP criticality output and show k-effective for the 
+first half, second half and total calculation.
+- Eddy will present a warning if an MCNP case was halted due to lost particles
+- Eddy will clearly present any FATAL ERROR messages in the MCNP output
+- Eddy currently **does not** accept multi-particle tallies of the form `F4:N,P`
+- For F2, F4 and F5 tallies, the units are presented as microSieverts per hour.
+  The actual result from MCNP is typically multiplied by some conversion factor, so the
+  tally output could be in any unit. The uSv/h units have been left in for now as this
+  seems to be by far the most common conversion factor used for shielding calculations. 
+
 Requirements
 
 - Python 3.6 or later
 - Jinja2 Python package is required (will be included automatically if Eddy is installed via pip)
+- importlib_resources may be required for versions of python < 3.9
 - pytest and pytest-mock Python packages are required to run the unit tests
 
 <details>
