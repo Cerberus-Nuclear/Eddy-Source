@@ -88,14 +88,14 @@ Solutions tried so far:
     patching various combinations of Tk and withdraw
 """
 
-# def test_get_filename_from_tkinter(mocker):
-#     # arrange
-#     mocker.patch("eddymc.eddy.Tk.withdraw", return_value=None)
-#     mocker.patch("eddymc.eddy.askopenfilename", return_value="mcnp_examples/F2.out")
-#     # act
-#     file = eddy.get_filename()
-#     # assert
-#     assert file == 'mcnp_examples/F2.out'
+def test_get_filename_from_tkinter(mocker):
+    # arrange
+    mocker.patch("eddymc.eddy.Tk.withdraw", return_value=None)
+    mocker.patch("eddymc.eddy.askopenfilename", return_value="mcnp_examples/F2.out")
+    # act
+    file = eddy.get_filename()
+    # assert
+    assert file == 'mcnp_examples/F2.out'
 
 
 def test_get_filename_if_file_missing():
