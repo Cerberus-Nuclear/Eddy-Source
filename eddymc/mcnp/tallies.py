@@ -141,15 +141,14 @@ class F2Tally(Tally):
             Returns: regions: a dictionary holding the results for that tally
         """
         data = self.data
-        results = {}
+        results = []
         for num, line in enumerate(data):
-            if "surface:" in line:
-                results["surface"] = int(data[num].split()[1])
-                results["areas"] = float(data[num+1].strip())
-            elif "surface  " in line:
-                results["result"] = float(data[num+1].split()[0])
-                results["variance"] = float(data[num+1].split()[1])
-                break
+            if "surface " in line:
+                results.append({
+                    "surface": line.strip().capitalize(),
+                    "result": float(data[num+1].split()[0]),
+                    "variance": float(data[num+1].split()[1])
+                })
         return results
 
     def scale_result(self, scaling_factor):
@@ -158,7 +157,8 @@ class F2Tally(Tally):
                 scaling_factor (float): a number by which the region results are multiplied
             Returns: none, but modifies self.results
         """
-        self.results["result"] *= scaling_factor
+        for surface in self.results:
+            surface['result'] *= scaling_factor
 
 
 class F4Tally(Tally):
@@ -189,7 +189,7 @@ class F4Tally(Tally):
                 scaling_factor (float): a number by which the region results are multiplied
             Returns: none, but modifies self.results
         """
-        for num, region in enumerate(self.results):
+        for region in self.results:
             region['result'] *= scaling_factor
 
 
@@ -279,7 +279,8 @@ class F6Tally(Tally):
 
         PATTERN_f6_cell = re.compile(r'^\s+cell\s+\d+')
         for num, line in enumerate(data):
-            if PATTERN_f6_cell.match(line):
+            if 'cell ' in line:
+            #if PATTERN_f6_cell.match(line):
                 cell_no = line.split()[1]
                 results[cell_no]["result"] = float(data[num+1].split()[0])
                 results[cell_no]["variance"] = float(data[num+1].split()[1])
