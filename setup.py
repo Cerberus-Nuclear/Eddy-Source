@@ -14,7 +14,7 @@ setuptools.setup(
     url="https://github.com/Cerberus-Nuclear/Eddy-Source",
     packages=['eddymc', 'eddymc//mcnp', 'eddymc//scale', 'eddymc//static'],
     package_data={'eddymc//static': ['*']},
-    install_requires=['Jinja2'],
+    install_requires=['Jinja2', 'importlib-resources'],
     classifiers=[
         "Programming Language :: Python :: 3",
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',

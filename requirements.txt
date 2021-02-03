@@ -10,5 +10,6 @@ py==1.9.0
 pyparsing==2.4.7
 pytest
 pytest-mock==3.3.1
+importlib-resources
 six==1.15.0
 toml==0.10.2

@@ -1,4 +1,4 @@
-# This workflow will run Eddy's full pytest suite on python versions 3.6, 3.7 and 3.8
+# This workflow will run Eddy's full pytest suite on python versions 3.6, 3.7, 3.8 and 3.9
 # every time there is a push to the master branch or a pull request on the master branch.
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.6, 3.7, 3.8, 3.9]
 
     steps:
     - uses: actions/checkout@v2
