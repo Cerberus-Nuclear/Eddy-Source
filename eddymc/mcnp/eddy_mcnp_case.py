@@ -402,7 +402,7 @@ class EddyMCNPCase:
         """Find the tally sections in the MCNP output.
 
         Returns:
-            None, but creates Tally class objects.
+            tuple: the tally_list, f_types, F2_tallies, F4_tallies, F5_tallies, F6_tallies variables
         """
         tally_list = []   # list of all tallies
         f_types = []

@@ -175,7 +175,7 @@ class F4Tally(Tally):
         data = self.data
         results = []
         for num, line in enumerate(data):
-            if (" cell  " in line) or (" surface  " in line):
+            if (" cell " in line) or (" surface  " in line):
                 results.append({
                     "region": line.strip().capitalize(),
                     "result": float(data[num+1].split()[0]),
