@@ -13,6 +13,17 @@ except ImportError:
     import importlib_resources as pkg_resources
 
 
+@pytest.fixture()
+def mock_tk(tmpdir):
+    class MockTk:
+        def __init__(self):
+            pass
+
+        def withdraw(self):
+            pass
+    return MockTk
+
+
 @pytest.fixture
 def f2_file(tmpdir):
     f2 = pkg_resources.read_text(mcnp_examples, 'F2.out')
@@ -80,17 +91,17 @@ def test_get_filename_with_passed_name():
     assert filename == file
 
 
-"""This test is commented out because I can't get github workflows to 
-ignore the Tk().withdraw() line, and it errors there because the server 
-can't connect to a display.
-Solutions tried so far:
-    setting the $DISPLAY variable in the workflow (sets the display, but tkinter can't connect)
-    patching various combinations of Tk and withdraw
-"""
-
-def test_get_filename_from_tkinter(mocker):
+def test_get_filename_from_tkinter(mocker, mock_tk):
+    """This test is commented out because I can't get github workflows to
+    ignore the Tk().withdraw() line, and it errors there because the server
+    can't connect to a display.
+    Solutions tried so far:
+        setting the $DISPLAY variable in the workflow (sets the display, but tkinter can't connect)
+        patching various combinations of Tk and withdraw
+    """
     # arrange
-    mocker.patch("eddymc.eddy.Tk.withdraw", return_value=None)
+    mocker.patch('eddymc.eddy.Tk', return_value=mock_tk())
+    #mocker.patch("eddymc.eddy.Tk.withdraw", create=True, return_value=None)
     mocker.patch("eddymc.eddy.askopenfilename", return_value="mcnp_examples/F2.out")
     # act
     file = eddy.get_filename()
