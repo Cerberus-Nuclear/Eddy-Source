@@ -141,18 +141,20 @@
             <th>Error</th>
         </tr>
         {% for tally in f2_tallies[particle] %}
+        {% for surface in tally.results %}
+
         <tr>
             <td>{{tally.tally_number}}</td>
-            <td>{{tally.results['surface']}}</td>
-            <td>{{"%.3e"|format(tally.results['result'])}}</td>
+            <td>{{surface['surface'][8:]}}</td>
+            <td>{{"%.3e"|format(surface['result'])}}</td>
             <td style="
-                {% if tally.results['variance'] > 0.1 %}background-color: tomato
-                {% elif tally.results['variance'] == 0.0 %}background-color: orangered
+                {% if surface['variance'] > 0.1 %}background-color: tomato
+                {% elif surface['variance'] == 0.0 %}background-color: orangered
                 {% endif %}
                 ">
-                {{tally.results['variance']}}
-            </td>
+                {{surface['variance']}}
         </tr>
+        {% endfor %}
         {% endfor %}
     </table>
     {% endfor %}
@@ -361,18 +363,20 @@
                         <th>Value (uSv/h)</th>
                         <th>Error</th>
                     </tr>
+                    {% for surface in tally.results %}
                     <tr>
                         <td>{{tally.tally_number}}</td>
-                        <td>{{tally.results['surface']}}</td>
-                        <td>{{"%.3e"|format(tally.results['result'])}}</td>
+                        <td>{{surface['surface'][8:]}}</td>
+                        <td>{{"%.3e"|format(surface['result'])}}</td>
                         <td style="
-                            {% if tally.results['variance'] > 0.1 %}background-color: tomato
-                            {% elif tally.results['variance'] == 0.0 %}background-color: orangered
+                            {% if surface['variance'] > 0.1 %}background-color: tomato
+                            {% elif surface['variance'] == 0.0 %}background-color: orangered
                             {% endif %}
                             ">
-                            {{tally.results['variance']}}
+                            {{surface['variance']}}
                         </td>
                     </tr>
+                    {% endfor %}
                 </table>
             </div>
             {{ tally_check(tally=tally) }}

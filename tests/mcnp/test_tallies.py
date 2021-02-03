@@ -536,10 +536,10 @@ def test_f2_tally_get_results(f2_tally_data):
     # act
     tally.results = tally.get_results()
     # assert
-    assert type(tally.results) == dict
-    assert tally.results['surface'] == 2
-    assert tally.results['result'] == 1.11143E-03
-    assert tally.results['variance'] == 0.0001
+    assert type(tally.results) == list
+    assert tally.results[0]['surface'] == 'Surface  2'
+    assert tally.results[0]['result'] == 1.11143E-03
+    assert tally.results[0]['variance'] == 0.0001
 
 
 def test_f2_tally_scale_result(f2_tally_data):
@@ -548,7 +548,7 @@ def test_f2_tally_scale_result(f2_tally_data):
     # act
     F2_object.scale_result(scaling_factor=3)
     # assert
-    assert F2_object.results['result'] == 1.11143E-03 * 3
+    assert F2_object.results[0]['result'] == 1.11143E-03 * 3
 
 
 def test_f4_init_creates_object(f4_tally_data):
