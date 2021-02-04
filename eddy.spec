@@ -37,4 +37,4 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='Eddy_0.3.3')
+               name='Eddy')

@@ -342,7 +342,7 @@ def test_get_cell_data(simple_case):
     assert len(cell_section) == 12
 
 
-def test_create_cell_objects_calls_cell_init(simple_case, mocker):
+def test_create_cells_calls_cell_init(simple_case, mocker):
     # arrange
     c = simple_case
     c.cell_data = [
