@@ -15,7 +15,7 @@ try:
 except ImportError:
     import importlib_resources as pkg_resources
 # Third party imports:
-from jinja2 import Template
+from jinja2 import Template, escape
 # local imports
 try:
     from .. import static
@@ -35,18 +35,18 @@ def get_css():
 
 
 def sanitize_input(mcnp_input):
-    """Replaces any < and > characters in the mcnp output with html codes &lt and &gt to stop
+    """Replace any html control characters in the mcnp output with the appropriate html codes to stop
     them from being interpreted as html tags.
 
-    Args: mcnp_input [list]: The mcnp input file
-    Returns: san_mcnp_input [list]: The sanitized version of the mcnp input
+    Args:
+        mcnp_input [list]: The mcnp input file
+
+    Returns:
+        [list]: The sanitized version of the mcnp input
     """
     san_mcnp_input = []
     for line in mcnp_input:
-        if "<" in line:
-            line = line.replace("<", "&lt")
-        if ">" in line:
-            line = line.replace(">", "&gt")
+        line = str(escape(line))
         san_mcnp_input.append(line)
     return san_mcnp_input
 

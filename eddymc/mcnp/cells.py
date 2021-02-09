@@ -71,7 +71,7 @@ class Cell:
                     self.electron_population = line[3]
                     self.electron_collisions = line[4]
 
-    def describe_object(self):
+    def __repr__(self):
         """Print a description of the cell object to the terminal (for debugging purposes)
 
         Args:
@@ -80,27 +80,21 @@ class Cell:
         Returns:
             None
         """
-        print(f"Cell number: {self.cell_number}")
-        print(f"Cell material: {self.material_number}")
-        print(f"Cell density: {self.gram_density} g/cm3")
-        print(f"Cell volume: {self.volume} cm3")
-        # The following attributes are particle-dependent, and so may or may not exist for any one mcnp case
-        # pylint: disable=multiple-statements
+        description = (f"Cell number: {self.cell_number}"
+                       f"Cell material: {self.material_number}"
+                       f"Cell density: {self.gram_density} g/cm3"
+                       f"Cell volume: {self.volume} cm3")
         try:
-            print(f"Neutron Importance: {self.neutron_importance}")
+            description += f"\nNeutron Importance: {self.neutron_importance}"
         except AttributeError:
             pass
         try:
-            print(f"Photon Importance: {self.photon_importance}")
+            description += f"\nPhoton Importance: {self.photon_importance}"
         except AttributeError:
             pass
         try:
-            print(f"Electron Importance: {self.electron_importance}")
+            description += f"\nElectron Importance: {self.electron_importance}"
         except AttributeError:
             pass
-        print()
+        return description
 
-
-############################################################
-#  End of Cell class                                       #
-############################################################
