@@ -54,7 +54,9 @@
 
 
 <div id="details">
-  <table class="details">
+<details open>
+    <summary>Summary</summary>
+    <table class="details">
     <tr>
       <td style="background-color: #cce0ff;">Input Generated from MCNP Case</td>
       <td>{{filename}}</td>
@@ -84,12 +86,14 @@
     </tr>
     {% endif %}
     </table>
+</details>
 </div>
 
 
 {% if parameters %}
 <div id="parameters">
-    <h1>Parameters</h1>
+<details>
+    <summary>Parameters</summary>
     <table>
         <tr>
             <th>Parameter</th>
@@ -102,19 +106,22 @@
             </tr>
         {% endfor %}
     </table>
+</details>
 </div>
 {% endif %}
 
 
 {% if fatal_errors %}
 <div id="fatal_errors">
-    <h1 class="termination_warning">WARNING: FATAL ERRORS OCCURRED DURING THIS RUN</h1>
+<details>
+    <summary class="termination_warning">WARNING: FATAL ERRORS OCCURRED DURING THIS RUN</summary>
     <div id="fatal_messages">
         <p style="font-weight: bold">The following fatal error messages were generated:</p>
         {% for message in fatal_errors %}
         <p>{{message}}</p>
         {% endfor %}
     </div>
+</details>
 </div>
 {% endif %}
 
@@ -128,7 +135,8 @@
 
 {% if tally_list %}
 <div id="results_summary">
-    <h1>Results - Summary</h1>
+<details>
+    <summary>Results - Summary</summary>
 
     {% if 'F2' in tally_types %}
     {% for particle in f2_tallies if f2_tallies[particle] %}
@@ -255,27 +263,28 @@
     </table>
     {% endfor %}
     {% endif %}
-</div>
 
 
-<div id="tally_check_summary">
-    <h2>Tally Summary Against 10 Error Checks</h2>
-    <table>
-        <tr>
-            <th>Tally Number</th>
-            <th>Target</th>
-            <th>Score out of 10</th>
-        </tr>
-        {% for tally in tally_list %}
-        {% if 'statistical_checks' in tally.__dict__ %}
-        <tr style="{{ 'background-color: #dfe85a' if tally.passes < 10 }}">
-            <td>{{tally.tally_number}}</td>
-            <td>10</td>
-            <td>{{tally.passes}}</td>
-        </tr>
-        {% endif %}
-        {% endfor %}
-    </table>
+    <div id="tally_check_summary">
+        <h2>Tally Summary Against 10 Error Checks</h2>
+        <table>
+            <tr>
+                <th>Tally Number</th>
+                <th>Target</th>
+                <th>Score out of 10</th>
+            </tr>
+            {% for tally in tally_list %}
+            {% if 'statistical_checks' in tally.__dict__ %}
+            <tr style="{{ 'background-color: #dfe85a' if tally.passes < 10 }}">
+                <td>{{tally.tally_number}}</td>
+                <td>10</td>
+                <td>{{tally.passes}}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+</details>
 </div>
 
 
@@ -345,7 +354,8 @@
 
 
 <div id="results_breakdown">
-    <h1>Results Breakdown</h1>
+<details>
+    <summary>Results Breakdown</summary>
 
     {# F2 TALLY RESULTS #}
     {% if 'F2' in tally_types %}
@@ -507,14 +517,15 @@
         {% endfor %} {# This was "for particle in F5_tallies" #}
     </div>
     {% endif %} {# This was "if F6 in tally_types" #}
-
+</details>
 </div>
 {% endif %} {# This is the "if tallies" #}
 
 
 {% if k_eff %}
 <div id="k_effective">
-    <h1>K-Effective</h1>
+<details>
+    <summary>K-Effective</summary>
     <table class="table">
         <tr>
             <th>Problem</th>
@@ -537,13 +548,15 @@
             <td>{{ k_eff['final stdev'] }}</td>
         </tr>
     </table>
+</details>
 </div>
 {% endif %}
 
 
 {% if cycles %}
 <div id="cycles">
-    <h1>Cycles</h1>
+<details>
+    <summary>Cycles</summary>
     <table class="table">
         <tr>
             <td>Inactive Cycles</td>
@@ -558,14 +571,15 @@
             <td>{{ cycles["inactive"] + cycles["active"] }}</td>
         </tr>
     </table>
-
+</details>
 </div>
 {% endif %}
 
 
 {% if warnings %}
 <div id="warnings">
-    <h1>Warnings</h1>
+<details>
+    <summary>Warnings</summary>
     <div id="warning_messages">
         <p style="font-weight: bold">The following warning messages were generated:</p>
         {% for warning in warnings %}
@@ -574,38 +588,44 @@
         {% endif %}
         {% endfor %}
     </div>
+</details>
 </div>
 {% endif %}
 
 
 {% if comments %}
 <div id="comments">
-    <h1>Comments</h1>
+<details>
+    <summary>Comments</summary>
     <div id="comment_messages">
         <p style="font-weight: bold">The following comments were generated:</p>
         {% for comment in comments %}
         <p>{{comment.capitalize()}}</p>
         {% endfor %}
     </div>
+</details>
 </div>
 {% endif %}
 
 
 {% if duplicate_surfaces %}
 <div id="duplicates">
-    <h1>Duplicate Surfaces</h1>
+<details>
+    <summary>Duplicate Surfaces</summary>
     <div id="duplicate_messages">
         <p style="font-weight: bold">The following duplicate surfaces were detected:</p>
         {% for item in duplicate_surfaces %}
         <p>{{item}}</p>
         {% endfor %}
     </div>
+</details>
 </div>
 {% endif %}
 
 
 <div id="cells">
-    <h1>Cells</h1>
+<details>
+    <summary>Cells</summary>
     <table>
         <!--header-->
         <tr>
@@ -625,12 +645,14 @@
         {% endfor %}
         <tr></tr>
     </table>
+</details>
 </div>
 
 
 {% for particle in particle_list %}
 <div id="{{particle.particle_type}}">
-    <h1>{{particle.particle_type.capitalize()}} Summary</h1>
+<details>
+    <summary>{{particle.particle_type.capitalize()}} Summary</summary>
     <div id="{{particle.particle_type}}_creation_table">
         <h2>{{particle.particle_type.capitalize()}} Creation</h2>
         <table>
@@ -675,6 +697,7 @@
             {% endfor %}
         </table>
     </div>
+</details>
 </div>
 {% endfor %}
 
@@ -682,7 +705,8 @@
 {% for particle in particle_list %} {# can be any of neutrons, photons, electrons #}
 {% set particle_name = particle.particle_type %}
 <div id="{{particle_name}}_populations">
-    <h1>{{particle_name.capitalize()}} Populations</h1>
+<details>
+    <summary>{{particle_name.capitalize()}} Populations</summary>
     <table>
         <tr>
             <th>Cell</th>
@@ -701,17 +725,20 @@
         {% endif %}
         {% endfor %}
     </table>
+</details>
 </div>
 {% endfor %}
 
 
 <div id="input_deck">
-  <H1>MCNP Input</H1>
+<details>
+  <summary>MCNP Input</summary>
   <div id="input">
     {% for line in input_deck %}
       <p>{{ line }}</p>
     {% endfor %}
   </div>
+</details>
 </div>
 
 <div id="cerberus_credit">
