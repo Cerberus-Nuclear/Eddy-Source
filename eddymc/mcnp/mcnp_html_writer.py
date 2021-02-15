@@ -15,7 +15,7 @@ try:
 except ImportError:
     import importlib_resources as pkg_resources
 # Third party imports:
-from jinja2 import Template
+from jinja2 import Template, escape
 # local imports
 try:
     from .. import static
@@ -34,21 +34,21 @@ def get_css():
     return inline_css
 
 
-def sanitize_input(mcnp_input):
-    """Replaces any < and > characters in the mcnp output with html codes &lt and &gt to stop
+def sanitize_list(text):
+    """Replace any html control characters in the mcnp output with the appropriate html codes to stop
     them from being interpreted as html tags.
 
-    Args: mcnp_input [list]: The mcnp input file
-    Returns: san_mcnp_input [list]: The sanitized version of the mcnp input
+    Args:
+        mcnp_input [list]: The mcnp input file
+
+    Returns:
+        list: The sanitized version of the mcnp input
     """
-    san_mcnp_input = []
-    for line in mcnp_input:
-        if "<" in line:
-            line = line.replace("<", "&lt")
-        if ">" in line:
-            line = line.replace(">", "&gt")
-        san_mcnp_input.append(line)
-    return san_mcnp_input
+    sanitized_text = []
+    for line in text:
+        line = str(escape(line))
+        sanitized_text.append(line)
+    return sanitized_text
 
 
 def get_html(case):
@@ -61,7 +61,19 @@ def get_html(case):
         html (str): The completed html output
     """
     inline_css = get_css()
-    mcnp_input = sanitize_input(case.mcnp_input)
+
+    # The mcnp input needs sanitizing because it can contain partial html tags, e.g. <h1 describing hydrogen
+    mcnp_input = sanitize_list(case.mcnp_input)
+
+    """We are also going to sanitize all the sections that are lists of strings.
+    I don't think MCNP puts any HTML control characters in these, so this may be excessive.
+    There are other cases, i.e. cell names, parameter names, that have not been sanitized
+    """
+    warnings = sanitize_list(case.warnings)
+    comments = sanitize_list(case.comments)
+    duplicate_surfaces = sanitize_list(case.duplicate_surfaces)
+    fatal_errors = sanitize_list(case.fatal_errors)
+
     html_template = pkg_resources.read_text(static, 'MCNP_template.html')
     template = Template(html_template)
     html = template.render(
@@ -77,7 +89,7 @@ def get_html(case):
         ctme=case.ctme,
         nps=case.nps,
         parameters=case.parameters,
-        fatal_errors=case.fatal_errors,
+        fatal_errors=fatal_errors,
         lost_particles=case.lost_particles,
         k_eff=case.k_effective,
         tally_list=case.tally_list,
@@ -86,9 +98,9 @@ def get_html(case):
         f4_tallies=case.F4_tallies,
         f5_tallies=case.F5_tallies,
         f6_tallies=case.F6_tallies,
-        warnings=case.warnings,
-        comments=case.comments,
-        duplicate_surfaces=case.duplicate_surfaces,
+        warnings=warnings,
+        comments=comments,
+        duplicate_surfaces=duplicate_surfaces,
         cell_list=case.cell_list,
         particle_list=case.particle_list,
         input_deck=mcnp_input,

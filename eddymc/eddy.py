@@ -30,6 +30,7 @@ Alternatively, main() can be called directly by another module and provided with
 """
 
 # Imports from standard library
+import re
 import os.path
 import argparse
 from tkinter import Tk, simpledialog
@@ -172,8 +173,9 @@ def check_if_crit(output_data):
         True if kcode found or False if not.
 
     """
+    PATTERN_crit = re.compile(r"\s+\d+-\s{7}(kcode).*")
     for line in output_data:
-        if 'kcode' in line.lower():
+        if re.match(PATTERN_crit, line):
             return True
     return False
 
