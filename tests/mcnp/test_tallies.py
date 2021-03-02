@@ -629,21 +629,165 @@ def test_f5_tally_get_results(f5_tally_data):
     # act
     tally.results = tally.get_results()
     # assert
-    assert type(tally.results) == dict
-    assert tally.results['x'] == 5
-    assert tally.results['y'] == 0
-    assert tally.results['z'] == 0
-    assert tally.results['result'] == 4.38636E-03
-    assert tally.results['variance'] == 0.0003
+    assert type(tally.results) == list
+    assert type(tally.results[0]) == dict
+    assert tally.results[0]['x'] == 5
+    assert tally.results[0]['y'] == 0
+    assert tally.results[0]['z'] == 0
+    assert tally.results[0]['result'] == 4.38636E-03
+    assert tally.results[0]['variance'] == 0.0003
 
 
-def test_f5_tally_scale_result( f5_tally_data):
+def test_f5_tally_with_multiple_detectors():
+    # arrange
+    tally_data = [
+        "1tally       15        nps =     3904520",
+        "           tally type 5    particle flux at a point detector.                                  ",
+        "           particle(s): photons  ",
+        "           this tally is modified by dose function DE15 and DF15.",
+        " ",
+        " detector located at x,y,z = 5.00000E+00 0.00000E+00 0.00000E+00",
+        "                 2.40763E-04 0.0029",
+        " ",
+        " detector located at x,y,z = 5.00000E+00 0.00000E+00 0.00000E+00",
+        " uncollided photon flux",
+        "                 1.94034E-04 0.0025",
+        " ",
+        " detector score diagnostics                  cumulative          tally         cumulative",
+        "                                             fraction of         per           fraction of",
+        "   times average score     transmissions     transmissions       history       total tally",
+        "        1.00000E-01                604         0.00202        2.68832E-09        0.00002",
+        "        1.00000E+00               4488         0.01702        1.10010E-07        0.00065",
+        "        2.00000E+00               9425         0.04853        6.46301E-07        0.00435",
+        "        5.00000E+00              25646         0.13427        3.91143E-06        0.02678",
+        "        1.00000E+01              78306         0.39605        2.76540E-05        0.18538",
+        "        1.00000E+02             180200         0.99847        1.39508E-04        0.98546",
+        "        1.00000E+03                349         0.99964        2.30379E-06        0.99867",
+        "        1.00000E+38                  3         0.99965        1.71417E-07        0.99966",
+        " before dd roulette                106         1.00000        6.00721E-08        1.00000",
+        "",
+        " average tally per history = 1.74368E-04            largest score = 2.85684E-01",
+        " (largest score)/(average tally) = 1.63840E+03      nps of largest score =      361869",
+        "",
+        " score contributions by cell",
+        "        cell      misses        hits    tally per history    weight per hit",
+        "     1     1       22605      298884       1.74200E-04         2.27569E-03",
+        "     2     2           1         210       1.62928E-07         3.02931E-03",
+        "     3     3           0           1       3.52737E-10         1.37727E-03",
+        "     4     4           0          32       4.36382E-09         5.32457E-04",
+        "       total       22606      299127       1.74368E-04         2.27603E-03",
+        "",
+        " score misses",
+        "   russian roulette on pd                        0",
+        "   psc=0.                                     1738",
+        "   russian roulette in transmission           5095",
+        "   underflow in transmission                 15773",
+        "   hit a zero-importance cell                    0",
+        "   energy cutoff                                 0",
+        " ",
+        " detector located at x,y,z = 1.00000E+01 0.00000E+00 0.00000E+00",
+        "                 5.98890E-05 0.0029",
+        " ",
+        " detector located at x,y,z = 1.00000E+01 0.00000E+00 0.00000E+00",
+        " uncollided photon flux",
+        "                 4.82377E-05 0.0025",
+        " ",
+        " detector score diagnostics                  cumulative          tally         cumulative",
+        "                                             fraction of         per           fraction of",
+        "   times average score     transmissions     transmissions       history       total tally",
+        "        1.00000E-01                617         0.00206        6.86885E-10        0.00002",
+        "        1.00000E+00               3653         0.01427        2.07056E-08        0.00049",
+        "        2.00000E+00               7408         0.03901        1.27778E-07        0.00344",
+        "        5.00000E+00              25450         0.12404        9.71558E-07        0.02582",
+        "        1.00000E+01              63439         0.33597        5.68921E-06        0.15690",
+        "        1.00000E+02             198434         0.99889        3.60837E-05        0.98825",
+        "        1.00000E+03                222         0.99963        3.99978E-07        0.99747",
+        "        1.00000E+38                  5         0.99965        9.47896E-08        0.99965",
+        " before dd roulette                106         1.00000        1.51668E-08        1.00000",
+        "",
+        " average tally per history = 4.34036E-05            largest score = 1.64584E-01",
+        " (largest score)/(average tally) = 3.79195E+03      nps of largest score =     2684859",
+        "",
+        " score contributions by cell",
+        "        cell      misses        hits    tally per history    weight per hit",
+        "     1     1       22396      299093       4.33479E-05         5.65887E-04",
+        "     2     2           3         208       4.92899E-08         9.25257E-04",
+        "     3     3           0           1       1.46115E-10         5.70511E-04",
+        "     4     4           0          32       6.29140E-09         7.67653E-04",
+        "       total       22399      299334       4.34036E-05         5.66158E-04",
+        "",
+        " score misses",
+        "   russian roulette on pd                        0",
+        "   psc=0.                                     1729",
+        "   russian roulette in transmission           4997",
+        "   underflow in transmission                 15673",
+        "   hit a zero-importance cell                    0",
+        "   energy cutoff                                 0",
+        "",
+        "",
+        " ===================================================================================================================================",
+        "",
+        "           results of 10 statistical checks for the estimated answer for the tally fluctuation chart (tfc) bin of tally       15",
+        "",
+        " tfc bin     --mean--      ---------relative error---------      ----variance of the variance----      --figure of merit--     -pdf-",
+        " behavior    behavior      value   decrease   decrease rate      value   decrease   decrease rate       value     behavior     slope",
+        "",
+        " desired      random       <0.05      yes      1/sqrt(nps)       <0.10      yes        1/nps           constant    random      >3.00",
+        " observed     random        0.00      yes          yes            0.00      yes         yes            constant    random       2.82",
+        " passed?        yes          yes      yes          yes             yes      yes         yes               yes        yes          no",
+        "",
+        " ===================================================================================================================================",
+        "",
+        "",
+        " warning.  the tally in the tally fluctuation chart bin did not pass  1 of the 10 statistical checks.",
+        "",
+        "1analysis of the results in the tally fluctuation chart bin (tfc) for tally 15 with nps = 3904520            print table 160",
+        "",
+        "",
+        " normed average tally per history  = 2.40763E-04          unnormed average tally per history  = 2.40763E-04",
+        " estimated tally relative error    = 0.0029               estimated variance of the variance  = 0.0009",
+        " relative error from zero tallies  = 0.0022               relative error from nonzero scores  = 0.0019",
+        "",
+        " number of nonzero history tallies =      198128          efficiency for the nonzero tallies  = 0.0507",
+        " history number of largest  tally  =      361869          largest  unnormalized history tally = 4.32843E-01",
+        " (largest  tally)/(average tally)  = 1.79780E+03          (largest  tally)/(avg nonzero tally)= 9.12260E+01",
+        "",
+        " (confidence interval shift)/mean  = 0.0000               shifted confidence interval center  = 2.40767E-04",
+        "",
+        "",
+        " if the largest  history score sampled so far were to occur on the next history, the tfc bin quantities would change as follows:",
+        "",
+        "      estimated quantities           value at nps           value at nps+1           value(nps+1)/value(nps)-1.",
+        "",
+        "      mean                            2.40763E-04             2.40874E-04                     0.000460",
+        "      relative error                  2.89441E-03             2.92941E-03                     0.012094",
+        "      variance of the variance        9.39070E-04             1.50118E-03                     0.598580",
+        "      shifted center                  2.40767E-04             2.40769E-04                     0.000005",
+        "      figure of merit                 1.16662E+05             1.13891E+05                    -0.023756",
+        "",
+        " the estimated inverse power slope of the 200 largest  tallies starting at 3.83869E-02 is 2.8181",
+        " the history score probability density function appears to have an unsampled region at the largest  history scores:",
+        " please examine. see print table 161.",
+        "",
+        " fom = (histories/minute)*(f(x) signal-to-noise ratio)**2 = (3.816E+06)*( 1.748E-01)**2 = (3.816E+06)*(3.057E-02) = 1.167E+05",
+        "",
+    ]
+    tally = tallies.F5Tally(tally_data)
+    # act
+    tally.results = tally.get_results()
+    # assert
+    assert len(tally.results) == 2
+    assert tally.results[0]['result'] == 2.40763E-04
+    assert tally.results[1]['result'] == 5.98890E-05
+
+
+def test_f5_tally_scale_result(f5_tally_data):
     # arrange
     F5_object = tallies.F5Tally(f5_tally_data)
     # act
     F5_object.scale_result(scaling_factor=3)
     # assert
-    assert F5_object.results["result"] == 4.38636E-03 * 3
+    assert F5_object.results[0]["result"] == 4.38636E-03 * 3
 
 
 def test_f6_init_creates_object(f6_tally_data):

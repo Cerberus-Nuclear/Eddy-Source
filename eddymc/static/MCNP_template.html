@@ -211,20 +211,22 @@
             <th>Error</th>
         </tr>
         {% for tally in f5_tallies[particle] %}
+        {% for detector in tally.results %}
         <tr>
             <td>{{tally.tally_number}}</td>
-            <td>{{tally.results['x']}}</td>
-            <td>{{tally.results['y']}}</td>
-            <td>{{tally.results['z']}}</td>
-            <td>{{"%.3e"|format(tally.results['result'])}}</td>
+            <td>{{detector['x']}}</td>
+            <td>{{detector['y']}}</td>
+            <td>{{detector['z']}}</td>
+            <td>{{"%.3e"|format(detector['result'])}}</td>
             <td style="
-                {% if tally.results['variance'] > 0.1 %}background-color: tomato
-                {% elif tally.results['variance'] == 0.0 %}background-color: orangered
+                {% if detector['variance'] > 0.1 %}background-color: tomato
+                {% elif detector['variance'] == 0.0 %}background-color: orangered
                 {% endif %}
                 ">
-                {{tally.results['variance']}}
+                {{detector['variance']}}
             </td>
         </tr>
+        {% endfor %}
         {% endfor %}
     </table>
     {% endfor %}
@@ -454,20 +456,22 @@
                         <th>Value (uSv/h)</th>
                         <th>Error</th>
                     </tr>
+                    {% for detector in tally.results %}
                     <tr>
                         <td>{{tally.tally_number}}</td>
-                        <td>{{tally.results['x']}}</td>
-                        <td>{{tally.results['y']}}</td>
-                        <td>{{tally.results['z']}}</td>
-                        <td>{{"%.3e"|format(tally.results['result'])}}</td>
+                        <td>{{detector['x']}}</td>
+                        <td>{{detector['y']}}</td>
+                        <td>{{detector['z']}}</td>
+                        <td>{{"%.3e"|format(detector['result'])}}</td>
                         <td style="
-                            {% if tally.results['variance'] > 0.1 %}background-color: tomato
-                            {% elif tally.results['variance'] == 0.0 %}background-color: orangered
+                            {% if detector['variance'] > 0.1 %}background-color: tomato
+                            {% elif detector['variance'] == 0.0 %}background-color: orangered
                             {% endif %}
                             ">
-                            {{tally.results['variance']}}
+                            {{detector['variance']}}
                         </td>
                     </tr>
+                    {% endfor %}
                 </table>
             </div>
             {{ tally_check(tally=tally) }}
