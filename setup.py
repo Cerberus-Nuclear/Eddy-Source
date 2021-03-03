@@ -5,7 +5,7 @@ with open("README.md", "r") as readme:
 
 setuptools.setup(
     name="eddy_mc", 
-    version="0.3.5",
+    version="0.4.0",
     author="Cerberus Nuclear",
     author_email="nuclear@cerberusnuclear.com",
     description="Eddy, the MCNP and SCALE HTML output converter",
@@ -20,6 +20,6 @@ setuptools.setup(
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         "Operating System :: OS Independent",
     ],
-    scripts=['eddymc/eddy.py'],
+    scripts=['eddymc/eddy'],
     python_requires='>=3.6',
 )

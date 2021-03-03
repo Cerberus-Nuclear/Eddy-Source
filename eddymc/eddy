@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+# Peter Evans
+# Cerberus Nuclear Ltd
+
+""" This is a CLI wrapper for the eddy-mc package, to remove the necessity of writing
+code to import eddy_mc and call eddy.main.
+This wrapper does not use the tkinter windows that eddy.py provides, and therefore has 
+a non-optional filename argument. A scaling factor should also be provided; if this 
+argument is not provided a default of 1.0 is assumed.
+"""
+
+import argparse
+from eddymc import eddy
+
+parser = argparse.ArgumentParser(description='MCNP or SCALE output to HTML Converter')
+parser.add_argument("file", help="MCNP or SCALE output file")
+parser.add_argument("-sf", "--scaling_factor", type=float, default=1.0, help="Scaling Factor")
+args = parser.parse_args()
+
+filepath = args.file
+scaling_factor = args.scaling_factor
+eddy.main(filepath, scaling_factor)
