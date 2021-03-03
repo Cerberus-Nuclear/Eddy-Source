@@ -3,12 +3,15 @@
 
 [![PyPI version](https://badge.fury.io/py/eddy-mc.svg)](https://badge.fury.io/py/eddy-mc)
 
-Eddy is a HTML output generator for MCNP and SCALE, it imports an MCNP or SCALE output file, extracts the important data, and writes it to a user-friendly HTML file.
+Eddy is a HTML output generator for MCNP and SCALE, it imports an MCNP or SCALE output file, extracts the important 
+data, and writes it to a user-friendly HTML file.
 
-This repository contains the source code version of Eddy, however Eddy is also available as [a pre-compiled executable](https://github.com/Cerberus-Nuclear/Eddy).
+This repository contains the source code version of Eddy, however Eddy is also available as 
+[a pre-compiled executable](https://github.com/Cerberus-Nuclear/Eddy).
 
 ### Source Code CLI Usage
-Eddy can be run from the command line with the output file and any applicable scaling factor as optional arguments; if no such arguments are supplied a GUI will appear to request them.
+Eddy can be run from the command line with the output file and any applicable scaling factor as optional arguments; if 
+no such arguments are supplied a GUI will appear to request them.
 
 General CLI usage:
 
@@ -17,7 +20,8 @@ python3 eddy.py [-o outputfile] [-sf scaling_factor]
 ```
 
 ### PyPI Package Usage
-Eddy is also available on the PyPI Python Package index as eddy-mc, in order to allow easier integration into other programs. It can be installed using pip:
+Eddy is also available on the PyPI Python Package index as eddy-mc, in order to allow easier integration into other 
+programs. It can be installed using pip:
 
 ```bash
 pip install eddy-mc
@@ -29,16 +33,18 @@ and accessed using:
 from eddymc import eddy
 eddy.main()
 ```
-where `eddy.main()` can take the same two optional arguments; the filepath for the MCNP output and a scaling factor. If these are not supplied, the GUI will appear to request them when `eddy.main()` is called.
+where `eddy.main()` can take the same two optional arguments; the filepath for the MCNP output and a scaling factor. 
+If these are not supplied, the GUI will appear to request them when `eddy.main()` is called.
 
-Additionally, for Linux installs the `eddymc/eddy` wrapper script will be placed in the `/usr/local/bin`
+Additionally, for Linux installs the wrapper script in `bin/eddy` will be placed in the `/usr/local/bin`
 directory, placing it into the user's `PATH` and allowing eddy to be called directly from any command line with 
 the following command:
 ```
 eddy outputfile [-h] [-sf SCALING_FACTOR] 
 ```
-If called in this way, the filename argument is non-optional, and if no scaling factor is supplied a default
-of 1.0 will be assumed; this CLI interface will not cause a GUI window to appear requesting these values.
+This method is intended for pure command-line use, so when eddy is called in this way, the filename argument is 
+non-optional, and if no scaling factor is supplied a default
+of 1.0 will be assumed; this CLI interface will prevent the GUI window from appearing to request these values.
 
 ## Features
 Features include:
