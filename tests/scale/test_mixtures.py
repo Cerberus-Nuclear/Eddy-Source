@@ -15,6 +15,12 @@ def ce_file(tmpdir):
 
 
 @pytest.fixture
+def ce_624_file(tmpdir):
+    file = pkg_resources.read_text(scale_examples, 'cylinder_ce_6_2_4.out')
+    return file.split('\n')
+
+
+@pytest.fixture
 def multigroup_file(tmpdir):
     file = pkg_resources.read_text(scale_examples, 'cylinder_multigroup.out')
     return file.split('\n')
@@ -47,6 +53,15 @@ def multigroup_table(tmpdir):
 def test_get_mixture_data_ce(ce_file):
     # arrange
     file = ce_file
+    # act
+    output = mixtures.get_mixture_data(file)
+    # assert
+    assert len(output) == 56
+
+
+def test_get_mixture_data_ce_624(ce_624_file):
+    # arrange
+    file = ce_624_file
     # act
     output = mixtures.get_mixture_data(file)
     # assert
