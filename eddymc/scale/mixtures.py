@@ -21,9 +21,16 @@ class Mixture:
         # There seem to be two formats of mixture table; if multigroup energies are used the table has a
         # 'nucmix' column, if continuous energies are used it does not.
         if 'nucmix' in data[1].split():
-            self.isotopes = self.get_isotope_data_multigroup_format()
+            try:
+                self.isotopes = self.get_isotope_data_multigroup_format()
+            except ValueError:
+                print(ValueError)
         else:
-            self.isotopes = self.get_isotope_data_continuous_format()
+            try:
+                self.isotopes = self.get_isotope_data_continuous_format()
+            except ValueError:
+                print(ValueError)
+
 
     def get_isotope_data_multigroup_format(self):
         """Create a dictionary with the relevant parts of the mixture table
@@ -34,20 +41,24 @@ class Mixture:
                             nuclide is a dict containing the relevant data about that nuclide
         """
         isotopes = {}
+        headings = self.data[1].split('   ') # need 2 spaces so 'wgt. frac' is not split
+        headings = [x.strip() for x in headings if x]  # remove empty strings
         for line in self.data[2:]:
             if line == '\n' or line == '':
                 continue
             else:
-                nuclide = line.split()[0]
+                nuclide_index = headings.index("nuclide")
+                nuclide = int(line.split()[nuclide_index])
                 isotopes[nuclide] = {}
-                isotopes[nuclide]['nuclide'] = int(nuclide)
-                isotopes[nuclide]['atom-density'] = float(line.split()[2])
-                isotopes[nuclide]['weight fraction'] = float(line.split()[2])
-                isotopes[nuclide]['z-number'] = int(line.split()[4])
-                isotopes[nuclide]['atomic weight'] = float(line.split()[5])
-                isotopes[nuclide]['title'] = line.split()[7].capitalize()
-                isotopes[nuclide]['temperature'] = float(line.split()[6])
+                isotopes[nuclide]['nuclide'] = nuclide
+                isotopes[nuclide]['atom-density'] = float(line.split()[headings.index('atom-dens.')])
+                isotopes[nuclide]['weight fraction'] = float(line.split()[headings.index('wgt. frac.')])
+                isotopes[nuclide]['z-number'] = int(line.split()[headings.index('za')])
+                isotopes[nuclide]['atomic weight'] = float(line.split()[headings.index('awt')])
+                isotopes[nuclide]['title'] = line.split()[headings.index('nuclide title')].capitalize()
+                isotopes[nuclide]['temperature'] = float(line.split()[headings.index('temp')])
         return isotopes
+
 
     def get_isotope_data_continuous_format(self):
         """Create a dictionary with the relevant parts of the mixture table
@@ -58,21 +69,23 @@ class Mixture:
                             nuclide is a dict containing the relevant data about that nuclide
         """
         isotopes = {}
+        headings = self.data[1].split('   ') # need 2 spaces so 'wgt. frac' is not split
+        headings = [x.strip() for x in headings if x]  # remove empty strings
         for line in self.data[2:]:
             if line == '\n' or line == '':
                 continue
             else:
-                nuclide = line.split()[0]
+                nuclide_index = headings.index("nuclide")
+                nuclide = int(line.split()[nuclide_index])
                 isotopes[nuclide] = {}
-                isotopes[nuclide]['nuclide'] = int(nuclide)
-                isotopes[nuclide]['atom-density'] = float(line.split()[1])
-                isotopes[nuclide]['weight fraction'] = float(line.split()[2])
-                isotopes[nuclide]['z-number'] = int(line.split()[3])
-                isotopes[nuclide]['atomic weight'] = float(line.split()[4])
-                isotopes[nuclide]['title'] = line.split()[5].capitalize()
-                isotopes[nuclide]['temperature'] = float(line.split()[6])
+                isotopes[nuclide]['nuclide'] = nuclide
+                isotopes[nuclide]['atom-density'] = float(line.split()[headings.index('atom-dens.')])
+                isotopes[nuclide]['weight fraction'] = float(line.split()[headings.index('wgt. frac.')])
+                isotopes[nuclide]['z-number'] = int(line.split()[headings.index('za')])
+                isotopes[nuclide]['atomic weight'] = float(line.split()[headings.index('awt')])
+                isotopes[nuclide]['title'] = line.split()[headings.index('title')].capitalize()
+                isotopes[nuclide]['temperature'] = float(line.split()[headings.index('temp')])
         return isotopes
-
 
 
 def get_mixture_data(output_data):
@@ -89,7 +102,7 @@ def get_mixture_data(output_data):
         if pattern_mix.match(line):
             for m, other_line in enumerate(output_data[n+1:], start=n+1):
                 if "Cross section" in other_line or "*****" in other_line:
-                    return output_data[n:m]
+                    return output_data[n:m+1]
 
 
 def create_mixtures(mix_data):
